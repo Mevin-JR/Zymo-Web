@@ -3,7 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
-import emailjs from "@emailjs/nodejs";
+// import emailjs from "@emailjs/nodejs";
 import ConfirmPage from "../components/ConfirmPage";
 
 // Function to dynamically load Razorpay script
@@ -43,31 +43,31 @@ function BookingPage() {
     const [customerEmail, setCustomerEmail] = useState(userEmail);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
 
-    emailjs.init({
-        publicKey: "u74XY2gOIbkt_YNz7",
-        // privateKey: "",
-    });
+    // emailjs.init({
+    //     publicKey: "u74XY2gOIbkt_YNz7",
+    //     // privateKey: "",
+    // });
 
-    const emailPaymentConfirmation = async (paymentId, orderId, amt) => {
-        const templateParams = {
-            to_name: customerName,
-            payment_id: paymentId,
-            order_id: orderId,
-            amount: amt,
-        };
+    // const emailPaymentConfirmation = async (paymentId, orderId, amt) => {
+    //     const templateParams = {
+    //         to_name: customerName,
+    //         payment_id: paymentId,
+    //         order_id: orderId,
+    //         amount: amt,
+    //     };
 
-        try {
-            const response = await emailjs.send(
-                "service_uwvt2p8",
-                "template_069rahc",
-                templateParams
-            );
+    //     try {
+    //         const response = await emailjs.send(
+    //             "service_uwvt2p8",
+    //             "template_069rahc",
+    //             templateParams
+    //         );
 
-            console.log(response);
-        } catch (error) {
-            console.error("Error sending payment confirmation:", error);
-        }
-    };
+    //         console.log(response);
+    //     } catch (error) {
+    //         console.error("Error sending payment confirmation:", error);
+    //     }
+    // };
 
     const bookingData = {
         carDetails: {
