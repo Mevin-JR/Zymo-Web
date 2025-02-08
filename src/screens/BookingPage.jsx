@@ -164,7 +164,7 @@ function BookingPage() {
     const updateBookingPayment = async (bookingId, amount, paymentData) => {
         let retry = 0;
 
-        const url = "http://localhost:3000";
+        const url = "https://api-cqkjtyggsq-uc.a.run.app";
         const response = await fetch(`${url}/zoomcar/payments`, {
             method: "POST",
             body: JSON.stringify({
@@ -210,7 +210,7 @@ function BookingPage() {
     const createOrder = async (amount, currency) => {
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/v1/payment/create-order",
+                "https://api-cqkjtyggsq-uc.a.run.app/payment/create-order",
                 {
                     amount,
                     currency,
@@ -230,7 +230,7 @@ function BookingPage() {
     const initiateRefund = async (payment_id) => {
         try {
             const response = await axios.post(
-                "http://localhost:3000/api/v1/payment/refund",
+                "https://api-cqkjtyggsq-uc.a.run.app/payment/refund",
                 {
                     payment_id,
                 }
@@ -299,7 +299,7 @@ function BookingPage() {
                         ...response,
                     };
                     const res = await axios.post(
-                        "http://localhost:3000/api/v1/payment/verifyPayment",
+                        "https://api-cqkjtyggsq-uc.a.run.app/payment/verifyPayment",
                         data
                     );
 
