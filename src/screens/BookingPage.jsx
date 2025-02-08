@@ -100,7 +100,7 @@ function BookingPage() {
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
 
-        const url = "http://localhost:3000";
+        const url = "https://api-cqkjtyggsq-uc.a.run.app";
         const response = await fetch(`${url}/zoomcar/bookings/create-booking`, {
             method: "POST",
             body: JSON.stringify({
