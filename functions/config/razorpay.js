@@ -1,8 +1,15 @@
+const { defineSecret } = require("firebase-functions/params");
 const Razorpay = require("razorpay");
 
+const keyId =
+    process.env.RAZORPAY_TEST_KEY || defineSecret("RAZORPAY_TEST_KEY");
+const keySecret =
+    process.env.RAZORPAY_TEST_KEY_SECRET ||
+    defineSecret("RAZORPAY_TEST_KEY_SECRET");
+
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_TEST_KEY,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: keyId,
+    key_secret: keySecret,
 });
 
 module.exports = razorpay;
