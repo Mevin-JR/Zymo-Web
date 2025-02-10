@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -7,7 +8,9 @@ const NavBar = () => {
     return (
         <nav className="bg-[#212121] text-white p-4 relative z-50 w-full">
             <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-[#faffa4]">Zymo</h1>
+                <h1 className="text-2xl font-bold text-[#faffa4]">
+                    <Link to="/">Zymo</Link>
+                </h1>
 
                 {/* Hamburger Button */}
                 <button
@@ -29,44 +32,35 @@ const NavBar = () => {
                 >
                     <ul className="mt-16 space-y-6 text-lg px-8">
                         <li>
-                            <a
-                                href="#fleet"
-                                className="block hover:text-gray-600"
-                            >
+                            <Link to="/" className="block hover:text-[#faffa4]">
                                 Fleet
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="#aboutus"
-                                className="block hover:text-gray-600"
+                            <Link
+                                to="/about-us"
+                                className="hover:text-[#faffa4]"
                             >
                                 About Us
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="#blogs"
-                                className="block hover:text-gray-600"
-                            >
+                            <Link to="/blogs" className="hover:text-[#faffa4]">
                                 Blogs
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="#careers"
-                                className="block hover:text-gray-600"
-                            >
-                                Careers
-                            </a>
+                            <Link to="/career" className="hover:text-[#faffa4]">
+                                Career
+                            </Link>
                         </li>
                         <li>
-                            <a
-                                href="#contactus"
-                                className="block hover:text-gray-600"
+                            <Link
+                                to="/contact-us"
+                                className="hover:text-[#faffa4]"
                             >
                                 Contact Us
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -74,29 +68,29 @@ const NavBar = () => {
                 {/* Desktop Menu */}
                 <ul className="hidden md:flex space-x-6 text-sm">
                     <li>
-                        <a href="#fleet" className="hover:text-gray-400">
+                        <Link to="/" className="block hover:text-[#faffa4]">
                             Fleet
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#aboutus" className="hover:text-gray-400">
+                        <Link to="/about-us" className="hover:text-[#faffa4]">
                             About Us
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#blogs" className="hover:text-gray-400">
+                        <Link to="/blogs" className="hover:text-[#faffa4]">
                             Blogs
-                        </a>
+                        </Link>
                     </li>
                     <li>
-                        <a href="#careers" className="hover:text-gray-400">
-                            Careers
-                        </a>
+                        <Link to="/career" className="hover:text-[#faffa4]">
+                            Career
+                        </Link>
                     </li>
                     <li>
-                        <a href="#contactus" className="hover:text-gray-400">
+                        <Link to="/contact-us" className="hover:text-[#faffa4]">
                             Contact Us
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+// import zoomcarlogo from "src/"
 
 const Listing = () => {
     const location = useLocation();
@@ -62,7 +63,7 @@ const Listing = () => {
         const search = async () => {
             setLoading(true);
             try {
-                const url = "https://api-cqkjtyggsq-uc.a.run.app";
+                const url = "http://localhost:3000";
                 const response = await fetch(`${url}/zoomcar/search`, {
                     method: "POST",
                     body: JSON.stringify({
@@ -350,9 +351,9 @@ const Listing = () => {
                                         </p>
                                         <div className="img-container">
                                             <img
-                                                src="images/ServiceProvider/zoomcars.png"
+                                                src="/images/ServiceProvider/zoomcarlogo.png"
                                                 alt="Zoomcar"
-                                                className="h-5 rounded-sm mt-2"
+                                                className="h-5 rounded-sm mt-2 bg-white p-1"
                                             />
                                         </div>
                                     </div>
@@ -395,9 +396,9 @@ const Listing = () => {
                                         </div>
                                         <div className="img-container">
                                             <img
-                                                src="images/ServiceProvider/zoomcars.png"
+                                                src="/images/ServiceProvider/zoomcarlogo.png"
                                                 alt="Zoomcar"
-                                                className="h-5 rounded-sm"
+                                                className="h-5 rounded-sm bg-white p-1"
                                             />
                                         </div>
                                         <div className="self-auto ">

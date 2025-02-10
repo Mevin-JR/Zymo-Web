@@ -192,7 +192,7 @@ const RSB = () => {
                         </button>
                         <button
                             onClick={() => setActiveTab("subscribe")}
-                            className={`text-md ${
+                            className={`text-sm ${
                                 activeTab === "subscribe"
                                     ? "text-white border-b-2 border-white"
                                     : "text-gray-400"
@@ -202,7 +202,7 @@ const RSB = () => {
                         </button>
                         <button
                             onClick={() => setActiveTab("buy")}
-                            className={`text-md ${
+                            className={`text-sm ${
                                 activeTab === "buy"
                                     ? "text-white border-b-2 border-white"
                                     : "text-gray-400"
@@ -217,10 +217,10 @@ const RSB = () => {
                         googleMapsApiKey={placesAPIKey}
                         libraries={placesAPILibraries}
                     >
-                        <div className="bg-[#303030] rounded-full py-3 px-6 flex items-center mb-4">
+                        <div className="bg-[#303030] rounded-full py-3 px-6 flex items-center mb-4 ">
                             <MapPinIcon className="w-6 h-5 text-gray-400 mr-2" />
 
-                            <div className="flex-1">
+                            <div className="flex-1 ">
                                 <Autocomplete
                                     onLoad={setAutocomplete}
                                     onPlaceChanged={handlePlaceSelect}
@@ -233,7 +233,7 @@ const RSB = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter a location"
-                                        className="bg-[#303030] text-white outline-none w-full"
+                                        className="bg-[#303030] text-white outline-none w-full "
                                     />
                                 </Autocomplete>
                             </div>
@@ -244,10 +244,10 @@ const RSB = () => {
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         {/* Start Date Picker */}
                         <div
-                            className="bg-[#303030] rounded-full p-2 flex items-center relative cursor-pointer"
+                            className="bg-[#303030] rounded-full p-2 flex items-center relative cursor-pointer text-sm"
                             onClick={handleStartDateClick}
                         >
-                            <CalendarIcon className="w-6 h-5 text-gray-400 absolute left-2" />
+                            <CalendarIcon className="w-6 h-5 text-gray-400 absolute left-3 " />
 
                             <input
                                 type="datetime-local"
@@ -257,7 +257,7 @@ const RSB = () => {
                                 onChange={handleStartDateChange}
                                 className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
                             />
-                            <span className="text-white pl-10">
+                            <span className="text-white pl-8">
                                 {startDate
                                     ? new Intl.DateTimeFormat("en-US", {
                                           month: "short",
@@ -273,10 +273,10 @@ const RSB = () => {
 
                         {/* End Date Picker */}
                         <div
-                            className="bg-[#303030] rounded-full p-2 flex items-center relative cursor-pointer"
+                            className="bg-[#303030] rounded-full p-2 flex items-center relative cursor-pointer text-sm"
                             onClick={handleEndDateClick}
                         >
-                            <CalendarIcon className="w-6 h-5 text-gray-400 absolute left-2" />
+                            <CalendarIcon className="w-6 h-5 text-gray-400 absolute left-3" />
                             <input
                                 type="datetime-local"
                                 step="3600"
@@ -286,7 +286,7 @@ const RSB = () => {
                                 className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
                             />
 
-                            <span className="text-white pl-10">
+                            <span className="text-white pl-8">
                                 {endDate
                                     ? new Intl.DateTimeFormat("en-US", {
                                           month: "short",

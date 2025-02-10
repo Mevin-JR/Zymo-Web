@@ -10,11 +10,20 @@ import LoginPage from "./components/LoginPage";
 import { ToastContainer } from "react-toastify";
 import ConfirmPage from "./components/ConfirmPage";
 import Details from "./screens/Details";
+import AboutUs from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import Career from "./pages/Career";
+import ScrollToTop from "./components/ScrollToTop";
+import Blog from "./pages/Blog";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsofService from "./pages/TermsofService";
+import CancellationPolicy from "./pages/CancellationPolicy";
 
 const App = () => {
     return (
         <>
             <BrowserRouter>
+                <ScrollToTop /> {/* Ensures scrolling to top on route change */}
                 <Routes>
                     {/* HomePage */}
                     <Route path="/" element={<HomeScreen />} />
@@ -38,6 +47,24 @@ const App = () => {
                         element={<BookingPage />}
                     />
 
+                    {/* NavBar Pages */}
+                    {/* About Us */}
+                    <Route path="/about-us" element={<AboutUs />} />
+                    {/* Contact Us */}
+                    <Route path="/contact-us" element={<ContactUs />} />
+                    {/* Carrer */}
+                    <Route path="/career" element={<Career />} />
+                    {/* Blogs  */}
+                    <Route path="/blogs" element={<Blog />} />
+                    <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                    <Route
+                        path="/termsofservice"
+                        element={<TermsofService />}
+                    />
+                    <Route
+                        path="/cancellationpolicy"
+                        element={<CancellationPolicy />}
+                    />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
                 <ToastContainer />
