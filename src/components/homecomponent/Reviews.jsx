@@ -37,7 +37,7 @@ const Reviews = () => {
                     {testimonials.map((testimonial, index) => (
                         <div
                             key={index}
-                            className="border border-[#faffa4] p-6 rounded-lg w-[300px] md:w-[350px] text-center"
+                            className="border border-[#faffa4] p-6 rounded-lg w-[300px] md:w-[350px] text-center flex flex-col justify-between"
                         >
                             <p className="text-sm italic mb-4">
                                 "{testimonial.quote}"

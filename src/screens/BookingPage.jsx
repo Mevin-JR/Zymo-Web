@@ -43,6 +43,8 @@ function BookingPage() {
     const [customerEmail, setCustomerEmail] = useState(userEmail);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
 
+    const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+
     // emailjs.init({
     //     publicKey: "u74XY2gOIbkt_YNz7",
     //     // privateKey: "",
@@ -100,34 +102,36 @@ function BookingPage() {
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
 
-        const url = "https://api-cqkjtyggsq-uc.a.run.app";
-        const response = await fetch(`${url}/zoomcar/bookings/create-booking`, {
-            method: "POST",
-            body: JSON.stringify({
-                customer: {
-                    uid: userData.uid,
-                    name: customerName,
-                    phone: customerPhone,
-                    email: customerEmail,
+        const response = await fetch(
+            `${functionsUrl}/zoomcar/bookings/create-booking`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    customer: {
+                        uid: userData.uid,
+                        name: customerName,
+                        phone: customerPhone,
+                        email: customerEmail,
+                    },
+                    booking_params: {
+                        type: "normal",
+                        cargroup_id: car.cargroup_id,
+                        car_id: car.id,
+                        city: formattedCity,
+                        search_location_id: car.location_id,
+                        ends: endDateEpoc,
+                        fuel_included: false,
+                        lat: car.lat,
+                        lng: car.lng,
+                        pricing_id: car.pricing_id,
+                        starts: startDateEpoc,
+                    },
+                }),
+                headers: {
+                    "Content-Type": "application/json",
                 },
-                booking_params: {
-                    type: "normal",
-                    cargroup_id: car.cargroup_id,
-                    car_id: car.id,
-                    city: formattedCity,
-                    search_location_id: car.location_id,
-                    ends: endDateEpoc,
-                    fuel_included: false,
-                    lat: car.lat,
-                    lng: car.lng,
-                    pricing_id: car.pricing_id,
-                    starts: startDateEpoc,
-                },
-            }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+            }
+        );
 
         if (!response.ok) {
             toast.error("Booking creation failed, Please try again later...", {
@@ -164,8 +168,7 @@ function BookingPage() {
     const updateBookingPayment = async (bookingId, amount, paymentData) => {
         let retry = 0;
 
-        const url = "https://api-cqkjtyggsq-uc.a.run.app";
-        const response = await fetch(`${url}/zoomcar/payments`, {
+        const response = await fetch(`${functionsUrl}/zoomcar/payments`, {
             method: "POST",
             body: JSON.stringify({
                 customer: {
@@ -210,7 +213,7 @@ function BookingPage() {
     const createOrder = async (amount, currency) => {
         try {
             const response = await axios.post(
-                "https://api-cqkjtyggsq-uc.a.run.app/payment/create-order",
+                `${functionsUrl}/payment/create-order`,
                 {
                     amount,
                     currency,
@@ -230,7 +233,7 @@ function BookingPage() {
     const initiateRefund = async (payment_id) => {
         try {
             const response = await axios.post(
-                "https://api-cqkjtyggsq-uc.a.run.app/payment/refund",
+                `${functionsUrl}/payment/refund`,
                 {
                     payment_id,
                 }
@@ -287,19 +290,19 @@ function BookingPage() {
             const amount = parseInt(car.fare.slice(1));
             const orderData = await createOrder(amount, "INR");
             const options = {
-                key: "rzp_test_d4Cb7FsEIsR6HB",
+                key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Zymo",
                 description: "title",
-                image: "https://s3-us-west-2.amazonaws.com/issuewireassets/primg/108145/zymo-logo355809676.jpg",
+                image: import.meta.env.VITE_ZYMO_LOGO_URL,
                 order_id: orderData.id,
                 handler: async function (response) {
                     const data = {
                         ...response,
                     };
                     const res = await axios.post(
-                        "https://api-cqkjtyggsq-uc.a.run.app/payment/verifyPayment",
+                        `${functionsUrl}/payment/verifyPayment`,
                         data
                     );
 

@@ -88,7 +88,7 @@ const CarDetails = () => {
                 startDate: startDateFormatted,
                 endDate: endDateFormatted,
                 driveType: "Self Drive",
-                logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS7Gb6Ue9_vla9TsyGmyCH1Rvkob5-R0-pwIA&s",
+                logo: "/images/ServiceProvider/zoomcarlogo.png",
             },
             specifications: [
                 { label: "Car Brand", value: car.brand },

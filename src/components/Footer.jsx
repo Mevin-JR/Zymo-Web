@@ -22,7 +22,7 @@ const Footer = () => {
                 <p>
                     Email:{" "}
                     <a
-                        href="mailto:ar@mail.com"
+                        href="mailto:hello@zymo.app"
                         className="hover:text-[#faffa4]"
                     >
                         hello@zymo.app
@@ -30,7 +30,7 @@ const Footer = () => {
                 </p>
                 <p>
                     Phone:{" "}
-                    <a href="tel:98039482934" className="hover:text-[#faffa4]">
+                    <a href="tel:9987933348" className="hover:text-[#faffa4]">
                         +91 9987933348
                     </a>
                 </p>
@@ -98,27 +98,21 @@ const Footer = () => {
                 </div>
                 <p>Secured Payment Gateway</p>
                 <div className="flex gap-4 mt-2">
-                    <a href="#">
-                        <img
-                            src="/images/Footer/visa.jpg"
-                            alt="Visa"
-                            className="w-10 h-6"
-                        />
-                    </a>
-                    <a href="#">
-                        <img
-                            src="/images/Footer/mcrd.jpg"
-                            alt="Mastercard"
-                            className="w-10 h-6"
-                        />
-                    </a>
-                    <a href="#">
-                        <img
-                            src="/images/Footer/msto.jpg"
-                            alt="Maestro"
-                            className="w-10 h-6"
-                        />
-                    </a>
+                    <img
+                        src="/images/Footer/visa.jpg"
+                        alt="Visa"
+                        className="w-10 h-6"
+                    />
+                    <img
+                        src="/images/Footer/mcrd.jpg"
+                        alt="Mastercard"
+                        className="w-10 h-6"
+                    />
+                    <img
+                        src="/images/Footer/msto.jpg"
+                        alt="Maestro"
+                        className="w-10 h-6"
+                    />
                 </div>
             </div>
 

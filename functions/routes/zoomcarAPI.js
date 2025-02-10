@@ -6,16 +6,16 @@ const router = express.Router();
 // Zoom credentials
 let prod = true;
 const zoomApiKey = prod
-    ? "b0Jhi0eTQg6SoHq9bcmLX6ldVlzM1OU9Wyuuurl3"
-    : "2KjvlPWskw2J3NHCZaKoV7KigmDjqNl71PPJdjMa";
+    ? process.env.ZOOMCAR_PROD_API_KEY
+    : process.env.ZOOMCAR_TEST_API_KEY;
 const zoomApiUrl = prod
-    ? "https://partner-api.zoomcar.com/"
-    : "https://sandbox.zoomcartest.com/";
+    ? process.env.ZOOMCAR_PROD_API_URL
+    : process.env.ZOOMCAR_TEST_URL;
 const apiVer = "v2/";
-const zoomId = prod ? "letzrent" : "bw10lmnvbmmts56b29ty2fy";
+const zoomId = prod ? process.env.ZOOMCAR_PROD_ID : process.env.ZOOMCAR_TEST_ID;
 const zoomPass = prod
-    ? "d&8rv#G9o9pvZ8P>D}M9"
-    : "ZWIxZmQyNTIxN2Qx*YzkwNDc4Y2FjMzhh";
+    ? process.env.ZOOMCAR_PROD_PASS
+    : process.env.ZOOMCAR_TEST_PASS;
 
 // Token Generators
 async function getZoomToken() {

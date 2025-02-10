@@ -42,7 +42,7 @@ const RSB = () => {
 
     // Places API
     const placesAPILibraries = useMemo(() => ["places"], []);
-    const placesAPIKey = "AIzaSyD4d4ZEpEFIc290yb6WNaiTQsnM-rt4cJQ";
+    const placesAPIKey = import.meta.env.VITE_PLACES_API_KEY;
 
     const handlePlaceSelect = () => {
         if (autocomplete) {

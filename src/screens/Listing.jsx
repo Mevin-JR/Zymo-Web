@@ -63,7 +63,7 @@ const Listing = () => {
         const search = async () => {
             setLoading(true);
             try {
-                const url = "https://api-cqkjtyggsq-uc.a.run.app";
+                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
                 const response = await fetch(`${url}/zoomcar/search`, {
                     method: "POST",
                     body: JSON.stringify({
