@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const crypto = require("crypto");
-const razorpay = require("../config/razorpay.js");
-
+const getRazorpayInstance = require("../config/razorpay.js");
 router.post("/create-order", async (req, res) => {
     try {
         const { amount, currency } = req.body;
@@ -19,6 +18,7 @@ router.post("/create-order", async (req, res) => {
             receipt: `receipt_order_${crypto.randomBytes(10).toString("hex")}`,
             payment_capture: 1,
         };
+        const razorpay = getRazorpayInstance();
         const response = await razorpay.orders.create(options);
         if (response) {
             res.status(200).json({
@@ -94,6 +94,7 @@ router.post("/refund", async (req, res) => {
                 message: "Payment ID is required.",
             });
         }
+        const razorpay = getRazorpayInstance();
         const refund = await razorpay.payments.refund(payment_id);
 
         if (refund) {
