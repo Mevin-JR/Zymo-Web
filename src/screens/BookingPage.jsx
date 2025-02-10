@@ -292,7 +292,7 @@ function BookingPage() {
                 currency: "INR",
                 name: "Zymo",
                 description: "title",
-                image: "https://picsum.photos/id/237/200/300",
+                image: "https://s3-us-west-2.amazonaws.com/issuewireassets/primg/108145/zymo-logo355809676.jpg",
                 order_id: orderData.id,
                 handler: async function (response) {
                     const data = {
