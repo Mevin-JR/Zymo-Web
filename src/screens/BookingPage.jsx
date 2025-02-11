@@ -295,7 +295,7 @@ function BookingPage() {
                 currency: "INR",
                 name: "Zymo",
                 description: "title",
-                image: "images/AppLogo/zymo2.jpg",
+                image: "/images/AppLogo/zymo2.jpg",
                 order_id: orderData.id,
                 handler: async function (response) {
                     const data = {

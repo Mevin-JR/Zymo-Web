@@ -12,7 +12,7 @@ const NavBar = () => {
                     <Link to="/">Zymo</Link>
                 </h1> */}
                 <img
-                    src="images/AppLogo/zymo2.jpg"
+                    src="/images/AppLogo/zymo2.jpg"
                     alt="zymologo"
                     className="h-14 mix-blend-screen"
                 />
