@@ -3,7 +3,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
-// import emailjs from "@emailjs/nodejs";
 import ConfirmPage from "../components/ConfirmPage";
 
 // Function to dynamically load Razorpay script
