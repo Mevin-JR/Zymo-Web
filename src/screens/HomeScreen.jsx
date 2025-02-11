@@ -9,6 +9,7 @@ import Cities from "../components/homecomponent/Cities";
 import Footer from "../components/Footer";
 import BrandsAvailable from "../components/homecomponent/BrandsAvailable";
 import ServiceProvider from "../components/homecomponent/ServiceProvider";
+import { FaWhatsapp } from "react-icons/fa";
 
 const HomeScreen = () => {
     return (
