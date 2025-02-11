@@ -103,12 +103,11 @@ const PrivacyPolicy = () => {
                         You may terminate your account at any time by writing to
                         us at hello@zymo.app, from the email ID you have used
                         for creating your account login, and mentioning "Please
-                        close myLetzrent account" in the subject line. We will
+                        close my Zymo account" in the subject line. We will
                         disable access to your account within 5 working days of
                         receiving your mail. However, your information may
                         remain stored in archive on our servers even after the
-                        deletion or termination of your account. When / How do
-                        we collect the Information?
+                        deletion or termination of your account.
                     </p>
                     <p className=" mb-4">
                         We will collect anonymous traffic information from you

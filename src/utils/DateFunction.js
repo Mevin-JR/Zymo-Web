@@ -1,7 +1,8 @@
 export const getCurrentTime = () => {
     const date = new Date();
-    
-    
+
+    date.setHours(date.getHours() + 2);
+
     // Round minutes to nearest 30-minute mark
     let minutes = date.getMinutes();
     if (minutes < 30) {

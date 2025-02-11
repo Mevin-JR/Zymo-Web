@@ -8,9 +8,14 @@ const NavBar = () => {
     return (
         <nav className="bg-[#212121] text-white p-4 relative z-50 w-full">
             <div className="container mx-auto flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-[#faffa4]">
+                {/* <h1 className="text-2xl font-bold text-[#faffa4]">
                     <Link to="/">Zymo</Link>
-                </h1>
+                </h1> */}
+                <img
+                    src="images/AppLogo/zymo2.jpg"
+                    alt="zymologo"
+                    className="h-14 mix-blend-screen"
+                />
 
                 {/* Hamburger Button */}
                 <button
@@ -31,11 +36,6 @@ const NavBar = () => {
                     } transition-transform duration-300 ease-in-out md:hidden`}
                 >
                     <ul className="mt-16 space-y-6 text-lg px-8">
-                        <li>
-                            <Link to="/" className="block hover:text-[#faffa4]">
-                                Fleet
-                            </Link>
-                        </li>
                         <li>
                             <Link
                                 to="/about-us"
@@ -67,11 +67,6 @@ const NavBar = () => {
 
                 {/* Desktop Menu */}
                 <ul className="hidden md:flex space-x-6 text-sm">
-                    <li>
-                        <Link to="/" className="block hover:text-[#faffa4]">
-                            Fleet
-                        </Link>
-                    </li>
                     <li>
                         <Link to="/about-us" className="hover:text-[#faffa4]">
                             About Us
