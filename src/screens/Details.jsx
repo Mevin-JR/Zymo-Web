@@ -41,7 +41,15 @@ const CarDetails = () => {
     });
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
-    const [authUser, setAuthUser] = useState(auth.currentUser);
+    const [authUser, setAuthUser] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            setAuthUser(user);
+        });
+
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         if (authUser) {
