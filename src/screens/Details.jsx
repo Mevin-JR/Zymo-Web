@@ -9,17 +9,25 @@ import {
     ArrowLeft,
 } from "lucide-react";
 import { auth } from "../utils/firebase";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+    useLocation,
+    useNavigate,
+    useParams,
+    useSearchParams,
+} from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
 
 const CarDetails = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { car, startDate, endDate } = location.state || {};
-    const { formattedCity, carName } = useParams();
-
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
-
+    const [searchParams] = useSearchParams();
+    const { formattedCity } = useParams();
+    const encodedCarData = searchParams.get("car") || {};
+    const rawParams = {
+        car: JSON.parse(decodeURIComponent(encodedCarData)),
+        startDate: searchParams.get("startDate"),
+        endDate: searchParams.get("endDate"),
+    };
+    const { car, startDate, endDate } = rawParams;
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
@@ -31,6 +39,8 @@ const CarDetails = () => {
         month: "long",
         year: "numeric",
     });
+
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
 
     const handleBooking = () => {
         const user = auth.currentUser;
@@ -44,15 +54,16 @@ const CarDetails = () => {
                 phone: user.phoneNumber,
             };
 
-            navigate(`/booking/${user.email}`, {
-                state: {
-                    car,
-                    formattedCity,
-                    userData,
-                    startDate,
-                    endDate,
-                },
+            const encodedUserData = encodeURIComponent(
+                JSON.stringify(userData)
+            );
+            const queryParams = new URLSearchParams({
+                startDate,
+                endDate,
+                userData: encodedUserData,
+                car: encodedCarData,
             });
+            navigate(`/booking/${formattedCity}?${queryParams}`);
         }
     };
 

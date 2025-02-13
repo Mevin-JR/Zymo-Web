@@ -6,20 +6,26 @@ import { toast } from "react-toastify";
 // import zoomcarlogo from "src/"
 
 const Listing = () => {
+    // Location State
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration } =
         location.state || {};
-
     const { city } = useParams();
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
+        // hour12: true,
+        // hour: "numeric", // TODO: Adjust this part of start date display
+        // minute: "numeric",
     });
     const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
+        // hour12: true,
+        // hour: "numeric", // TODO: Adjust this part of end date display
+        // minute: "numeric",
     });
 
     const hasRun = useRef(false);
@@ -188,10 +194,13 @@ const Listing = () => {
 
     const navigate = useNavigate();
     const goToDetails = async (car) => {
-        const carName = `${car.brand.split(" ")[0]}-${car.name.split(" ")[0]}`;
-        navigate(`/details/${city}/${carName}`, {
-            state: { car, startDate, endDate },
-        });
+        const encodedCarData = encodeURIComponent(JSON.stringify(car));
+        const queryParams = new URLSearchParams({
+            startDate,
+            endDate,
+            car: encodedCarData,
+        }).toString();
+        navigate(`/details/${city}?${queryParams}`);
     };
 
     return (

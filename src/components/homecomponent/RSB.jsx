@@ -132,7 +132,8 @@ const RSB = () => {
         if (city && startDate && endDate) {
             const lat = place.lat;
             const lng = place.lng;
-            const formattedCity = city === "Bengaluru" ? "Bangalore" : city;
+            const formattedCity =
+                city === "Bengaluru" ? "bangalore" : city.toLowerCase();
 
             const stateData = {
                 address,
@@ -143,7 +144,7 @@ const RSB = () => {
                 tripDuration,
             };
 
-            navigate(`/listing/${formattedCity}`, {
+            navigate(`/self-drive-car-rentals/${formattedCity}`, {
                 state: stateData,
             });
         } else {

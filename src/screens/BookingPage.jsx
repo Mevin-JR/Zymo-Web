@@ -1,5 +1,10 @@
 import { ArrowLeft, MapPin, Calendar, IndianRupee } from "lucide-react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+    useLocation,
+    useNavigate,
+    useParams,
+    useSearchParams,
+} from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -19,11 +24,18 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function BookingPage() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { car, formattedCity, userData, startDate, endDate } =
-        location.state || {};
+    const [searchParams] = useSearchParams();
+    const { formattedCity } = useParams();
+    const rawParams = {
+        startDate: searchParams.get("startDate"),
+        endDate: searchParams.get("endDate"),
+        userData: JSON.parse(
+            decodeURIComponent(searchParams.get("userDate") || "{}")
+        ),
+        car: JSON.parse(decodeURIComponent(searchParams.get("car") || "{}")),
+    };
 
-    const { userEmail } = useParams();
+    const { startDate, endDate, userData, car } = rawParams;
 
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
@@ -39,7 +51,7 @@ function BookingPage() {
 
     const [customerName, setCustomerName] = useState(userData.name);
     const [customerPhone, setCustomerPhone] = useState(userData.phone);
-    const [customerEmail, setCustomerEmail] = useState(userEmail);
+    const [customerEmail, setCustomerEmail] = useState(userData.email);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;

@@ -6,9 +6,7 @@ import HomeScreen from "./screens/HomeScreen";
 import BookingPage from "./screens/BookingPage";
 import BookingCard from "./screens/BookingCard";
 import Listing from "./screens/Listing";
-import LoginPage from "./components/LoginPage";
 import { ToastContainer } from "react-toastify";
-import ConfirmPage from "./components/ConfirmPage";
 import Details from "./screens/Details";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
@@ -29,23 +27,20 @@ const App = () => {
                     <Route path="/" element={<HomeScreen />} />
 
                     {/* Page2 */}
-                    <Route path="/listing/:city" element={<Listing />} />
+                    <Route
+                        path="/self-drive-car-rentals/:city"
+                        element={<Listing />}
+                    />
 
                     {/* Page3 */}
                     {/* Temporarily disabled */}
                     <Route path="/booking-card" element={<BookingCard />} />
 
                     {/* Page4 */}
-                    <Route
-                        path="/details/:city/:carName"
-                        element={<Details />}
-                    />
+                    <Route path="/details/:city" element={<Details />} />
 
                     {/* Page5 */}
-                    <Route
-                        path="/booking/:userEmail"
-                        element={<BookingPage />}
-                    />
+                    <Route path="/booking/:city" element={<BookingPage />} />
 
                     {/* NavBar Pages */}
                     {/* About Us */}
