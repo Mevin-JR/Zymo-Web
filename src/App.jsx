@@ -12,7 +12,8 @@ import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Career from "./pages/Career";
 import ScrollToTop from "./components/ScrollToTop";
-import Blog from "./pages/Blog";
+import BlogsMainPage from "./pages/BlogsMainPage";
+import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
@@ -50,7 +51,8 @@ const App = () => {
                     {/* Carrer */}
                     <Route path="/career" element={<Career />} />
                     {/* Blogs  */}
-                    <Route path="/blogs" element={<Blog />} />
+                    <Route path="/blogs" element={<BlogsMainPage />} />
+                    <Route path="/blogs/:id" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                     <Route
                         path="/termsofservice"
