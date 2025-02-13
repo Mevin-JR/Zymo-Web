@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const cities = [
     [
@@ -57,8 +58,14 @@ const cities = [
 ];
 
 const Cities = () => {
+    const navigate = useNavigate();
+
+    const handleCityClick = (city) => {
+        window.history.pushState({}, "", `/self-drive-car-rentals/${city}`); // Updates the URL without navigating
+    };
+
     return (
-        <section className=" text-black py-10">
+        <section className="text-black py-10">
             <div className="bg-[#faffa4] mx-auto p-6 rounded-lg max-w-6xl">
                 <h2 className="text-xl font-bold mb-4 text-center">
                     Service Available In Cities
@@ -67,12 +74,13 @@ const Cities = () => {
                     {cities.map((column, colIndex) => (
                         <div key={colIndex}>
                             {column.map((city, index) => (
-                                <span
+                                <button
                                     key={index}
-                                    className="block text-sm text-black"
+                                    onClick={() => handleCityClick(city)}
+                                    className="block text-black hover:text-gray-700 transition duration-300 cursor-pointer"
                                 >
                                     {city}
-                                </span>
+                                </button>
                             ))}
                         </div>
                     ))}
