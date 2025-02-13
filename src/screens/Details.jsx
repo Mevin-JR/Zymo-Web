@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     MapPin,
     Calendar,
@@ -41,30 +41,37 @@ const CarDetails = () => {
     });
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
+    const [authUser, setAuthUser] = useState(auth.currentUser);
+
+    useEffect(() => {
+        if (authUser) {
+            goToBooking();
+        }
+    }, [authUser]);
 
     const handleBooking = () => {
-        const user = auth.currentUser;
-        if (!user) {
+        if (!authUser) {
             setIsLoginModalOpen(true); // Open modal if not logged in
         } else {
-            const userData = {
-                uid: user.uid,
-                name: user.displayName,
-                email: user.email,
-                phone: user.phoneNumber,
-            };
-
-            const encodedUserData = encodeURIComponent(
-                JSON.stringify(userData)
-            );
-            const queryParams = new URLSearchParams({
-                startDate,
-                endDate,
-                userData: encodedUserData,
-                car: encodedCarData,
-            });
-            navigate(`/booking/${formattedCity}?${queryParams}`);
+            goToBooking();
         }
+    };
+
+    const goToBooking = () => {
+        const userData = {
+            uid: authUser.uid,
+            name: authUser.displayName,
+            email: authUser.email,
+            phone: authUser.phoneNumber,
+        };
+        const encodedUserData = encodeURIComponent(JSON.stringify(userData));
+        const queryParams = new URLSearchParams({
+            startDate,
+            endDate,
+            userData: encodedUserData,
+            car: encodedCarData,
+        });
+        navigate(`/booking/${formattedCity}?${queryParams}`);
     };
 
     const carDetails = [
@@ -250,6 +257,7 @@ const CarDetails = () => {
 
             {/* Login Modal */}
             <LoginPage
+                onAuth={setAuthUser}
                 isOpen={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
             />

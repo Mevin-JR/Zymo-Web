@@ -30,7 +30,7 @@ function BookingPage() {
         startDate: searchParams.get("startDate"),
         endDate: searchParams.get("endDate"),
         userData: JSON.parse(
-            decodeURIComponent(searchParams.get("userDate") || "{}")
+            decodeURIComponent(searchParams.get("userData") || "{}")
         ),
         car: JSON.parse(decodeURIComponent(searchParams.get("car") || "{}")),
     };
