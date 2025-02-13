@@ -17,11 +17,15 @@ app.use((req, res, next) => {
     next();
 });
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Parses form data
+
 
 const zoomcarRoutes = require("./routes/zoomcarAPI");
 const paymentRoutes = require("./routes/paymentAPI");
+const messageRoutes = require("./routes/messageAPI");
 
 app.use("/zoomcar", zoomcarRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/message", messageRoutes);
 
 exports.api = functions.https.onRequest(app);
