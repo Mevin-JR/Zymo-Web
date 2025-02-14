@@ -1,15 +1,10 @@
 const twilio = require("twilio");
 const MessagingResponse = require('twilio').twiml.MessagingResponse;
 
-app.use(express.json()); // Parses JSON body
-app.use(express.urlencoded({ extended: true })); // Parses form data
-
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const whatsapp_messaging_service_id=process.env.TWILIO_WHATSAPP_SERVICE_ID;
-const verify_service_id_thr_whatsapp=process.env.TWILIO_VERIFY_SERVICE_SID;
 
 const send_whatsapp_message_booking_confirm_template_id = process.env.WHATSAPP_TEMPLATE_BOOKING_CONFIRM;
 const send_whatsapp_message_booking_confirm_vendor_template_id = process.env.WHATSAPP_TEMPLATE_BOOKING_CONFIRM_VENDOR;
@@ -19,254 +14,165 @@ const send_whatsapp_message_booking_cancel_template_id = process.env.WHATSAPP_TE
 const client = twilio(accountSid, authToken);
 
 
-//Send otp to the user through Whatsapp
-async function sendOtp(phone) {
-    try {
-      // Validate phone number
-      if (!phone || typeof phone !== 'string' || phone.length < 10) {
-        throw new Error('Invalid phone number: Enter the right phone number');
-      }
-    
-      const verification = await client.verify.v2
-        .services(verify_service_id_thr_whatsapp)
-        .verifications.create({
-          channel: 'whatsapp',
-          to: phone,
-        });
-  
-      console.log('OTP Sent via WhatsApp:', verification.status);
-      console.log('Response: ',verification)
-      return { message: 'OTP sent via WhatsApp', status: verification.status };
-    } catch (error) {
-      console.error('WhatsApp OTP failed:', error.message);
-      return sendOtpFallback(phone); // Fallback to SMS
-    }
-}
-
-//Send otp to the user through message (if whatsapp failed)
-async function sendOtpFallback(phone) {
-    // Validate phone number
-    if (!phone || typeof phone !== 'string' || phone.length < 10) {
-        throw new Error('Invalid phone number: Enter the right phone number');
-    }
-    try {
-      const verification = await client.verify.v2
-        .services(verify_service_id_thr_whatsapp)
-        .verifications.create({
-          channel: 'sms',
-          to: phone,
-        });
-  
-      console.log('OTP Sent via SMS:', verification.status);
-      return { message: 'OTP sent via SMS', status: verification.status };
-    } catch (error) {
-      console.error('SMS OTP failed:', error.message);
-      return { error: error.message };
-    }
-}
-  
-// ✅ Verify OTP
-async function verifyOtp(phone, code) {
-    try {
-      // Validate phone number
-      if (!phone || phone.length < 10) {
-        throw new Error('Invalid phone number');
-      }
-        if (!code || phone.length < 6) {
-        throw new Error('Invalid OTP code');
-      }
-  
-      const verificationCheck = await client.verify.v2
-        .services(verify_service_id_thr_whatsapp)
-        .verificationChecks.create({
-          to: `whatsapp:${phone}`,
-          code,
-        });
-  
-      console.log('Verification Status:', verificationCheck.status);
-  
-      if (verificationCheck.status === 'approved') {
-        return { message: 'OTP Verified Successfully' };
-      } else {
-        return { message: 'Invalid OTP', error: true };
-      }
-    } catch (error) {
-      console.error('Error verifying OTP:', error.message);
-      return { error: error.message };
-    }
-}
-
 //Whatsapp message to user 
-async function sendWhatsAppMessage(recipient) {
-  try {
-    const response = await client.messages.create({
-      from: whatsapp_messaging_service_id, // WhatsApp  Messaging Services id
-      to: `whatsapp:${recipient}`,// "whatsapp:+917517442597",
-      contentSid: send_whatsapp_message_booking_confirm_template_id, //Template name - zymo_bc_zc
-      contentVariables: JSON.stringify({ 
-        "1": "John Doe",                      // Customer Name
-        "2": "Sedan, Automatic",              // Car and Transmission Type
-        "3": "Airport Terminal 1",            // Pick-up Location
-        "4": "ABC12345",                      // Booking ID
-        "5": "100",                           // Free KMs
-        "6": "2025-02-15",                    // Start Date
-        "7": "2025-02-20",                    // End Date
-        "8": "Ghaziabad",                     // City
-        "9": "+917517442597"                  // Phone Number      
-       }),
-    });
-
-    // console.log('Message:',response);
-    // console.log(`Message sent to ${to}: ${response.sid}`);
-  } catch (error) {
-    console.error(`Failed to send message: ${error}`);
-  }
+async function sendWhatsAppMessage(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id, // WhatsApp Messaging Service ID
+         to: `whatsapp:${data.phone}`, // Dynamic recipient
+         contentSid: send_whatsapp_message_booking_confirm_template_id, // Template ID
+         contentVariables: JSON.stringify({
+            "1": data.customerName,           // Customer Name
+            "2": `${data.model}-${data.transmission}`,         // Car Name and Transmission Type
+            "3": data.pickupLocation,  // Pick-up Location
+            "4": data.id,              // Booking ID
+            "5": data.freeKMs,         // Free KMs
+            "6": data.startDate,       // Start Date
+            "7": data.endDate,         // End Date
+            "8": data.city,            // City
+            "9": data.phone            // Phone Number      
+         }),
+      });
+ 
+     console.log(`Booking confirmation message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+     console.error(`Failed to send WhatsApp message: ${error.message}`);
+   }
 }
-
-// Whatsapp message to user if booked through vendor
-async function sendWhatsAppMessageincludevendor(recipient) {
-  try {
-    const response = await client.messages.create({
-      from: whatsapp_messaging_service_id,  // WhatsApp Messaging Services id
-      to: `whatsapp:${recipient}`,// "whatsapp:+917517442597",
-      contentSid: send_whatsapp_message_booking_confirm_vendor_template_id, //Template name - zymo_bc_nz
-      contentVariables: JSON.stringify({ 
-        "1": "John Doe",                      // Customer Name
-        "2": "Sedan, Automatic",              // Car and Transmission Type
-        "3": "Airport Terminal 1",            // Pick-up Location
-        "4": "ABC12345",                      // Booking ID
-        "5": "Zymo Rentals",                  // Vendor Name
-        "6": "+917517442597",                 // Mobile Number
-        "7": "johndoe@example.com",           // Email ID
-        "8": "Self Drive",                    // Service Type
-        "9": "Ghaziabad",                     // City
-        "10": "2025-02-15 10:00 AM",          // Start Date & Time
-        "11": "2025-02-20 06:00 PM",          // End Date & Time
-        "12": "₹5000",                        // Amount
-        "13": "1990-05-12",                   // Date of Birth
-        "14": "Unlimited KMs Package",        // Package
-        "15": "Online Payment",               // Mode
-        "16": "Zymo Hub, Ghaziabad"           // Vendor Location
-      }) ,
-    });
-
-    // console.log('Message:',response);
-    // console.log(`Message sent to ${to}: ${response.sid}`);
-  } catch (error) {
-    console.error(`Failed to send message: ${error}`);
-  }
+ 
+//Whatsapp message to vendor
+async function sendWhatsAppMessageIncludeVendor(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id,  // WhatsApp Messaging Services ID
+         to: `whatsapp:${data.phone}`, 
+         contentSid: send_whatsapp_message_booking_confirm_vendor_template_id, // Template ID
+         contentVariables: JSON.stringify({ 
+            "1": data.customerName,      // Customer Name
+            "2": `${data.model}-${data.transmission}`  ,           // Car Name and Transmission Type
+            "3": data.pickupLocation,          // Pick-up Location
+            "4": data.id,                // Booking ID
+            "5": data.vendorName,        // Vendor Name
+            "6": data.phone,             // Mobile Number
+            "7": data.email,             // Email ID
+            "8": data.serviceType,       // Service Type
+            "9": data.city,              // City
+            "10": data.startDateTime,    // Start Date & Time
+            "11": data.endDateTime,      // End Date & Time
+            "12": data.amount,           // Amount
+            "13": data.dateOfBirth,      // Date of Birth
+            "14": data.package,          // Package
+            "15": data.paymentMode,      // Payment Mode
+            "16": data.vendorLocation    // Vendor Location
+         }),
+      });
+ 
+      console.log(`Vendor Booking Message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+      console.error(`Failed to send vendor booking message: ${error.message}`);
+   }
 }
-
-//Refund message 
-async function refund_message(recipient) {
-  try {
-    const response = await client.messages.create({
-      from: whatsapp_messaging_service_id, // WhatsApp Messaging Service ID
-      to: `whatsapp:${recipient}`,  // "whatsapp:+917517442597",
-      contentSid: send_whatsapp_message_refund_template_id, // Template ID
-      contentVariables: JSON.stringify({
-        "1": "John Doe",  // Customer Name
-        "2": "ABC12345", // Booking ID
-        "3": "Sedan, Automatic" // Car and Transmission Type
-      }),
-    });
-
-    console.log(`Message sent to ${recipient}: ${response.sid}`);
-  } catch (error) {
-    console.error(`Failed to send message: ${error.message}`);
-  }
+ 
+//Refund Message Function
+async function sendRefundMessage(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id,            //WhatsApp Messaging Service ID
+         to: `whatsapp:${data.phone}`,                   // "whatsapp:+917517442597",
+         contentSid: send_whatsapp_message_refund_template_id, // Template ID
+         contentVariables: JSON.stringify({
+            "1": data.customerName,                             // Customer Name
+            "2": data.id,                                      // Booking ID
+            "3": `${data.model}-${data.transmission}`          // Car Name and Transmission Type
+         }),
+      });
+ 
+      console.log(`Refund Message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+      console.error(`Failed to send refund message: ${error.message}`);
+   }
 }
-
+ 
 //Booking cancel Message 
-async function booking_cancel_message(recipient) {
-  try {
-    const response = await client.messages.create({
-      from: whatsapp_messaging_service_id, // WhatsApp Messaging Service ID
-      to: `whatsapp:${recipient}`,// "whatsapp:+917517442597",
-      contentSid: send_whatsapp_message_booking_cancel_template_id, // Template ID
-      contentVariables: JSON.stringify( {
-        "1": "John Doe",  // Customer Name
-        "2": "ABC12345", // Booking ID
-        "3": "Airport Terminal 1", // Location
-        "4": "Sedan, Automatic" // Car
-      }),
-    });
-
-    console.log(`Message sent to ${recipient}: ${response.sid}`);
-  } catch (error) {
-    console.error(`Failed to send message: ${error.message}`);
-  }
+async function bookingCancelMessage(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id,      // WhatsApp Messaging Service ID
+         to: `whatsapp:${data.phone}`,  // Dynamic recipient
+         contentSid: send_whatsapp_message_booking_cancel_template_id, // Template ID
+         contentVariables: JSON.stringify({
+            "1": data.customerName,    // Customer Name
+            "2": data.id,              // Booking ID
+            "3": data.location,        // Location
+            "4": data.model             // Car Name
+         }),
+      });
+ 
+      console.log(`Booking cancellation message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+      console.error(`Failed to send booking cancellation message: ${error.message}`);
+   }
 }
+ 
 
+module.exports = {
+  sendWhatsAppMessage,
+  sendWhatsAppMessageIncludeVendor,
+  sendRefundMessage,
+  bookingCancelMessage
+};
 
-//To send otp to the user
-//Request
+//Dummy JSON for Booking Confirmation Message
 // {
-//   "phone": "+917517442597",
-// }
-//Response
+//    "customerName": "John Doe",
+//    "model": "Sedan",
+//    "transmission": "Automatic",
+//    "pickupLocation": "Airport Terminal 1 , new twon , garden near ...",
+//    "bookingId": "ABC12345",
+//    "freeKMs": "100",
+//    "startDate": "2025-02-15",
+//    "endDate": "2025-02-20",
+//    "city": "Ghaziabad",
+//    "phone": "+917517442597"
+//  }
+ 
+
+// Dummy JSON for Vendor Booking
 // {
-//   sid: '',
-//   serviceSid: '',
-//   accountSid: '',
-//   to: '+',
-//   channel: 'whatsapp',
-//   status: 'pending',
-//   valid: false,
-//   lookup: { carrier: null },
-//   amount: null,
-//   payee: null,
-//   sendCodeAttempts: [
-//     {
-//       attempt_sid: '',
-//       channel: 'whatsapp',
-//       time: '2025-02'
-//     }
-//   ],
-//   dateCreated: 2025-02-11T14:02:47.000Z,
-//   dateUpdated: 2025-02-11T14:02:47.000Z,
-//   sna: undefined,
-//   url: ''
+//      "customerName": "John Doe",
+//      "model": "Sedan",
+//      "transmission": "Automatic",
+//      "pickupLocation": "Airport Terminal 1 , new twon , garden near ...",
+//      "id": "ABC12345",
+//      "vendorName": "Zymo Rentals",
+//      "mobileNumber": "+917517442597",
+//      "email": "johndoe@example.com",
+//      "serviceType": "Self Drive",
+//      "city": "Ghaziabad",
+//      "startDateTime": "2025-02-15 10:00 AM",
+//      "endDateTime": "2025-02-20 06:00 PM",
+//      "amount": "₹5000",
+//      "dateOfBirth": "1990-05-12",
+//      "package": "Unlimited KMs Package",
+//      "paymentMode": "Online Payment",
+//      "vendorLocation": "Zymo Hub, Ghaziabad",
+//      "phone": "+917517442597"
 // }
-
-
-
-//Verify otp response
-//Request
+ 
+// Dummy JSON for Refund Message
 // {
-//   "phone": "+917517442597",
-//   "code": "031579"
-// }
+//      "customerName": "John Doe",
+//      "id": "ABC12345",
+//      "model": "Sedan",
+//      "phone": "+917517442597"
+//  }
 
-//Response
+// Dummy JSON for Booking Cancellation Message
 // {
-//   sid: '',
-//   serviceSid: '',
-//   accountSid: '',
-//   to: '+917517442597',
-//   channel: 'whatsapp',
-//   status: 'approved',
-//   valid: true,
-//   amount: null,
-//   payee: null,
-//   dateCreated: 2025-02-11T13:55:31.000Z,
-//   dateUpdated: 2025-02-11T13:59:52.000Z,
-//   snaAttemptsErrorCodes: undefined
-// }
-
-//  Invalid OTP
-// {
-//   sid: '',
-//   serviceSid: '',
-//   accountSid: '',
-//   to: '+917517442597',
-//   channel: 'whatsapp',
-//   status: 'pending',
-//   valid: false,
-//   amount: null,
-//   payee: null,
-//   dateCreated: 2025-02-11T14:02:47.000Z,
-//   dateUpdated: 2025-02-11T14:08:48.000Z,
-//   snaAttemptsErrorCodes: undefined
-// }
-
+//    "customerName": "John Doe",
+//    "id": "ABC12345",
+//    "pickupLocation": "Airport Terminal 1",
+//    "model": "Sedan",
+//    "phone": "+917517442597"
+//  }
+ 
