@@ -144,7 +144,9 @@ const RSB = () => {
                 tripDuration,
             };
 
-            navigate(`/self-drive-car-rentals/${formattedCity}`, {
+            sessionStorage.setItem("fromSearch", true);
+
+            navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
             });
         } else {
@@ -234,7 +236,8 @@ const RSB = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter a location"
-                                        className="bg-[#303030] text-white outline-none w-full "
+                                        className="bg-[#303030] text-white outline-none w-full"
+                                        id="location-input"
                                     />
                                 </Autocomplete>
                             </div>

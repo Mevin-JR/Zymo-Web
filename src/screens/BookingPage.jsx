@@ -1,10 +1,5 @@
 import { ArrowLeft, MapPin, Calendar, IndianRupee } from "lucide-react";
-import {
-    useLocation,
-    useNavigate,
-    useParams,
-    useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -24,25 +19,14 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function BookingPage() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
+    const location = useLocation();
     const { formattedCity } = useParams();
-    const rawParams = {
-        startDate: searchParams.get("startDate"),
-        endDate: searchParams.get("endDate"),
-        userData: JSON.parse(
-            decodeURIComponent(searchParams.get("userData") || "{}")
-        ),
-        car: JSON.parse(decodeURIComponent(searchParams.get("car") || "{}")),
-    };
-
-    const { startDate, endDate, userData, car } = rawParams;
-
+    const { startDate, endDate, userData, car } = location.state || {};
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
     });
-
     const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
@@ -55,32 +39,6 @@ function BookingPage() {
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-
-    // emailjs.init({
-    //     publicKey: "u74XY2gOIbkt_YNz7",
-    //     // privateKey: "",
-    // });
-
-    // const emailPaymentConfirmation = async (paymentId, orderId, amt) => {
-    //     const templateParams = {
-    //         to_name: customerName,
-    //         payment_id: paymentId,
-    //         order_id: orderId,
-    //         amount: amt,
-    //     };
-
-    //     try {
-    //         const response = await emailjs.send(
-    //             "service_uwvt2p8",
-    //             "template_069rahc",
-    //             templateParams
-    //         );
-
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.error("Error sending payment confirmation:", error);
-    //     }
-    // };
 
     const bookingData = {
         carDetails: {

@@ -24,12 +24,21 @@ const App = () => {
             <BrowserRouter>
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
                 <Routes>
-                    {/* HomePage */}
+                    {/* HomePage urls */}
                     <Route path="/" element={<HomeScreen />} />
+                    <Route path="/home" element={<HomeScreen />} />
+                    <Route
+                        path="/self-drive-car-rentals"
+                        element={<HomeScreen />}
+                    />
+                    <Route
+                        path="/self-drive-car-rentals/:city"
+                        element={<HomeScreen />}
+                    />
 
                     {/* Page2 */}
                     <Route
-                        path="/self-drive-car-rentals/:city"
+                        path="/self-drive-car-rentals/:city/cars"
                         element={<Listing />}
                     />
 
@@ -38,10 +47,16 @@ const App = () => {
                     <Route path="/booking-card" element={<BookingCard />} />
 
                     {/* Page4 */}
-                    <Route path="/details/:city" element={<Details />} />
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars/booking-details"
+                        element={<Details />}
+                    />
 
                     {/* Page5 */}
-                    <Route path="/booking/:city" element={<BookingPage />} />
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
+                        element={<BookingPage />}
+                    />
 
                     {/* NavBar Pages */}
                     {/* About Us */}

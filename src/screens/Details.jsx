@@ -9,25 +9,14 @@ import {
     ArrowLeft,
 } from "lucide-react";
 import { auth } from "../utils/firebase";
-import {
-    useLocation,
-    useNavigate,
-    useParams,
-    useSearchParams,
-} from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
 
 const CarDetails = () => {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const { formattedCity } = useParams();
-    const encodedCarData = searchParams.get("car") || {};
-    const rawParams = {
-        car: JSON.parse(decodeURIComponent(encodedCarData)),
-        startDate: searchParams.get("startDate"),
-        endDate: searchParams.get("endDate"),
-    };
-    const { car, startDate, endDate } = rawParams;
+    const location = useLocation();
+    const { city } = useParams();
+    const { startDate, endDate, car } = location.state || {};
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
@@ -43,43 +32,48 @@ const CarDetails = () => {
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
     const [authUser, setAuthUser] = useState(null);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            setAuthUser(user);
-        });
+    // useEffect(() => {
+    //     const unsubscribe = auth.onAuthStateChanged((user) => {
+    //         setAuthUser(user);
+    //     });
 
-        return () => unsubscribe();
-    }, []);
+    //     return () => unsubscribe();
+    // }, []);
 
     useEffect(() => {
         if (authUser) {
-            goToBooking();
+            goToBooking(authUser);
         }
     }, [authUser]);
 
     const handleBooking = () => {
-        if (!authUser) {
+        const user = auth.currentUser;
+        console.log(user);
+        if (!user) {
             setIsLoginModalOpen(true); // Open modal if not logged in
         } else {
-            goToBooking();
+            goToBooking(user);
         }
     };
 
-    const goToBooking = () => {
+    const goToBooking = (user) => {
         const userData = {
-            uid: authUser.uid,
-            name: authUser.displayName,
-            email: authUser.email,
-            phone: authUser.phoneNumber,
+            uid: user.uid,
+            name: user.displayName,
+            email: user.email,
+            phone: user.phoneNumber,
         };
-        const encodedUserData = encodeURIComponent(JSON.stringify(userData));
-        const queryParams = new URLSearchParams({
-            startDate,
-            endDate,
-            userData: encodedUserData,
-            car: encodedCarData,
-        });
-        navigate(`/booking/${formattedCity}?${queryParams}`);
+        navigate(
+            `/self-drive-car-rentals/${city}/cars/booking-details/confirmation`,
+            {
+                state: {
+                    startDate,
+                    endDate,
+                    userData,
+                    car,
+                },
+            }
+        );
     };
 
     const carDetails = [
@@ -110,7 +104,7 @@ const CarDetails = () => {
                 },
             ],
             bookingInfo: {
-                city: formattedCity,
+                city: city,
                 startDate: startDateFormatted,
                 endDate: endDateFormatted,
                 driveType: "Self Drive",
@@ -131,7 +125,10 @@ const CarDetails = () => {
     return (
         <div>
             <button
-                onClick={() => navigate(-1)}
+                onClick={() => {
+                    sessionStorage.setItem("fromSearch", false);
+                    navigate(-1);
+                }}
                 className=" text-white m-3 mt-5 cursor-pointer"
             >
                 <ArrowLeft size={25} />

@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-// import zoomcarlogo from "src/"
 
 const Listing = () => {
     // Location State
@@ -64,6 +63,16 @@ const Listing = () => {
 
         if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
             return;
+        }
+
+        if (sessionStorage.getItem("fromSearch") !== "true") {
+            sessionStorage.setItem("fromSearch", false);
+            // Load from cache if exists
+            if (localStorage.getItem("carList")) {
+                setCarList(JSON.parse(localStorage.getItem("carList")));
+                setLoading(false);
+                return;
+            }
         }
 
         const search = async () => {
@@ -141,8 +150,11 @@ const Listing = () => {
                 setLoading(false);
                 setCarList(carData);
                 setCarCount(carCards.length);
+
+                localStorage.setItem("carList", JSON.stringify(carData)); // Storing carList as cache
             } catch (error) {
                 unknownError();
+                console.error(error);
             }
         };
         search();
@@ -193,14 +205,14 @@ const Listing = () => {
     };
 
     const navigate = useNavigate();
-    const goToDetails = async (car) => {
-        const encodedCarData = encodeURIComponent(JSON.stringify(car));
-        const queryParams = new URLSearchParams({
-            startDate,
-            endDate,
-            car: encodedCarData,
-        }).toString();
-        navigate(`/details/${city}?${queryParams}`);
+    const goToDetails = (car) => {
+        navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
+            state: {
+                startDate,
+                endDate,
+                car,
+            },
+        });
     };
 
     return (
