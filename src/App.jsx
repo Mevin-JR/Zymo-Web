@@ -17,6 +17,9 @@ import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import FormPage from "./pages/Buy/EnterInformation";
+import UploadDocuments from "./pages/Buy/UploadDocuments";
+import DatePicker from "./pages/Buy/DatePicker";
 
 const App = () => {
     return (
@@ -57,6 +60,11 @@ const App = () => {
                         path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
                         element={<BookingPage />}
                     />
+                    
+                    {/* Buy Page Routes*/}
+                    <Route path="/buy/date-picker" element={<DatePicker />} />
+                    <Route path="/buy/upload-info" element={<FormPage />} />
+                    <Route path="/buy/upload-doc" element={<UploadDocuments />} />
 
                     {/* NavBar Pages */}
                     {/* About Us */}
