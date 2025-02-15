@@ -42,6 +42,7 @@ const CarDetails = () => {
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
     const [authUser, setAuthUser] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -56,6 +57,16 @@ const CarDetails = () => {
             goToBooking();
         }
     }, [authUser]);
+
+      // Automatic image scroller
+      useEffect(() => {
+        if (car?.images?.length > 1) {
+            const interval = setInterval(() => {
+                setCurrentIndex((prevIndex) => (prevIndex + 1) % car.images.length);
+            }, 4000);
+            return () => clearInterval(interval);
+        }
+    }, [car?.images]);
 
     const handleBooking = () => {
         if (!authUser) {
@@ -85,7 +96,7 @@ const CarDetails = () => {
     const carDetails = [
         {
             name: `${car.brand} ${car.name}`,
-            image: car.images[0],
+            image: car?.images || [],
             rating: car.ratingData.rating,
             features: [
                 {
@@ -142,11 +153,34 @@ const CarDetails = () => {
                         <>
                             {/* Left Section */}
                             <div key={`left-${index}`}>
-                                <img
-                                    src={car.image}
-                                    alt={car.name}
-                                    className="w-full rounded-2xl shadow-xl"
-                                />
+                                 {/* Left Section - Image Scroller */}
+                            <div>
+                                <div className="img-container relative w-full overflow-hidden rounded-2xl">
+                                    <div
+                                        className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
+                                        style={{
+                                            width: `${car.image.length * 100}%`,
+                                            transform: `translateX(-${(currentIndex * 100) / car.image.length}%)`,
+                                        }}
+                                    >
+                                        {car.image.map((image, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={image}
+                                                alt={`${car.name} ${idx + 1}`}
+                                                className="w-full flex-none rounded-2xl shadow-xl"
+                                                style={{ width: `${100 / car.image.length}%` }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Booking Information */}
+                                {/* <div className="bg-darkGrey2 mt-10 p-7 rounded-xl shadow-md mb-8 hidden lg:block"> */}
+                                    {/* Booking Info Content */}
+                                {/* </div> */}
+                            </div>
+
                                 {/* Booking Information */}
                                 <div className="bg-darkGrey2 mt-10 p-7 rounded-xl shadow-md mb-8 hidden lg:block">
                                     <div className="flex justify-between">
@@ -186,7 +220,7 @@ const CarDetails = () => {
                                             <img
                                                 src={car.bookingInfo.logo}
                                                 alt="Zoomcar Logo"
-                                                className="h-8"
+                                                className="h-6"
                                             />
                                             <span className="ml-2">
                                                 {car.bookingInfo.driveType}

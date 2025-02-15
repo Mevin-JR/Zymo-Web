@@ -10,6 +10,7 @@ import Footer from "../components/Footer";
 import BrandsAvailable from "../components/homecomponent/BrandsAvailable";
 import ServiceProvider from "../components/homecomponent/ServiceProvider";
 import { FaWhatsapp } from "react-icons/fa";
+import NewRSB from "../components/NewRSB";
 
 const HomeScreen = () => {
     return (
@@ -18,8 +19,9 @@ const HomeScreen = () => {
                 <NavBar />
                 <div className="container">
                     <Header />
+                    <NewRSB/>
                     <HeroImage />
-                    <RSB />
+                    {/* <RSB /> */}
                     <Benefits />
                     <BrandsAvailable />
                     <ServiceProvider />
