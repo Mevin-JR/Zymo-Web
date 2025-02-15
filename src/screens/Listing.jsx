@@ -3,155 +3,145 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-// import zoomcarlogo from "src/"
+import { collectionGroup, getDocs } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 const Listing = () => {
-    // Location State
     const location = useLocation();
-    const { address, lat, lng, startDate, endDate, tripDuration } =
-        location.state || {};
+    const { address, lat, lng, startDate, endDate, tripDuration } = location.state || {};
     const { city } = useParams();
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of start date display
-        // minute: "numeric",
-    });
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of end date display
-        // minute: "numeric",
-    });
-
-    const hasRun = useRef(false);
-    let searchCount = 0;
-
     const [loading, setLoading] = useState(true);
     const [carList, setCarList] = useState([]);
     const [priceRange, setPriceRange] = useState("");
     const [seats, setSeats] = useState("");
     const [fuel, setFuel] = useState("");
     const [transmission, setTransmission] = useState("");
-    const [filteredList, setFilteredList] = useState(carList);
+    const [filteredList, setFilteredList] = useState([]);
     const [carCount, setCarCount] = useState("");
 
-    // Errors
-    const noCarsFound = () => {
-        toast.error("No cars found for specified filter(s)", {
-            position: "top-center",
-            autoClose: 1000 * 2,
-        });
-    };
-
-    const unknownError = () => {
-        toast.error("Something went wrong, Please try again later...", {
-            position: "top-center",
-            autoClose: 1000 * 3,
-        });
-    };
-
-    useEffect(() => {
-        if (hasRun.current) return;
-        hasRun.current = true;
-
-        const startDateEpoc = Date.parse(startDate);
-        const endDateEpoc = Date.parse(endDate);
-
-        if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
-            return;
-        }
-
-        const search = async () => {
-            setLoading(true);
-            try {
-                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
-                const response = await fetch(`${url}/zoomcar/search`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        data: {
-                            city,
-                            lat,
-                            lng,
-                            fromDate: startDateEpoc,
-                            toDate: endDateEpoc,
-                        },
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
+    const fetchApiCars = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_FUNCTIONS_API_URL}/zoomcar/search`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    data: {
+                        city,
+                        lat,
+                        lng,
+                        fromDate: Date.parse(startDate),
+                        toDate: Date.parse(endDate),
                     },
-                });
-
-                if (!response.ok) {
-                    if (searchCount <= 2) {
-                        searchCount += 1;
-                        search();
-                        return;
-                    }
-                    setLoading(false);
-                    unknownError();
-                    searchCount = 0;
-                    throw new Error(
-                        `Error: ${response.status} - ${response.statusText}`
-                    );
-                }
-
-                searchCount = 0;
-                const data = await response.json();
-                if (!data.sections) {
-                    // setLoading(false);
-                    toast.error(
-                        "No cars found, Please try modifying input...",
-                        {
-                            position: "top-center",
-                            autoClose: 1000 * 5,
-                        }
-                    );
-                    return;
-                }
-                const sections = data.sections;
-                const carCards = sections[sections.length - 1].cards;
-
-                const carData = carCards.map((car) => ({
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+            }
+    
+            const data = await response.json();
+            console.log("API Response:", data); // Debugging log
+    
+            return (
+                data.sections?.[data.sections.length - 1]?.cards?.map((car) => ({
                     id: car.car_data.car_id,
-                    cargroup_id: car.car_data.cargroup_id,
                     brand: car.car_data.brand,
                     name: car.car_data.name,
                     options: car.car_data.accessories,
                     address: car.car_data.location.address,
-                    location_id: car.car_data.location.location_id,
-                    location_est: car.car_data.location.text,
-                    lat: car.car_data.location.lat,
-                    lng: car.car_data.location.lng,
                     fare: `₹${car.car_data.pricing.revenue}`,
-                    actual_fare: car.car_data.pricing.fare_breakup
-                        ? car.car_data.pricing.fare_breakup[0].fare_item[0]
-                              .value
-                        : "000",
-                    hourly_amount: car.car_data.pricing.payable_amount,
-                    pricing_id: car.car_data.pricing.id,
+                    actual_fare: car.car_data.pricing.fare_breakup?.[0]?.fare_item?.[0]?.value || 0,
                     images: car.car_data.image_urls,
                     ratingData: car.car_data.rating_v3,
                     trips: car.car_data.trip_count,
+                    type: "api",
+                })) || []
+            );
+        } catch (error) {
+            console.error("Error fetching API cars:", error);
+            return [];
+        }
+    };
+    
+
+    const fetchFirebaseCars = async () => {
+        try {
+            const snapshot = await getDocs(collectionGroup(db, "uploadedCars"));
+            console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
+    
+            return snapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
+                .map(car => ({
+                    id: car.id,
+                    brand: car.name.split(" ")[0],
+                    name: car.name,
+                    options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
+                    address: car.pickupLocation,
+                    fare: `₹${car.kmRate}/km`,
+                    actual_fare: car.kmRate,
+                    images: car.images,
+                    ratingData: { rating: 4.5 },
+                    trips: Math.floor(Math.random() * 50),
+                    type: "firebase",
+                    location_est: "Local Owner",
                 }));
-                setLoading(false);
-                setCarList(carData);
-                setCarCount(carCards.length);
+        } catch (error) {
+            console.error("Error fetching Firebase cars:", error);
+            return [];
+        }
+    };
+    
+    useEffect(() => {
+        const loadCars = async () => {
+            try {
+                const [apiCars, firebaseCars] = await Promise.all([
+                    fetchApiCars(),
+                    fetchFirebaseCars()
+                ]);
+                
+                const combinedCars = [...apiCars, ...firebaseCars];
+                setCarList(combinedCars);
+                setFilteredList(combinedCars);
+                setCarCount(combinedCars.length);
             } catch (error) {
-                unknownError();
+                toast.error("Error loading cars", { position: "top-center" });
+            } finally {
+                setLoading(false);
             }
         };
-        search();
+
+        if (city && lat && lng && startDate && endDate) {
+            loadCars();
+        }
+        console.log("City:", city, "Lat:", lat, "Lng:", lng, "StartDate:", startDate, "EndDate:", endDate);
+        if (city && lat && lng && startDate && endDate) {
+            loadCars();
+        }
     }, [city, startDate, endDate]);
 
-    // Filter functionality
-    useEffect(() => {
-        setFilteredList(carList);
-    }, [carList]);
+    const applyFilters = () => {
+        let filtered = carList.filter(car => {
+            const transmissionMatch = !transmission || car.options.includes(transmission);
+            const seatsMatch = !seats || car.options.includes(seats);
+            const fuelMatch = !fuel || car.options.includes(fuel);
+            return transmissionMatch && seatsMatch && fuelMatch;
+        });
+
+        if (filtered.length === 0) {
+            toast.error("No cars found for specified filters", { position: "top-center" });
+            return;
+        }
+
+        if (priceRange) {
+            filtered = filtered.sort((a, b) => 
+                priceRange === "lowToHigh" ? a.actual_fare - b.actual_fare : b.actual_fare - a.actual_fare
+            );
+        }
+
+        setFilteredList(filtered);
+        setCarCount(filtered.length);
+    };
 
     const resetFilters = () => {
         setTransmission("");
@@ -159,37 +149,6 @@ const Listing = () => {
         setSeats("");
         setFuel("");
         setFilteredList(carList);
-    };
-
-    const applyFilters = () => {
-        let filteredList = carList.filter((car) => {
-            const trasmissionFilter =
-                !transmission ||
-                car.options.some((opt) => opt.includes(transmission));
-            const seatsFilter =
-                !seats || car.options.some((opt) => opt.includes(seats));
-            const fuelFilter =
-                !fuel || car.options.some((opt) => opt.includes(fuel));
-            return trasmissionFilter && seatsFilter && fuelFilter;
-        });
-
-        if (filteredList.length === 0) {
-            noCarsFound();
-            return;
-        }
-
-        if (priceRange) {
-            filteredList = filteredList.sort((a, b) => {
-                const priceA = parseInt(a.fare.replace(/[^0-9]/g, ""));
-                const priceB = parseInt(b.fare.replace(/[^0-9]/g, ""));
-                return priceRange == "lowToHigh"
-                    ? priceA - priceB
-                    : priceB - priceA;
-            });
-        }
-
-        setFilteredList(filteredList);
-        setCarCount(filteredList.length);
     };
 
     const navigate = useNavigate();
@@ -224,7 +183,15 @@ const Listing = () => {
             </header>
 
             <div className="bg-[#404040] text-white px-4 py-2 rounded-lg text-md w-full max-w-md text-center mb-4">
-                {startDateFormatted} - {endDateFormatted}
+                {new Date(startDate).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                })} - {new Date(endDate).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                })}
             </div>
 
             {/* Filters */}
@@ -340,31 +307,39 @@ const Listing = () => {
                     {filteredList.map((car) => (
                         <div
                             key={car.id}
-                            className="bg-[#404040] p-0 rounded-lg shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-[2%] mb-5"
+                            className="bg-[#404040] p-0 rounded-lg shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-[2%] mb-5 relative"
                         >
+                            {/* Local Owner Badge */}
+                            {car.type === "firebase" && (
+                                <div className="absolute top-2 left-2 bg-lime text-black px-2 py-1 rounded-full text-xs z-10">
+                                    Local Owner
+                                </div>
+                            )}
+
                             {/* Small Screens Layout */}
                             <div className="block md:hidden p-3">
                                 <img
-                                    src={car.images[0]}
+                                    src={car.images[0] || "/default-car.jpg"}
                                     alt={car.name}
-                                    className="w-full h-40 object-cover bg-[#353535] rounded-lg  p-1"
+                                    className="w-full h-40 object-cover bg-[#353535] rounded-lg p-1"
                                 />
                                 <div className="mt-3 flex justify-between items-start">
                                     <div>
                                         <h3 className="text-md font-semibold">
-                                            {car.brand.split(" ")[0]}{" "}
-                                            {car.name.split(" ")[0]}
+                                            {car.brand?.split(" ")[0]} {car.name?.split(" ")[0]}
                                         </h3>
                                         <p className="text-md text-gray-400">
                                             {car.options[2]}
                                         </p>
-                                        <div className="img-container">
-                                            <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm mt-2 bg-white p-1"
-                                            />
-                                        </div>
+                                        {car.type === "api" && (
+                                            <div className="img-container">
+                                                <img
+                                                    src="/images/ServiceProvider/zoomcarlogo.png"
+                                                    alt="Zoomcar"
+                                                    className="h-5 rounded-sm mt-2 bg-white p-1"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="text-right">
                                         <p className="text-md text-gray-400">
@@ -393,23 +368,24 @@ const Listing = () => {
                             </div>
 
                             {/* Medium and Larger Screens Layout */}
-
-                            <div className="hidden md:flex items-center  px-4 rounded-xl shadow-xl w-full h-44">
-                                <div className="flex items-stretch justify-between w-full  ">
+                            <div className="hidden md:flex items-center px-4 rounded-xl shadow-xl w-full h-44">
+                                <div className="flex items-stretch justify-between w-full">
                                     {/* Left Side Info */}
-                                    <div className="flex flex-col text-white w-1/4 justify-between ">
+                                    <div className="flex flex-col text-white w-1/4 justify-between">
                                         <div className="self-auto">
                                             <h3 className="text-lg font-semibold mb-1">
                                                 {car.brand} {car.name}
                                             </h3>
                                         </div>
-                                        <div className="img-container">
-                                            <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm bg-white p-1"
-                                            />
-                                        </div>
+                                        {car.type === "api" && (
+                                            <div className="img-container">
+                                                <img
+                                                    src="/images/ServiceProvider/zoomcarlogo.png"
+                                                    alt="Zoomcar"
+                                                    className="h-5 rounded-sm bg-white p-1"
+                                                />
+                                            </div>
+                                        )}
                                         <div className="self-auto ">
                                             <p className="text-left text-xs text-gray-400 mb-1">
                                                 {car.options[2]}
@@ -423,7 +399,7 @@ const Listing = () => {
                                     {/* Middle Car Image */}
                                     <div className="w-2/4 flex justify-center items-center ">
                                         <img
-                                            src={car.images[0]}
+                                            src={car.images[0] || "/default-car.jpg"}
                                             alt={car.name}
                                             className="w-48 h-32 object-contain bg-[#353535] rounded-md p-1"
                                         />
