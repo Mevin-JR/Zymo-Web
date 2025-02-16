@@ -12,12 +12,12 @@ import ConfirmPage from "./components/ConfirmPage";
 import Details from "./screens/Details";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
-import Career from "./pages/Career";
 import ScrollToTop from "./components/ScrollToTop";
 import Blog from "./pages/Blog";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import CareerForm from "./pages/Career";
 
 const App = () => {
     return (
@@ -53,7 +53,7 @@ const App = () => {
                     {/* Contact Us */}
                     <Route path="/contact-us" element={<ContactUs />} />
                     {/* Carrer */}
-                    <Route path="/career" element={<Career />} />
+                    <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<Blog />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
