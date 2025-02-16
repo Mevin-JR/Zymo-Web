@@ -20,6 +20,7 @@ import FormPage from "./pages/Buy/EnterInformation";
 import UploadDocuments from "./pages/Buy/UploadDocuments";
 import DatePicker from "./pages/Buy/DatePicker";
 import CareerForm from "./pages/Career";
+import Summary from "./pages/Buy/Summary";
 
 const App = () => {
     return (
@@ -62,6 +63,7 @@ const App = () => {
                     />
                     
                     {/* Buy Page Routes*/}
+                    <Route path="/buy/summary" element={<Summary />} />
                     <Route path="/buy/date-picker" element={<DatePicker />} />
                     <Route path="/buy/upload-info" element={<FormPage />} />
                     <Route path="/buy/upload-doc" element={<UploadDocuments />} />
