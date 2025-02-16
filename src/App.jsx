@@ -10,7 +10,6 @@ import { ToastContainer } from "react-toastify";
 import Details from "./screens/Details";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
-import Career from "./pages/Career";
 import ScrollToTop from "./components/ScrollToTop";
 import BlogsMainPage from "./pages/BlogsMainPage";
 import BlogDetailPage from "./pages/BlogDetailsPage";
@@ -20,6 +19,7 @@ import CancellationPolicy from "./pages/CancellationPolicy";
 import FormPage from "./pages/Buy/EnterInformation";
 import UploadDocuments from "./pages/Buy/UploadDocuments";
 import DatePicker from "./pages/Buy/DatePicker";
+import CareerForm from "./pages/Career";
 
 const App = () => {
     return (
@@ -72,7 +72,7 @@ const App = () => {
                     {/* Contact Us */}
                     <Route path="/contact-us" element={<ContactUs />} />
                     {/* Carrer */}
-                    <Route path="/career" element={<Career />} />
+                    <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:id" element={<BlogDetailPage />} />
