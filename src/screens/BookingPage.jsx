@@ -3,7 +3,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useState } from "react";
-// import emailjs from "@emailjs/nodejs";
 import ConfirmPage from "../components/ConfirmPage";
 
 // Function to dynamically load Razorpay script
@@ -21,17 +20,13 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function BookingPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { car, formattedCity, userData, startDate, endDate } =
-        location.state || {};
-
-    const { userEmail } = useParams();
-
+    const { formattedCity } = useParams();
+    const { startDate, endDate, userData, car } = location.state || {};
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
     });
-
     const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
@@ -40,36 +35,10 @@ function BookingPage() {
 
     const [customerName, setCustomerName] = useState(userData.name);
     const [customerPhone, setCustomerPhone] = useState(userData.phone);
-    const [customerEmail, setCustomerEmail] = useState(userEmail);
+    const [customerEmail, setCustomerEmail] = useState(userData.email);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-
-    // emailjs.init({
-    //     publicKey: "u74XY2gOIbkt_YNz7",
-    //     // privateKey: "",
-    // });
-
-    // const emailPaymentConfirmation = async (paymentId, orderId, amt) => {
-    //     const templateParams = {
-    //         to_name: customerName,
-    //         payment_id: paymentId,
-    //         order_id: orderId,
-    //         amount: amt,
-    //     };
-
-    //     try {
-    //         const response = await emailjs.send(
-    //             "service_uwvt2p8",
-    //             "template_069rahc",
-    //             templateParams
-    //         );
-
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.error("Error sending payment confirmation:", error);
-    //     }
-    // };
 
     const bookingData = {
         carDetails: {
@@ -295,7 +264,7 @@ function BookingPage() {
                 currency: "INR",
                 name: "Zymo",
                 description: "title",
-                image: import.meta.env.VITE_ZYMO_LOGO_URL,
+                image: "/images/AppLogo/zymo2.jpg",
                 order_id: orderData.id,
                 handler: async function (response) {
                     const data = {

@@ -5,6 +5,8 @@ import { db, storage } from "../utils/firebase";
 
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+const CareerForm = () => {
+    const [selectedType, setSelectedType] = useState("Internship");
 
 const CareerForm = () => {
     const [selectedType, setSelectedType] = useState("Internship");
@@ -127,7 +129,7 @@ const CareerForm = () => {
                     <button type="submit" className="w-full bg-[#faffa4] text-black py-3 rounded-lg font-semibold transition duration-300 hover:bg-[#faffa4]-700">Submit Application</button>
                 </form>
             </div>
-            <Footer />
+            <Footer></Footer>
         </>
     );
 };

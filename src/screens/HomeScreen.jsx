@@ -9,6 +9,7 @@ import Cities from "../components/homecomponent/Cities";
 import Footer from "../components/Footer";
 import BrandsAvailable from "../components/homecomponent/BrandsAvailable";
 import ServiceProvider from "../components/homecomponent/ServiceProvider";
+import { FaWhatsapp } from "react-icons/fa";
 
 const HomeScreen = () => {
     return (
@@ -26,6 +27,16 @@ const HomeScreen = () => {
                     <Cities />
                 </div>
                 <Footer />
+
+                {/* WhatsApp Floating Button */}
+                <a
+                    href="https://wa.me/919987933348"
+                    className="fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <FaWhatsapp className="text-3xl" />
+                </a>
             </div>
         </>
     );
