@@ -155,7 +155,7 @@ const CarDetails = () => {
                             <div key={`left-${index}`}>
                                  {/* Left Section - Image Scroller */}
                             <div>
-                                <div className="img-container relative w-full overflow-hidden rounded-2xl">
+                                {/* <div className="img-container relative w-full overflow-hidden rounded-2xl">
                                     <div
                                         className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
                                         style={{
@@ -173,7 +173,47 @@ const CarDetails = () => {
                                             />
                                         ))}
                                     </div>
-                                </div>
+                                </div> */}
+                                <div className="img-container relative w-full overflow-hidden rounded-2xl">
+    {/* Backward Button */}
+    <button
+        className="absolute left-0 top-1/2 transform -translate-y-1/2  bg-black bg-opacity-25 text-[#faffa4] p-2 rounded-full z-10"
+        onClick={() => {
+            setCurrentIndex((prevIndex) => (prevIndex === 0 ? car.image.length - 1 : prevIndex - 1));
+        }}
+    >
+        &#10094; {/* Left arrow */}
+    </button>
+
+    {/* Image Scroller */}
+    <div
+        className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
+        style={{
+            width: `${car.image.length * 100}%`,
+            transform: `translateX(-${(currentIndex * 100) / car.image.length}%)`,
+        }}
+    >
+        {car.image.map((image, idx) => (
+            <img
+                key={idx}
+                src={image}
+                alt={`${car.name} ${idx + 1}`}
+                className="w-full flex-none rounded-2xl shadow-xl"
+                style={{ width: `${100 / car.image.length}%` }}
+            />
+        ))}
+    </div>
+
+    {/* Forward Button */}
+    <button
+        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-25 text-[#faffa4] p-2 rounded-full z-10"
+        onClick={() => {
+            setCurrentIndex((prevIndex) => (prevIndex === car.image.length - 1 ? 0 : prevIndex + 1));
+        }}
+    >
+        &#10095; {/* Right arrow */}
+    </button>
+</div>
 
                                 {/* Booking Information */}
                                 {/* <div className="bg-darkGrey2 mt-10 p-7 rounded-xl shadow-md mb-8 hidden lg:block"> */}
