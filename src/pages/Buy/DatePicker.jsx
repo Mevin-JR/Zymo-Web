@@ -15,44 +15,46 @@ const DatePicker = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md mx-auto"
+        className="container mx-auto max-w-4xl py-8"
       >
         {/* Header */}
         <button
-            onClick={() => navigate(-1)}
-            className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
-            >
-            <ArrowLeft size={30} />
+          onClick={() => navigate(-1)}
+          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
+          >
+          <ArrowLeft size={28} />
         </button>
 
-        <div className="text-center mb-10 text-3xl md:text-4xl mt-5">
-            <span className="text-appColor  font-bold mb-8 text-center">Welcome</span> to Extended Test Drive!
+        <div className="text-center mb-6 md:mb-10 text-xl md:text-4xl font-bold">
+          <span className="block sm:inline text-appColor font-bold mb-2 sm:mb-0">Welcome</span>
+          <span className="block sm:inline"> to Extended Test Drive!</span>
         </div>
 
-        <div className="bg-[#212121]  md:bg-[#2A2A2A]  p-7 md:p-8 rounded-xl shadow-xl">
+
+        <div className="bg-[#212121]  md:bg-[#2A2A2A]  p-6 md:p-8 rounded-xl shadow-xl border border-white/10">
             {/* Date Selection */}
             <div className="mb-6">
-            <h2 className="text-xl mb-4">Pick-up Date</h2>
-            <div className="bg-darkGrey rounded-lg p-3">
-                <div className="text-xl mb-4">{format(selectedDate, "MMMM dd, yyyy")}</div>
-                
-                <div className="flex space-x-2 mb-6 pb-4  overflow-x-scroll no-scrollbar">
-                    {dates.map((date) => (
-                        <button
-                        key={date.toISOString()}
-                        onClick={() => setSelectedDate(date)}
-                        className={`flex-shrink-0 w-14 h-16 rounded-lg flex flex-col items-center justify-center transition-all duration-200 ${
-                            selectedDate.toDateString() === date.toDateString()
-                            ? "bg-appColor text-black"
-                            : "bg-darkGrey2 text-white hover:bg-opacity-70"
-                        }`}
-                        >
-                        <span className="text-xs">{format(date, "MMM")}</span>
-                        <span className="text-lg font-semibold">{format(date, "dd")}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
+              <h2 className="text-xl mb-4">Pick-up Date</h2>
+              <div className="bg-darkGrey rounded-lg p-5 border border-white/10">
+                  <div className="text-xl mb-4">{format(selectedDate, "MMMM dd, yyyy")}</div>
+                  
+                  <div className="flex space-x-2 mb-3 pb-1 overflow-x-scroll hide-scrollbar ">
+                      {dates.map((date) => (
+                          <button
+                          key={date.toISOString()}
+                          onClick={() => setSelectedDate(date)}
+                          className={`flex-shrink-0 w-16 h-16 rounded-lg flex flex-col items-center justify-center transition-all duration-200 border border-white/10 ${
+                              selectedDate.toDateString() === date.toDateString()
+                              ? "bg-appColor text-black"
+                              : "bg-darkGrey2 text-white hover:bg-opacity-70"
+                          }`}
+                          >
+                          <span className="text-xs">{format(date, "MMM")}</span>
+                          <span className="text-lg font-semibold">{format(date, "dd")}</span>
+                          </button>
+                      ))}
+                  </div>
+              </div>
             </div>
 
             {/* Booking Info */}
@@ -68,7 +70,7 @@ const DatePicker = () => {
             <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full bg-appColor text-black py-4 rounded-full font-semibold hover:opacity-90 transition-opacity"
+            className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
             onClick={() => navigate('/buy/upload-info')}
             >
             Next

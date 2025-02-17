@@ -124,7 +124,7 @@ const UploadSection = ({title,image,onUpload}) => (
             onClick={() => onUpload('camera')}
             className="upload-button group"
           >
-            <Camera size={30} className="mb-2 text-[#edff8d]" />
+            <Camera size={28} className="mb-2 text-[#edff8d]" />
           </button>
 
           <button
@@ -213,8 +213,8 @@ const handleSubmit =async()=>{
     }
 }
   return (
-    <div className="min-h-screen bg-[#121212] text-white">
-      <div className="container mx-auto px-4 py-10 max-w-4xl">
+    <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
+      <div className="container mx-auto max-w-4xl py-8">
         <button
             onClick={() => navigate(-1)}
             className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
@@ -222,14 +222,14 @@ const handleSubmit =async()=>{
             <ArrowLeft size={30} />
         </button>
 
-        <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-4xl font-bold text-center">
+        <div className="text-center mb-6 md:mb-10">
+            <h1 className="text-xl md:text-4xl font-bold">
                 You're just one step away from{' '}
                 <span className="text-[#edff8d]">Booking</span>
             </h1>
         </div>
 
-        <div className="bg-[#2A2A2A] p-6 md:p-8 rounded-xl shadow-2xl">
+        <div className="bg-[#2A2A2A] p-6 md:p-8 rounded-xl shadow-2xl border border-white/10">
           <div className="space-y-8">
             <UploadSection
               title="Upload Driving License Front Page"
