@@ -6,6 +6,44 @@ const ConfirmPage = ({ isOpen, close }) => {
     if (!isOpen) return null;
 
     const navigate = useNavigate();
+    const {userData}= location.state || {}
+
+    const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    const sendWhatsAppMessage = async (bookingData) => {
+        try {
+            const response = await fetch(`${functionsUrl}/message/send-whatsapp-message`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ bookingData })
+            });
+    
+            const data = await response.json();
+            console.log("WhatsApp Message Response:", data);
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+    
+    // Example usage
+    const handleSendMessage = () => {
+        const bookingData = {
+            customerName: userData.name,
+            model: "Sedan",
+            transmission:"Automatic",
+            pickupLocation: "Airport Terminal 1",
+            id: "ABC12345",
+            freeKMs: "100",
+            startDate: "2025-02-15",
+            endDate: "2025-02-20",
+            city: "Ghaziabad",
+            phone: userData.phone
+        };
+    
+        sendWhatsAppMessage(bookingData);
+    };
+    
     return (
         <>
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">

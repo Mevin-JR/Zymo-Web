@@ -2,16 +2,16 @@ import { useEffect, useRef } from "react";
 
 const BrandsAvailable = () => {
     const brands = [
-        { name: "Kia", logo: "images/CarLogos/Kia.png" },
-        { name: "Toyota", logo: "images/CarLogos/toyota.png" },
-        { name: "Mahindra", logo: "images/CarLogos/mahindraa.png" },
-        { name: "MG", logo: "images/CarLogos/mg.png" },
-        { name: "Tata", logo: "images/CarLogos/tata.png" },
-        { name: "Honda", logo: "images/CarLogos/honda.png" },
-        { name: "BMW", logo: "images/CarLogos/bmw.png" },
-        { name: "Mercedes-Benz", logo: "images/CarLogos/mbenz.png" },
-        { name: "Maruti", logo: "images/CarLogos/suzuki.png" },
-        { name: "Audi", logo: "images/CarLogos/audi.png" },
+        { name: "Kia", logo: "/images/CarLogos/Kia.png" },
+        { name: "Toyota", logo: "/images/CarLogos/toyota.png" },
+        { name: "Mahindra", logo: "/images/CarLogos/mahindraa.png" },
+        { name: "MG", logo: "/images/CarLogos/mg.png" },
+        { name: "Tata", logo: "/images/CarLogos/tata.png" },
+        { name: "Honda", logo: "/images/CarLogos/honda.png" },
+        { name: "BMW", logo: "/images/CarLogos/bmw.png" },
+        { name: "Mercedes-Benz", logo: "/images/CarLogos/mbenz.png" },
+        { name: "Maruti", logo: "/images/CarLogos/suzuki.png" },
+        { name: "Audi", logo: "/images/CarLogos/audi.png" },
     ];
 
     const scrollRef = useRef(null);
