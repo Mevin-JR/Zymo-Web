@@ -1,15 +1,18 @@
 export const getCurrentTime = () => {
     const date = new Date();
 
+    // Add 2 hours to the current time
     date.setHours(date.getHours() + 2);
 
-    // Round minutes to nearest 30-minute mark
-    let minutes = date.getMinutes();
-    if (minutes < 30) {
-        minutes = 30;
+    // Round to the nearest 0 or 30 minutes
+    const minutes = date.getMinutes();
+    if (minutes < 15) {
+        date.setMinutes(0);
+    } else if (minutes >= 15 && minutes < 45) {
+        date.setMinutes(30);
     } else {
-        minutes = 0;
-        date.setHours(date.getHours() + 1);
+        date.setMinutes(0);
+        date.setHours(date.getHours() + 1); // Round up to the next hour
     }
 
     // Format as "YYYY-MM-DDTHH:MM" for datetime-local input
@@ -17,7 +20,7 @@ export const getCurrentTime = () => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     const hours = String(date.getHours()).padStart(2, "0");
-    const formattedMinutes = String(minutes).padStart(2, "0");
+    const minutesFormatted = String(date.getMinutes()).padStart(2, "0");
 
-    return `${year}-${month}-${day}T${hours}:${formattedMinutes}`;
+    return `${year}-${month}-${day}T${hours}:${minutesFormatted}`;
 };
