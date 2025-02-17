@@ -124,7 +124,7 @@ const UploadSection = ({title,image,onUpload}) => (
             onClick={() => onUpload('camera')}
             className="upload-button group"
           >
-            <Camera size={30} className="mb-2 text-[#edff8d]" />
+            <Camera size={28} className="mb-2 text-[#edff8d]" />
           </button>
 
           <button

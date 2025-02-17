@@ -20,14 +20,16 @@ const DatePicker = () => {
         {/* Header */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
+          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
           >
-          <ArrowLeft size={30} />
+          <ArrowLeft size={28} />
         </button>
 
         <div className="text-center mb-6 md:mb-10 text-xl md:text-4xl font-bold">
-          <span className="text-appColor font-bold mb-8 text-center">Welcome</span> to Extended Test Drive!
+          <span className="block sm:inline text-appColor font-bold mb-2 sm:mb-0">Welcome</span>
+          <span className="block sm:inline"> to Extended Test Drive!</span>
         </div>
+
 
         <div className="bg-[#212121]  md:bg-[#2A2A2A]  p-6 md:p-8 rounded-xl shadow-xl border border-white/10">
             {/* Date Selection */}
@@ -36,12 +38,12 @@ const DatePicker = () => {
               <div className="bg-darkGrey rounded-lg p-5 border border-white/10">
                   <div className="text-xl mb-4">{format(selectedDate, "MMMM dd, yyyy")}</div>
                   
-                  <div className="flex space-x-2 mb-6 pb-2 overflow-x-scroll no-scrollbar ">
+                  <div className="flex space-x-2 mb-3 pb-1 overflow-x-scroll hide-scrollbar ">
                       {dates.map((date) => (
                           <button
                           key={date.toISOString()}
                           onClick={() => setSelectedDate(date)}
-                          className={`flex-shrink-0 w-14 h-16 rounded-lg flex flex-col items-center justify-center transition-all duration-200 border border-white/10 ${
+                          className={`flex-shrink-0 w-16 h-16 rounded-lg flex flex-col items-center justify-center transition-all duration-200 border border-white/10 ${
                               selectedDate.toDateString() === date.toDateString()
                               ? "bg-appColor text-black"
                               : "bg-darkGrey2 text-white hover:bg-opacity-70"

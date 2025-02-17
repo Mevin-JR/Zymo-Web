@@ -63,13 +63,13 @@ export default function FormPage() {
       <div className="container mx-auto max-w-4xl py-8">
         <button
           onClick={() => navigate(-1)}
-          className="absolute left-2 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all"
+          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all"
         >
-          <ArrowLeft size={24} />
+          <ArrowLeft size={28} />
         </button>
 
         <div className="text-center mb-6 md:mb-10">
-          <h1 className="text-xl md:text-4xl font-bold">
+          <h1 className="text-xl p-2 md:text-4xl font-bold">
             Extended Test Drive Booking
           </h1>
         </div>
