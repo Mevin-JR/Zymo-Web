@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 
-const DateTimeOverlay = ({ selectedDate, setSelectedDate, onSave, onClose }) => {
+const DateTimeOverlay = ({
+    selectedDate,
+    setSelectedDate,
+    onSave,
+    onClose,
+}) => {
     const [hour, setHour] = useState(10);
     const [minute, setMinute] = useState(0);
     const [ampm, setAmpm] = useState("AM");
@@ -27,10 +32,7 @@ const DateTimeOverlay = ({ selectedDate, setSelectedDate, onSave, onClose }) => 
 
         newDate.setHours(adjustedHour, minute, 0, 0); // Use setHours (LOCAL time)
 
-        console.log("Saving date (Local Time):", newDate.toString().slice(0, 16)); //new change----
-
         onSave(newDate);
-        console.log("Calling onClose");
         onClose();
     };
 
@@ -39,26 +41,40 @@ const DateTimeOverlay = ({ selectedDate, setSelectedDate, onSave, onClose }) => 
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 {/* Date Picker */}
                 <div className="flex flex-col w-full sm:w-auto">
-                    <label className="text-gray-300 text-sm mb-1">Select Date</label>
+                    <label className="text-gray-300 text-sm mb-1">
+                        Select Date
+                    </label>
                     <input
                         type="date"
                         className="border p-2 rounded bg-[#212121]  text-white w-full sm:w-auto"
                         value={selectedDate.toLocaleDateString("en-CA")}
-                        onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                        onChange={(e) =>
+                            setSelectedDate(new Date(e.target.value))
+                        }
                     />
                 </div>
 
                 {/* Time Picker */}
                 <div className="flex flex-col w-full sm:w-auto md:border-l-2 border-gray-500 ">
-                    <label className="text-gray-300 text-sm mb-1">Select Time</label>
+                    <label className="text-gray-300 text-sm mb-1">
+                        Select Time
+                    </label>
                     <div className="flex items-center justify-between bg-[#212121] p-2 rounded text-white w-full md:ml-2 sm:w-auto">
                         {/* Hour */}
                         <div className="flex flex-col items-center">
-                            <button onClick={() => adjustTime("hour", 1)} aria-label="Increase Hour">
+                            <button
+                                onClick={() => adjustTime("hour", 1)}
+                                aria-label="Increase Hour"
+                            >
                                 <ChevronUp />
                             </button>
-                            <span className="text-lg font-semibold">{hour.toString().padStart(2, "0")}</span>
-                            <button onClick={() => adjustTime("hour", -1)} aria-label="Decrease Hour">
+                            <span className="text-lg font-semibold">
+                                {hour.toString().padStart(2, "0")}
+                            </span>
+                            <button
+                                onClick={() => adjustTime("hour", -1)}
+                                aria-label="Decrease Hour"
+                            >
                                 <ChevronDown />
                             </button>
                         </div>
@@ -67,11 +83,19 @@ const DateTimeOverlay = ({ selectedDate, setSelectedDate, onSave, onClose }) => 
 
                         {/* Minute */}
                         <div className="flex flex-col items-center">
-                            <button onClick={() => adjustTime("minute", 1)} aria-label="Increase Minute">
+                            <button
+                                onClick={() => adjustTime("minute", 1)}
+                                aria-label="Increase Minute"
+                            >
                                 <ChevronUp />
                             </button>
-                            <span className="text-lg font-semibold">{minute.toString().padStart(2, "0")}</span>
-                            <button onClick={() => adjustTime("minute", -1)} aria-label="Decrease Minute">
+                            <span className="text-lg font-semibold">
+                                {minute.toString().padStart(2, "0")}
+                            </span>
+                            <button
+                                onClick={() => adjustTime("minute", -1)}
+                                aria-label="Decrease Minute"
+                            >
                                 <ChevronDown />
                             </button>
                         </div>
@@ -80,11 +104,19 @@ const DateTimeOverlay = ({ selectedDate, setSelectedDate, onSave, onClose }) => 
 
                         {/* AM/PM */}
                         <div className="flex flex-col items-center">
-                            <button onClick={() => adjustTime("ampm", 1)} aria-label="Toggle AM/PM">
+                            <button
+                                onClick={() => adjustTime("ampm", 1)}
+                                aria-label="Toggle AM/PM"
+                            >
                                 <ChevronUp />
                             </button>
-                            <span className="text-lg font-semibold">{ampm}</span>
-                            <button onClick={() => adjustTime("ampm", -1)} aria-label="Toggle AM/PM">
+                            <span className="text-lg font-semibold">
+                                {ampm}
+                            </span>
+                            <button
+                                onClick={() => adjustTime("ampm", -1)}
+                                aria-label="Toggle AM/PM"
+                            >
                                 <ChevronDown />
                             </button>
                         </div>

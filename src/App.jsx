@@ -61,12 +61,15 @@ const App = () => {
                         path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
                         element={<BookingPage />}
                     />
-                    
+
                     {/* Buy Page Routes*/}
                     <Route path="/buy/summary" element={<Summary />} />
                     <Route path="/buy/date-picker" element={<DatePicker />} />
                     <Route path="/buy/upload-info" element={<FormPage />} />
-                    <Route path="/buy/upload-doc" element={<UploadDocuments />} />
+                    <Route
+                        path="/buy/upload-doc"
+                        element={<UploadDocuments />}
+                    />
 
                     {/* NavBar Pages */}
                     {/* About Us */}
@@ -77,7 +80,7 @@ const App = () => {
                     <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
-                    <Route path="/blogs/:id" element={<BlogDetailPage />} />
+                    <Route path="/blogs/:title" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                     <Route
                         path="/termsofservice"

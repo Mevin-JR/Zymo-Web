@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "../utils/firebase";
+import { appDB, appStorage } from "../utils/firebase";
 
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
@@ -52,13 +52,13 @@ const CareerForm = () => {
             let resumeURL = "";
             if (formData.resume) {
                 const resumeRef = ref(
-                    storage,
+                    appStorage,
                     `resumes/${formData.email}-${Date.now()}`
                 );
                 await uploadBytes(resumeRef, formData.resume);
                 resumeURL = await getDownloadURL(resumeRef);
             }
-            await addDoc(collection(db, "careerApplications"), {
+            await addDoc(collection(appDB, "careerApplications"), {
                 ...formData,
                 resume: resumeURL,
                 jobType: selectedType,

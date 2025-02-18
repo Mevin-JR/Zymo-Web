@@ -15,11 +15,11 @@ import NewRSB from "../components/NewRSB";
 const HomeScreen = () => {
     return (
         <>
+            <NavBar />
             <div className="container flex flex-col w-full mx-auto">
-                <NavBar />
                 <div className="container">
                     <Header />
-                    <NewRSB/>
+                    <NewRSB />
                     <HeroImage />
                     {/* <RSB /> */}
                     <Benefits />
@@ -28,8 +28,6 @@ const HomeScreen = () => {
                     <Reviews />
                     <Cities />
                 </div>
-                <Footer />
-
                 {/* WhatsApp Floating Button */}
                 <a
                     href="https://wa.me/919987933348"
@@ -40,6 +38,7 @@ const HomeScreen = () => {
                     <FaWhatsapp className="text-3xl" />
                 </a>
             </div>
+            <Footer />
         </>
     );
 };
