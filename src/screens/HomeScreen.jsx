@@ -1,4 +1,3 @@
-import React from "react";
 import NavBar from "../components/NavBar";
 import Header from "../components/homecomponent/Header";
 import RSB from "../components/homecomponent/RSB";
@@ -13,8 +12,8 @@ import ServiceProvider from "../components/homecomponent/ServiceProvider";
 const HomeScreen = () => {
     return (
         <>
+              <NavBar />
             <div className="container flex flex-col w-full mx-auto">
-                <NavBar />
                 <div className="container">
                     <Header />
                     <HeroImage />
