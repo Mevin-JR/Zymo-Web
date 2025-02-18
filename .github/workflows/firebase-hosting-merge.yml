@@ -3,18 +3,36 @@
 
 name: Deploy to Firebase Hosting on merge
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches:
+            - main
 jobs:
-  build_and_deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ZYMO_PROD }}
-          channelId: live
-          projectId: zymo-prod
+    build_and_deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Setting up env vars
+              run: |
+                  echo "VITE_PLACES_API_KEY=${{ secrets.VITE_PLACES_API_KEY }}" >> .env.production
+                  echo "VITE_FUNCTIONS_API_URL=${{ secrets.VITE_FUNCTIONS_API_URL }}" >> .env.production
+                  echo "VITE_RAZORPAY_TEST_KEY=${{ secrets.VITE_RAZORPAY_TEST_KEY }}" >> .env.production
+                  echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}" >> .env.production
+                  echo "VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}" >> .env.production
+                  echo "VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}" >> .env.production
+                  echo "VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" >> .env.production
+                  echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_SENDER_ID }}" >> .env.production
+                  echo "VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}" >> .env.production
+                  echo "VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}" >> .env.production
+
+            - name: Installing dependencies & building
+              run: npm ci && npm run build
+
+            - name: Deploying to firebase
+              uses: FirebaseExtended/action-hosting-deploy@v0
+              with:
+                  repoToken: ${{ secrets.GITHUB_TOKEN }}
+                  firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ZYMO_PROD }}
+                  channelId: live
+                  projectId: zymo-prod

@@ -132,7 +132,8 @@ const RSB = () => {
         if (city && startDate && endDate) {
             const lat = place.lat;
             const lng = place.lng;
-            const formattedCity = city === "Bengaluru" ? "Bangalore" : city;
+            const formattedCity =
+                city === "Bengaluru" ? "bangalore" : city.toLowerCase();
 
             const stateData = {
                 address,
@@ -143,7 +144,9 @@ const RSB = () => {
                 tripDuration,
             };
 
-            navigate(`/listing/${formattedCity}`, {
+            sessionStorage.setItem("fromSearch", true);
+
+            navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
             });
         } else {
@@ -233,7 +236,8 @@ const RSB = () => {
                                     <input
                                         type="text"
                                         placeholder="Enter a location"
-                                        className="bg-[#303030] text-white outline-none w-full "
+                                        className="bg-[#303030] text-white outline-none w-full"
+                                        id="location-input"
                                     />
                                 </Autocomplete>
                             </div>

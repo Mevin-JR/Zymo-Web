@@ -6,14 +6,13 @@ import HomeScreen from "./screens/HomeScreen";
 import BookingPage from "./screens/BookingPage";
 import BookingCard from "./screens/BookingCard";
 import Listing from "./screens/Listing";
-import LoginPage from "./components/LoginPage";
 import { ToastContainer } from "react-toastify";
-import ConfirmPage from "./components/ConfirmPage";
 import Details from "./screens/Details";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import ScrollToTop from "./components/ScrollToTop";
-import Blog from "./pages/Blog";
+import BlogsMainPage from "./pages/BlogsMainPage";
+import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
@@ -25,11 +24,23 @@ const App = () => {
             <BrowserRouter>
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
                 <Routes>
-                    {/* HomePage */}
+                    {/* HomePage urls */}
                     <Route path="/" element={<HomeScreen />} />
+                    <Route path="/home" element={<HomeScreen />} />
+                    <Route
+                        path="/self-drive-car-rentals"
+                        element={<HomeScreen />}
+                    />
+                    <Route
+                        path="/self-drive-car-rentals/:city"
+                        element={<HomeScreen />}
+                    />
 
                     {/* Page2 */}
-                    <Route path="/listing/:city" element={<Listing />} />
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars"
+                        element={<Listing />}
+                    />
 
                     {/* Page3 */}
                     {/* Temporarily disabled */}
@@ -37,13 +48,13 @@ const App = () => {
 
                     {/* Page4 */}
                     <Route
-                        path="/details/:city/:carName"
+                        path="/self-drive-car-rentals/:city/cars/booking-details"
                         element={<Details />}
                     />
 
                     {/* Page5 */}
                     <Route
-                        path="/booking/:userEmail"
+                        path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
                         element={<BookingPage />}
                     />
 
@@ -55,7 +66,8 @@ const App = () => {
                     {/* Carrer */}
                     <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
-                    <Route path="/blogs" element={<Blog />} />
+                    <Route path="/blogs" element={<BlogsMainPage />} />
+                    <Route path="/blogs/:id" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                     <Route
                         path="/termsofservice"

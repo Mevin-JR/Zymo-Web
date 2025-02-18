@@ -6,11 +6,10 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
 } from "firebase/auth";
-import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { IoClose } from "react-icons/io5";
 
-const LoginPage = ({ isOpen, onClose }) => {
+const LoginPage = ({ onAuth, isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const [isLogin, setIsLogin] = useState(true);
@@ -19,9 +18,6 @@ const LoginPage = ({ isOpen, onClose }) => {
     const [message, setMessage] = useState("");
 
     const googleProvider = new GoogleAuthProvider();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const previousState = location.state || {};
 
     const successMessage = (message) => {
         toast.success(message, {
@@ -37,20 +33,10 @@ const LoginPage = ({ isOpen, onClose }) => {
         });
     };
 
-    const goToBooking = () => {
+    const closePopup = () => {
         const user = auth.currentUser;
-        const userData = {
-            uid: user.uid,
-            name: user.displayName,
-            email: user.email,
-            phone: user.phoneNumber,
-        };
-
-        const updatedState = { ...previousState, userData };
-
-        navigate(`/booking/${user.email}`, { state: updatedState });
-        console.log(updatedState);
-        onClose(); // Close modal after navigation
+        onAuth(user);
+        onClose();
     };
 
     const handleAuth = async (e) => {
@@ -65,7 +51,7 @@ const LoginPage = ({ isOpen, onClose }) => {
                 await createUserWithEmailAndPassword(auth, email, password);
                 successMessage("Account created successfully!");
             }
-            goToBooking();
+            closePopup();
         } catch (error) {
             errorMessage(error.message);
         }
@@ -75,7 +61,7 @@ const LoginPage = ({ isOpen, onClose }) => {
         try {
             await signInWithPopup(auth, googleProvider);
             successMessage("Google sign-in successful!");
-            goToBooking();
+            closePopup();
         } catch (error) {
             errorMessage(error.message);
         }

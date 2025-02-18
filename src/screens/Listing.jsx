@@ -3,23 +3,28 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-// import zoomcarlogo from "src/"
 
 const Listing = () => {
+    // Location State
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration } =
         location.state || {};
-
     const { city } = useParams();
     const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
+        // hour12: true,
+        // hour: "numeric", // TODO: Adjust this part of start date display
+        // minute: "numeric",
     });
     const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "long",
         year: "numeric",
+        // hour12: true,
+        // hour: "numeric", // TODO: Adjust this part of end date display
+        // minute: "numeric",
     });
 
     const hasRun = useRef(false);
@@ -58,6 +63,16 @@ const Listing = () => {
 
         if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
             return;
+        }
+
+        if (sessionStorage.getItem("fromSearch") !== "true") {
+            sessionStorage.setItem("fromSearch", false);
+            // Load from cache if exists
+            if (localStorage.getItem("carList")) {
+                setCarList(JSON.parse(localStorage.getItem("carList")));
+                setLoading(false);
+                return;
+            }
         }
 
         const search = async () => {
@@ -135,8 +150,11 @@ const Listing = () => {
                 setLoading(false);
                 setCarList(carData);
                 setCarCount(carCards.length);
+
+                localStorage.setItem("carList", JSON.stringify(carData)); // Storing carList as cache
             } catch (error) {
                 unknownError();
+                console.error(error);
             }
         };
         search();
@@ -187,10 +205,13 @@ const Listing = () => {
     };
 
     const navigate = useNavigate();
-    const goToDetails = async (car) => {
-        const carName = `${car.brand.split(" ")[0]}-${car.name.split(" ")[0]}`;
-        navigate(`/details/${city}/${carName}`, {
-            state: { car, startDate, endDate },
+    const goToDetails = (car) => {
+        navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
+            state: {
+                startDate,
+                endDate,
+                car,
+            },
         });
     };
 
