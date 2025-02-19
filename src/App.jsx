@@ -96,6 +96,10 @@ const App = () => {
                         path="/cancellationpolicy"
                         element={<CancellationPolicy />}
                     />
+                    <Route
+                        path="/mybookings"
+                        element={<MyBookings />}
+                    />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
                 <ToastContainer />

@@ -19,12 +19,14 @@ const Profile = () => {
         </Link>
 
         {/* Your Bookings Section */}
+        <Link to="/mybookings">
         <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <FaCar className="text-gray-700 text-lg" />
             <span className="text-gray-800 font-medium">Your Bookings</span>
           </div>
         </div>
+        </Link>
 
         {/* Horizontal Line */}
         <hr className="border-gray-600 my-3" />
