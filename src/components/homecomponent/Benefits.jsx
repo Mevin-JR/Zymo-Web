@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const benefits = [
-    { title: "Wide Range of Cars" },
-    { title: "Quick and Easy Booking" },
-    { title: "No Hidden Charges" },
-    { title: "Trusted by 100,000+ Happy Customers" },
+    { title: "Wide Range of Cars", imgSrc: "/images/Benefits/img-1.png" },
+    { title: "Quick and Easy Booking", imgSrc: "/images/Benefits/img-2.png" },
+    { title: "No Hidden Charges", imgSrc: "/images/Benefits/img-3.png" },
+    { title: "Trusted by 100,00+ Happy Customers",imgSrc:"/images/Benefits/img-4.png   " },
 ];
 
 const Benefits = () => {
@@ -18,7 +18,7 @@ const Benefits = () => {
                     setVisibleBoxes((prev) => prev.map(() => true));
                 }
             },
-            { threshold: 0.3 } 
+            { threshold: 0.3 }
         );
 
         if (sectionRef.current) {
@@ -41,13 +41,24 @@ const Benefits = () => {
                 {benefits.map((benefit, index) => (
                     <div
                         key={index}
-                        className={`p-6 rounded-lg flex flex-col justify-center items-center w-[250px] md:w-[300px] text-center border border-[#faffa4] h-[150px] 
+                        className={`p-6 rounded-lg flex flex-col justify-center items-center w-[250px] md:w-[300px] text-center border border-[#faffa4] h-[200px] 
                         transition-all duration-700 ease-in-out transform ${
                             visibleBoxes[index] ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4"
                         }`}
-                        style={{ transitionDelay: `${index * 1000}ms` }} 
+                        style={{ transitionDelay: `${index * 300}ms` }} 
                     >
-                        <p className={`text-[#faffa4] text-1xl font-bold transition-opacity duration-700 ease-in-out ${visibleBoxes[index] ? "opacity-100" : "opacity-0"}`}>
+                        {benefit.imgSrc && (
+                            <img
+                                src={benefit.imgSrc}
+                                alt={benefit.title}
+                                className={`w-16 h-16 mb-2 transition-opacity duration-700 ease-in-out ${
+                                    visibleBoxes[index] ? "opacity-100" : "opacity-0"
+                                }`}
+                            />
+                        )}
+                        <p className={`text-[#faffa4] text-xl font-bold transition-opacity duration-700 ease-in-out ${
+                            visibleBoxes[index] ? "opacity-100" : "opacity-0"
+                        }`}>
                             {benefit.title}
                         </p>
                     </div>
