@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
@@ -20,6 +19,8 @@ import FormPage from "./pages/Buy/EnterInformation";
 import UploadDocuments from "./pages/Buy/UploadDocuments";
 import DatePicker from "./pages/Buy/DatePicker";
 import CareerForm from "./pages/Career";
+import YourDetails from "./pages/details";
+import Profile from "./components/Profile";
 import Summary from "./pages/Buy/Summary";
 
 const App = () => {
@@ -76,12 +77,17 @@ const App = () => {
                     <Route path="/about-us" element={<AboutUs />} />
                     {/* Contact Us */}
                     <Route path="/contact-us" element={<ContactUs />} />
+
+                    <Route path="/profile" element={<Profile />} />
+
                     {/* Carrer */}
                     <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:title" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                    <Route path="/details" element={<YourDetails />} />
+
                     <Route
                         path="/termsofservice"
                         element={<TermsofService />}
