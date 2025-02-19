@@ -72,13 +72,13 @@ const NewRSB = () => {
         }
     };
 
-    const handlePlacesAutocomplete = async () => {
-        const locationInput = document.getElementById("location-input");
-        const autocomplete = new google.maps.places.Autocomplete(locationInput, {
-            types: ['geocode'],
-        })
-        console.log(autocomplete.getPredictions());
-    }
+    // const handlePlacesAutocomplete = async () => {
+    //     const locationInput = document.getElementById("location-input");
+    //     const autocomplete = new google.maps.places.Autocomplete(locationInput, {
+    //         types: ['geocode'],
+    //     })
+    //     console.log(autocomplete.getPredictions());
+    // }
 
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
@@ -145,9 +145,8 @@ const NewRSB = () => {
             {/* Header */}
             <div className="bg-[#303030] rounded-full p-3 mx-auto mb-6 w-full max-w-md sm:w-[60%] md:max-w-xl lg:max-w-2xl">
                 <h1
-                    className={`text-white text-center text-md transition-opacity duration-500 ${
-                        fade ? "opacity-0" : "opacity-100"
-                    }`}
+                    className={`text-white text-center text-md transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"
+                        }`}
                 >
                     <SparklesIcon className="inline-block w-5 h-5 mr-2 text-[#faffa4]" />
                     {headerTexts[headerIndex]}
@@ -169,11 +168,10 @@ const NewRSB = () => {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`text-lg ${
-                                activeTab === tab
-                                    ? "text-white border-b-2 border-gray-200"
-                                    : "text-gray-400"
-                            }`}
+                            className={`text-lg ${activeTab === tab
+                                ? "text-white border-b-2 border-gray-200"
+                                : "text-gray-400"
+                                }`}
                         >
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </button>
@@ -183,14 +181,14 @@ const NewRSB = () => {
                 {/* Input Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
-                    {/* <LoadScriptNext
+                    <LoadScriptNext
                         googleMapsApiKey={placesAPIKey}
                         libraries={placesAPILibraries}
-                    > */}
+                    >
                         <div className="relative rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
                             <MapPinIcon className="w-6 h-5 text-gray-400 pr-1" />
                             <div className="flex-1">
-                                {/* <Autocomplete
+                                <Autocomplete
                                     onLoad={setAutocomplete}
                                     onPlaceChanged={handlePlaceSelect}
                                     options={{
@@ -198,19 +196,19 @@ const NewRSB = () => {
                                             country: "IN",
                                         },
                                     }}
-                                > */}
+                                >
                                     <input
                                         type="text"
                                         placeholder="Location"
-                                        value={placeInput}
-                                        onChange={(e) => setPlaceInput(e.target.value)}
+                                        // value={placeInput}
+                                        // onChange={(e) => setPlaceInput(e.target.value)}
                                         className="bg-transparent text-white outline-none w-full h-full"
                                         id="location-input"
                                     />
-                                {/* </Autocomplete> */}
+                                </Autocomplete>
 
                                 {/* Get current location option */}
-                                {placeInput && (
+                                {/* {placeInput && (
                                     <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
                                     <li
                                         className="p-2 cursor-pointer hover:bg-gray-700 text-white"
@@ -219,10 +217,10 @@ const NewRSB = () => {
                                         📍 Get Current Location
                                     </li>
                                 </ul>
-                                )}
+                                )} */}
                             </div>
                         </div>
-                    {/* </LoadScriptNext> */}
+                    </LoadScriptNext>
 
                     {/* Start Date Picker */}
                     <div className="relative w-full">
@@ -237,13 +235,13 @@ const NewRSB = () => {
                             <span className="text-gray-200 pl-10">
                                 {startDate
                                     ? new Intl.DateTimeFormat("en-US", {
-                                          month: "short",
-                                          day: "2-digit",
-                                          year: "numeric",
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                          hour12: true,
-                                      }).format(new Date(startDate))
+                                        month: "short",
+                                        day: "2-digit",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    }).format(new Date(startDate))
                                     : "Select Start Date"}
                             </span>
                         </div>
@@ -275,13 +273,13 @@ const NewRSB = () => {
                             <span className="text-gray-200 pl-10">
                                 {endDate
                                     ? new Intl.DateTimeFormat("en-US", {
-                                          month: "short",
-                                          day: "2-digit",
-                                          year: "numeric",
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                          hour12: true,
-                                      }).format(new Date(endDate))
+                                        month: "short",
+                                        day: "2-digit",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    }).format(new Date(endDate))
                                     : "Select End Date"}
                             </span>
                         </div>
