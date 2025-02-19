@@ -41,3 +41,56 @@
 .read-the-docs {
     color: #888;
 }
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  .upload-section {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+  
+  .upload-button {
+    @apply relative flex flex-col items-center justify-center p-6 rounded-xl 
+           transition-all duration-300 hover:scale-105 active:scale-95;
+  }
+  
+  .image-preview {
+    animation: scaleIn 0.4s ease-out forwards;
+  }
+  
+  .section-title {
+    @apply text-xl font-medium tracking-tight;
+  }
+  
+  .check-icon {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+/* Hide scrollbar for WebKit (Chrome, Safari) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none; /* IE & Edge */
+}

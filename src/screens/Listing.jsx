@@ -136,7 +136,7 @@ const Listing = () => {
                     location_est: car.car_data.location.text,
                     lat: car.car_data.location.lat,
                     lng: car.car_data.location.lng,
-                    fare: `₹${car.car_data.pricing.revenue}`,
+                    fare: `₹${car.car_data.pricing.revenue.toLocaleString("en-IN")}`,
                     actual_fare: car.car_data.pricing.fare_breakup
                         ? car.car_data.pricing.fare_breakup[0].fare_item[0]
                               .value

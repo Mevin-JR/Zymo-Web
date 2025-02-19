@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "../utils/firebase";
+import { appAuth } from "../utils/firebase";
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
@@ -34,7 +34,7 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
     };
 
     const closePopup = () => {
-        const user = auth.currentUser;
+        const user = appAuth.currentUser;
         onAuth(user);
         onClose();
     };
@@ -45,10 +45,10 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
 
         try {
             if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
+                await signInWithEmailAndPassword(appAuth, email, password);
                 successMessage("Login successful!");
             } else {
-                await createUserWithEmailAndPassword(auth, email, password);
+                await createUserWithEmailAndPassword(appAuth, email, password);
                 successMessage("Account created successfully!");
             }
             closePopup();
@@ -59,7 +59,7 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
 
     const handleGoogleLogin = async () => {
         try {
-            await signInWithPopup(auth, googleProvider);
+            await signInWithPopup(appAuth, googleProvider);
             successMessage("Google sign-in successful!");
             closePopup();
         } catch (error) {

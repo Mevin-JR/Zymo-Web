@@ -9,24 +9,24 @@ import Footer from "../components/Footer";
 import BrandsAvailable from "../components/homecomponent/BrandsAvailable";
 import ServiceProvider from "../components/homecomponent/ServiceProvider";
 import { FaWhatsapp } from "react-icons/fa";
+import NewRSB from "../components/NewRSB";
 
 const HomeScreen = () => {
     return (
         <>
-              <NavBar />
+            <NavBar />
             <div className="container flex flex-col w-full mx-auto">
                 <div className="container">
                     <Header />
+                    <NewRSB />
                     <HeroImage />
-                    <RSB />
+                    {/* <RSB /> */}
                     <Benefits />
                     <BrandsAvailable />
                     <ServiceProvider />
                     <Reviews />
                     <Cities />
                 </div>
-                <Footer />
-
                 {/* WhatsApp Floating Button */}
                 <a
                     href="https://wa.me/919987933348"
@@ -37,6 +37,7 @@ const HomeScreen = () => {
                     <FaWhatsapp className="text-3xl" />
                 </a>
             </div>
+            <Footer />
         </>
     );
 };

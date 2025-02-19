@@ -9,14 +9,13 @@ const NavBar = () => {
     return (
         <nav className="bg-[#212121] text-white p-4 relative z-50 w-full">
             <div className="container mx-auto flex justify-between items-center">
-                {/* <h1 className="text-2xl font-bold text-[#faffa4]">
-                    <Link to="/">Zymo</Link>
-                </h1> */}
+                <Link to={"/"}>
                 <img
                     src="/images/AppLogo/zymo2.jpg"
                     alt="zymologo"
                     className="h-14 mix-blend-screen"
                 />
+                </Link>
 
                 {/* Hamburger Button */}
                 <button

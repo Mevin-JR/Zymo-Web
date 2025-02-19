@@ -15,9 +15,13 @@ import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import FormPage from "./pages/Buy/EnterInformation";
+import UploadDocuments from "./pages/Buy/UploadDocuments";
+import DatePicker from "./pages/Buy/DatePicker";
 import CareerForm from "./pages/Career";
 import YourDetails from "./pages/details";
 import Profile from "./components/Profile";
+import Summary from "./pages/Buy/Summary";
 
 const App = () => {
     return (
@@ -59,6 +63,15 @@ const App = () => {
                         element={<BookingPage />}
                     />
 
+                    {/* Buy Page Routes*/}
+                    <Route path="/buy/summary" element={<Summary />} />
+                    <Route path="/buy/date-picker" element={<DatePicker />} />
+                    <Route path="/buy/upload-info" element={<FormPage />} />
+                    <Route
+                        path="/buy/upload-doc"
+                        element={<UploadDocuments />}
+                    />
+
                     {/* NavBar Pages */}
                     {/* About Us */}
                     <Route path="/about-us" element={<AboutUs />} />
@@ -71,7 +84,7 @@ const App = () => {
                     <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
-                    <Route path="/blogs/:id" element={<BlogDetailPage />} />
+                    <Route path="/blogs/:title" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
                     <Route path="/details" element={<YourDetails />} />
 
