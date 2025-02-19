@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import UpcomingBookingCard from "./UpcomingBookingCard";
-import CancelledBookings from "./CancelledBookings";
 import PastBookings from "./PastBookings";
 
 export default function MyBookings() {
@@ -57,7 +56,8 @@ export default function MyBookings() {
           )}
           {activeTab === "cancelled" && (
             <>
-              <CancelledBookings />
+              {/* Add the page before using components */}
+              {/* <CancelledBookings /> */}
             </>
           )}
         </div>

@@ -8,6 +8,7 @@ import { getCurrentTime } from "../utils/DateFunction";
 
 const NewRSB = () => {
     const [activeTab, setActiveTab] = useState("rent");
+    const [placeInput, setPlaceInput] = useState("");
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -70,6 +71,14 @@ const NewRSB = () => {
             }
         }
     };
+
+    const handlePlacesAutocomplete = async () => {
+        const locationInput = document.getElementById("location-input");
+        const autocomplete = new google.maps.places.Autocomplete(locationInput, {
+            types: ['geocode'],
+        })
+        console.log(autocomplete.getPredictions());
+    }
 
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
@@ -174,14 +183,14 @@ const NewRSB = () => {
                 {/* Input Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
-                    <LoadScriptNext
+                    {/* <LoadScriptNext
                         googleMapsApiKey={placesAPIKey}
                         libraries={placesAPILibraries}
-                    >
-                        <div className="rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
+                    > */}
+                        <div className="relative rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
                             <MapPinIcon className="w-6 h-5 text-gray-400 pr-1" />
                             <div className="flex-1">
-                                <Autocomplete
+                                {/* <Autocomplete
                                     onLoad={setAutocomplete}
                                     onPlaceChanged={handlePlaceSelect}
                                     options={{
@@ -189,16 +198,31 @@ const NewRSB = () => {
                                             country: "IN",
                                         },
                                     }}
-                                >
+                                > */}
                                     <input
                                         type="text"
                                         placeholder="Location"
+                                        value={placeInput}
+                                        onChange={(e) => setPlaceInput(e.target.value)}
                                         className="bg-transparent text-white outline-none w-full h-full"
+                                        id="location-input"
                                     />
-                                </Autocomplete>
+                                {/* </Autocomplete> */}
+
+                                {/* Get current location option */}
+                                {placeInput && (
+                                    <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
+                                    <li
+                                        className="p-2 cursor-pointer hover:bg-gray-700 text-white"
+                                        onClick={handlePlacesAutocomplete}
+                                    >
+                                        📍 Get Current Location
+                                    </li>
+                                </ul>
+                                )}
                             </div>
                         </div>
-                    </LoadScriptNext>
+                    {/* </LoadScriptNext> */}
 
                     {/* Start Date Picker */}
                     <div className="relative w-full">

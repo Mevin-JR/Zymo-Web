@@ -22,6 +22,7 @@ import CareerForm from "./pages/Career";
 import YourDetails from "./pages/details";
 import Profile from "./components/Profile";
 import Summary from "./pages/Buy/Summary";
+import MyBookings from "./pages/MyBookings";
 
 const App = () => {
     return (
