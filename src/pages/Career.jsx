@@ -5,8 +5,6 @@ import { db, storage } from "../utils/firebase";
 
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-const CareerForm = () => {
-    const [selectedType, setSelectedType] = useState("Internship");
 
 const CareerForm = () => {
     const [selectedType, setSelectedType] = useState("Internship");
