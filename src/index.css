@@ -17,6 +17,7 @@ body {
     -webkit-appearance: none;
 }
 
+/* Google places dropdown */
 .pac-container {
     width: 500px !important;
     background-color: #303030 !important;
@@ -42,3 +43,14 @@ body {
     font-weight: bold !important;
     color: #eeff87 !important;
 }
+
+/* Add this to your global styles or component-specific styles */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* For Internet Explorer 10+ */
+    scrollbar-width: none;  /* For Firefox */
+  }
+  

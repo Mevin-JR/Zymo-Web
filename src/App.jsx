@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
@@ -10,13 +9,20 @@ import { ToastContainer } from "react-toastify";
 import Details from "./screens/Details";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
-import Career from "./pages/Career";
 import ScrollToTop from "./components/ScrollToTop";
 import BlogsMainPage from "./pages/BlogsMainPage";
 import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import FormPage from "./pages/Buy/EnterInformation";
+import UploadDocuments from "./pages/Buy/UploadDocuments";
+import DatePicker from "./pages/Buy/DatePicker";
+import CareerForm from "./pages/Career";
+import YourDetails from "./pages/details";
+import Profile from "./components/Profile";
+import Summary from "./pages/Buy/Summary";
+import MyBookings from "./pages/MyBookings";
 
 const App = () => {
     return (
@@ -58,17 +64,31 @@ const App = () => {
                         element={<BookingPage />}
                     />
 
+                    {/* Buy Page Routes*/}
+                    <Route path="/buy/summary" element={<Summary />} />
+                    <Route path="/buy/date-picker" element={<DatePicker />} />
+                    <Route path="/buy/upload-info" element={<FormPage />} />
+                    <Route
+                        path="/buy/upload-doc"
+                        element={<UploadDocuments />}
+                    />
+
                     {/* NavBar Pages */}
                     {/* About Us */}
                     <Route path="/about-us" element={<AboutUs />} />
                     {/* Contact Us */}
                     <Route path="/contact-us" element={<ContactUs />} />
+
+                    <Route path="/profile" element={<Profile />} />
+
                     {/* Carrer */}
-                    <Route path="/career" element={<Career />} />
+                    <Route path="/career" element={<CareerForm />} />
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
-                    <Route path="/blogs/:id" element={<BlogDetailPage />} />
+                    <Route path="/blogs/:title" element={<BlogDetailPage />} />
                     <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                    <Route path="/details" element={<YourDetails />} />
+
                     <Route
                         path="/termsofservice"
                         element={<TermsofService />}
@@ -76,6 +96,10 @@ const App = () => {
                     <Route
                         path="/cancellationpolicy"
                         element={<CancellationPolicy />}
+                    />
+                    <Route
+                        path="/mybookings"
+                        element={<MyBookings />}
                     />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>

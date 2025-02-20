@@ -170,9 +170,90 @@ const Listing = () => {
         } catch (error) {
           console.error("Unexpected error:", error);
         }
-      };
-    
-      search();
+
+        const search = async () => {
+            setLoading(true);
+            try {
+                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+                const response = await fetch(`${url}/zoomcar/search`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        data: {
+                            city,
+                            lat,
+                            lng,
+                            fromDate: startDateEpoc,
+                            toDate: endDateEpoc,
+                        },
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    if (searchCount <= 2) {
+                        searchCount += 1;
+                        search();
+                        return;
+                    }
+                    setLoading(false);
+                    unknownError();
+                    searchCount = 0;
+                    throw new Error(
+                        `Error: ${response.status} - ${response.statusText}`
+                    );
+                }
+
+                searchCount = 0;
+                const data = await response.json();
+                if (!data.sections) {
+                    // setLoading(false);
+                    toast.error(
+                        "No cars found, Please try modifying input...",
+                        {
+                            position: "top-center",
+                            autoClose: 1000 * 5,
+                        }
+                    );
+                    return;
+                }
+                const sections = data.sections;
+                const carCards = sections[sections.length - 1].cards;
+
+                const carData = carCards.map((car) => ({
+                    id: car.car_data.car_id,
+                    cargroup_id: car.car_data.cargroup_id,
+                    brand: car.car_data.brand,
+                    name: car.car_data.name,
+                    options: car.car_data.accessories,
+                    address: car.car_data.location.address,
+                    location_id: car.car_data.location.location_id,
+                    location_est: car.car_data.location.text,
+                    lat: car.car_data.location.lat,
+                    lng: car.car_data.location.lng,
+                    fare: `₹${car.car_data.pricing.revenue.toLocaleString("en-IN")}`,
+                    actual_fare: car.car_data.pricing.fare_breakup
+                        ? car.car_data.pricing.fare_breakup[0].fare_item[0]
+                              .value
+                        : "000",
+                    hourly_amount: car.car_data.pricing.payable_amount,
+                    pricing_id: car.car_data.pricing.id,
+                    images: car.car_data.image_urls,
+                    ratingData: car.car_data.rating_v3,
+                    trips: car.car_data.trip_count,
+                }));
+                setLoading(false);
+                setCarList(carData);
+                setCarCount(carCards.length);
+
+                localStorage.setItem("carList", JSON.stringify(carData)); // Storing carList as cache
+            } catch (error) {
+                unknownError();
+                console.error(error);
+            }
+        };
+        search();
     }, [city, startDate, endDate]);
     
 

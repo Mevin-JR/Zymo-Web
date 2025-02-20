@@ -8,7 +8,7 @@ import {
     Armchair,
     ArrowLeft,
 } from "lucide-react";
-import { auth } from "../utils/firebase";
+import { appAuth } from "../utils/firebase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
 
@@ -31,9 +31,10 @@ const CarDetails = () => {
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
     const [authUser, setAuthUser] = useState(null);
+    const [currentIndex, setCurrentIndex] = useState(0);
 
     // useEffect(() => {
-    //     const unsubscribe = auth.onAuthStateChanged((user) => {
+    //     const unsubscribe = appAuth.onAuthStateChanged((user) => {
     //         setAuthUser(user);
     //     });
 
@@ -46,8 +47,20 @@ const CarDetails = () => {
         }
     }, [authUser]);
 
+    // Automatic image scroller
+    useEffect(() => {
+        if (car?.images?.length > 1) {
+            const interval = setInterval(() => {
+                setCurrentIndex(
+                    (prevIndex) => (prevIndex + 1) % car.images.length
+                );
+            }, 4000);
+            return () => clearInterval(interval);
+        }
+    }, [car?.images]);
+
     const handleBooking = () => {
-        const user = auth.currentUser;
+        const user = appAuth.currentUser;
         console.log(user);
         if (!user) {
             setIsLoginModalOpen(true); // Open modal if not logged in
@@ -79,7 +92,7 @@ const CarDetails = () => {
     const carDetails = [
         {
             name: `${car.brand} ${car.name}`,
-            image: car.images[0],
+            image: car?.images || [],
             rating: car.ratingData.rating,
             features: [
                 {
@@ -141,11 +154,95 @@ const CarDetails = () => {
                         <>
                             {/* Left Section */}
                             <div key={`left-${index}`}>
-                                <img
-                                    src={car.image}
-                                    alt={car.name}
-                                    className="w-full rounded-2xl shadow-xl"
-                                />
+                                {/* Left Section - Image Scroller */}
+                                <div>
+                                    {/* <div className="img-container relative w-full overflow-hidden rounded-2xl">
+                                    <div
+                                        className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
+                                        style={{
+                                            width: `${car.image.length * 100}%`,
+                                            transform: `translateX(-${(currentIndex * 100) / car.image.length}%)`,
+                                        }}
+                                    >
+                                        {car.image.map((image, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={image}
+                                                alt={`${car.name} ${idx + 1}`}
+                                                className="w-full flex-none rounded-2xl shadow-xl"
+                                                style={{ width: `${100 / car.image.length}%` }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div> */}
+                                    <div className="img-container relative w-full overflow-hidden rounded-2xl">
+                                        {/* Backward Button */}
+                                        <button
+                                            className="absolute left-0 top-1/2 transform -translate-y-1/2  bg-black bg-opacity-25 text-[#faffa4] p-2 rounded-full z-10"
+                                            onClick={() => {
+                                                setCurrentIndex((prevIndex) =>
+                                                    prevIndex === 0
+                                                        ? car.image.length - 1
+                                                        : prevIndex - 1
+                                                );
+                                            }}
+                                        >
+                                            &#10094; {/* Left arrow */}
+                                        </button>
+
+                                        {/* Image Scroller */}
+                                        <div
+                                            className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
+                                            style={{
+                                                width: `${
+                                                    car.image.length * 100
+                                                }%`,
+                                                transform: `translateX(-${
+                                                    (currentIndex * 100) /
+                                                    car.image.length
+                                                }%)`,
+                                            }}
+                                        >
+                                            {car.image.map((image, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={image}
+                                                    alt={`${car.name} ${
+                                                        idx + 1
+                                                    }`}
+                                                    className="w-full flex-none rounded-2xl shadow-xl"
+                                                    style={{
+                                                        width: `${
+                                                            100 /
+                                                            car.image.length
+                                                        }%`,
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
+
+                                        {/* Forward Button */}
+                                        <button
+                                            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-25 text-[#faffa4] p-2 rounded-full z-10"
+                                            onClick={() => {
+                                                setCurrentIndex((prevIndex) =>
+                                                    prevIndex ===
+                                                    car.image.length - 1
+                                                        ? 0
+                                                        : prevIndex + 1
+                                                );
+                                            }}
+                                        >
+                                            &#10095; {/* Right arrow */}
+                                        </button>
+                                    </div>
+
+                                    {/* Booking Information */}
+                                    {/* <div className="bg-darkGrey2 mt-10 p-7 rounded-xl shadow-md mb-8 hidden lg:block"> */}
+                                    {/* Booking Info Content */}
+                                    {/* </div> */}
+                                </div>
+
                                 {/* Booking Information */}
                                 <div className="bg-darkGrey2 mt-10 p-7 rounded-xl shadow-md mb-8 hidden lg:block">
                                     <div className="flex justify-between">
@@ -185,7 +282,7 @@ const CarDetails = () => {
                                             <img
                                                 src={car.bookingInfo.logo}
                                                 alt="Zoomcar Logo"
-                                                className="h-8"
+                                                className="h-6"
                                             />
                                             <span className="ml-2">
                                                 {car.bookingInfo.driveType}
