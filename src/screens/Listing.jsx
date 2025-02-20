@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 
 const Listing = () => {
     // Location State
+    const vendor = { currentRate: 1.1, discountRate: 0.9 };
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration } =
         location.state || {};
@@ -26,6 +27,12 @@ const Listing = () => {
         // hour: "numeric", // TODO: Adjust this part of end date display
         // minute: "numeric",
     });
+    const formatDateForMyChoize = (dateString) => {
+        const date = new Date(dateString);
+        if (isNaN(date)) return null; // Handle invalid date input
+        return `\/Date(${date.getTime()}+0530)\/`;
+    };
+    
 
     const hasRun = useRef(false);
     let searchCount = 0;
@@ -38,6 +45,32 @@ const Listing = () => {
     const [transmission, setTransmission] = useState("");
     const [filteredList, setFilteredList] = useState(carList);
     const [carCount, setCarCount] = useState("");
+
+    const calculateFreeKM = (rateBasis, tripDuration) => {
+        switch (rateBasis) {
+          case "DR": // Daily Rental - Unlimited KM
+            return "Unlimited";
+          case "FF": // Fixed Fare - 120 KM/Day
+            return `${(120 / 24) * tripDuration} KM`;
+          case "MP": // Monthly Plan - 300 KM/Day
+            return `${(300 / 24) * tripDuration} KM`;
+          default:
+            return "0 KM"; // Default case
+        }
+      };
+      const calculatePackagePrice = (rateBasis, tripDuration, basePrice,ExKMRate)=> {
+        switch (rateBasis) {
+            case "DR": // Daily Rental - Unlimited KM
+                return basePrice;
+            case "FF": // Fixed Fare - 120 KM/Day
+                return ((120 / 24) * tripDuration) * ExKMRate; 
+            case "MP": // Monthly Plan - 300 KM/Day
+                return ((300 / 24) * tripDuration) * ExKMRate;
+            default:
+                return basePrice;
+        }
+    };
+      
 
     // Errors
     const noCarsFound = () => {
@@ -57,29 +90,41 @@ const Listing = () => {
     useEffect(() => {
         if (hasRun.current) return;
         hasRun.current = true;
-
+    
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
-
+        const CityName = address.split(",")[0].trim();
+        const formattedPickDate = formatDateForMyChoize(startDate);
+        const formattedDropDate = formatDateForMyChoize(endDate);
+       
+    
+        if (!formattedPickDate || !formattedDropDate) {
+            toast.error("Invalid date format!", { position: "top-center" });
+            return;
+        }
+    
         if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
             return;
         }
-
+    
         if (sessionStorage.getItem("fromSearch") !== "true") {
             sessionStorage.setItem("fromSearch", false);
-            // Load from cache if exists
             if (localStorage.getItem("carList")) {
                 setCarList(JSON.parse(localStorage.getItem("carList")));
                 setLoading(false);
                 return;
             }
         }
-
+        
+    
         const search = async () => {
             setLoading(true);
             try {
                 const url = import.meta.env.VITE_FUNCTIONS_API_URL;
-                const response = await fetch(`${url}/zoomcar/search`, {
+                const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+    
+                // Fetch Zoomcar API
+                const zoomPromise = fetch(`${url}/zoomcar/search`, {
                     method: "POST",
                     body: JSON.stringify({
                         data: {
@@ -93,72 +138,105 @@ const Listing = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                });
-
-                if (!response.ok) {
-                    if (searchCount <= 2) {
-                        searchCount += 1;
-                        search();
-                        return;
-                    }
-                    setLoading(false);
-                    unknownError();
-                    searchCount = 0;
-                    throw new Error(
-                        `Error: ${response.status} - ${response.statusText}`
-                    );
+                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
+    
+                // Fetch MyChoize API
+                const mychoizePromise = fetch(`${apiUrl}/mychoize/search-cars`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        data: {
+                            CityName,
+                            PickDate: formattedPickDate,
+                            DropDate: formattedDropDate,
+                        },
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }).then((res) => (res.ok ? res.json() : Promise.reject("MyChoize API error")));
+    
+                // Execute both API calls in parallel, but handle failures separately
+                const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
+    
+                let allCarData = [];
+    
+                if (zoomData.status === "fulfilled" && zoomData.value.sections) {
+                    const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
+                        id: car.car_data.car_id,
+                        brand: car.car_data.brand,
+                        name: car.car_data.name,
+                        options: car.car_data.accessories,
+                        address: car.car_data.location.address,
+                        location_id: car.car_data.location.location_id,
+                        location_est: car.car_data.location.text,
+                        lat: car.car_data.location.lat,
+                        lng: car.car_data.location.lng,
+                        fare: `₹${car.car_data.pricing.revenue}`,
+                        actual_fare: car.car_data.pricing.fare_breakup
+                            ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
+                            : "000",
+                        hourly_amount: car.car_data.pricing.payable_amount,
+                        images: car.car_data.image_urls,
+                        ratingData: car.car_data.rating_v3,
+                        trips: car.car_data.trip_count,
+                        
+                        source: "zoomcar", // Indicating the data source
+                    }));
+                    allCarData = [...allCarData, ...zoomCarData];
+                } else {
+                    console.error("Zoomcar API failed:", zoomData.reason);
                 }
-
-                searchCount = 0;
-                const data = await response.json();
-                if (!data.sections) {
-                    // setLoading(false);
-                    toast.error(
-                        "No cars found, Please try modifying input...",
-                        {
-                            position: "top-center",
-                            autoClose: 1000 * 5,
-                        }
-                    );
-                    return;
+    
+                if (mychoizeData.status === "fulfilled" && mychoizeData.value.SearchBookingModel) {
+                    const mychoizeCarData = mychoizeData.value.SearchBookingModel
+                    .filter((car) => car.RateBasis !== "MLK" && car.BrandName) 
+                    .map((car) => ({
+                      id: car.TariffKey,
+                      brand: car.BrandName,
+                      name: "",
+                      options: [car.TransMissionType, car.FuelType, car.SeatingCapacity],
+                      address: car.LocationName,
+                      location_id: car.LocationKey,
+                      fare: `₹${car.TotalExpCharge}`,
+                      actual_fare: car.TotalExpCharge,
+                      hourly_amount: car.PerUnitCharges,
+                      images: [car.VehicleBrandImageName],
+                      ratingData: { text: "No ratings available" },
+                      freekm: calculateFreeKM(car.RateBasis, tripDuration), 
+                      extrakm_charge: car.ExKMRate,
+                      trips: car.TotalBookinCount,
+                      dailyRentalPrice: `₹${calculatePackagePrice("DR", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
+                fixedFarePrice: `₹${calculatePackagePrice("FF", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
+                monthlyPlanPrice: `₹${calculatePackagePrice("MP", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
+                      source: "mychoize",
+                    }));
+                    console.log(mychoizeCarData);
+                    allCarData = [...allCarData, ...mychoizeCarData];
+                } else {
+                    console.error("MyChoize API failed:", mychoizeData.reason);
                 }
-                const sections = data.sections;
-                const carCards = sections[sections.length - 1].cards;
-
-                const carData = carCards.map((car) => ({
-                    id: car.car_data.car_id,
-                    cargroup_id: car.car_data.cargroup_id,
-                    brand: car.car_data.brand,
-                    name: car.car_data.name,
-                    options: car.car_data.accessories,
-                    address: car.car_data.location.address,
-                    location_id: car.car_data.location.location_id,
-                    location_est: car.car_data.location.text,
-                    lat: car.car_data.location.lat,
-                    lng: car.car_data.location.lng,
-                    fare: `₹${car.car_data.pricing.revenue}`,
-                    actual_fare: car.car_data.pricing.fare_breakup
-                        ? car.car_data.pricing.fare_breakup[0].fare_item[0]
-                              .value
-                        : "000",
-                    hourly_amount: car.car_data.pricing.payable_amount,
-                    pricing_id: car.car_data.pricing.id,
-                    images: car.car_data.image_urls,
-                    ratingData: car.car_data.rating_v3,
-                    trips: car.car_data.trip_count,
-                }));
+    
+                if (allCarData.length === 0) {
+                    toast.error("No cars found, Please try modifying input...", {
+                        position: "top-center",
+                        autoClose: 1000 * 5,
+                    });
+                }
+    
+                setCarList(allCarData);
+                setCarCount(allCarData.length);
                 setLoading(false);
-                setCarList(carData);
-                setCarCount(carCards.length);
-
-                localStorage.setItem("carList", JSON.stringify(carData)); // Storing carList as cache
+    
+                // Cache data in localStorage
+                localStorage.setItem("carList", JSON.stringify(allCarData));
             } catch (error) {
-                unknownError();
-                console.error(error);
+                console.error("Unexpected error:", error);
             }
         };
+    
         search();
-    }, [city, startDate, endDate]);
+    }, [city, startDate, endDate]);   
+    
 
     // Filter functionality
     useEffect(() => {
@@ -371,10 +449,10 @@ const Listing = () => {
                                             {car.options[2]}
                                         </p>
                                         <div className="img-container">
-                                            <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm mt-2 bg-white p-1"
+                                        <img
+                                            src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
+                                            alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
+                                            className="h-6 rounded-sm mt-2 bg-white p-1"
                                             />
                                         </div>
                                     </div>
@@ -416,11 +494,11 @@ const Listing = () => {
                                             </h3>
                                         </div>
                                         <div className="img-container">
-                                            <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm bg-white p-1"
-                                            />
+                                        <img
+                                            src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
+                                            alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
+                                            className="h-5 rounded-sm mt-2 bg-white p-1"
+                                        />
                                         </div>
                                         <div className="self-auto ">
                                             <p className="text-left text-xs text-gray-400 mb-1">
