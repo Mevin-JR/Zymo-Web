@@ -106,5 +106,5 @@ router.post("/send-whatsapp-message", async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
 

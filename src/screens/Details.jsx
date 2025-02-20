@@ -121,11 +121,13 @@ const CarDetails = () => {
                 startDate: startDateFormatted,
                 endDate: endDateFormatted,
                 driveType: "Self Drive",
-                logo: "/images/ServiceProvider/zoomcarlogo.png",
+                logo: car.source === "zoomcar" 
+                ? "/images/ServiceProvider/zoomcarlogo.png" 
+                : "/images/ServiceProvider/mychoize.png",
             },
             specifications: [
                 { label: "Car Brand", value: car.brand },
-                { label: "Car Name", value: car.name },
+                { label: "Car Name", value: car.name || car.brand},
                 { label: "Hourly Amount", value: car.hourly_amount },
                 { label: "Seats", value: car.options[2] },
                 { label: "Fuel Type", value: car.options[1] },
