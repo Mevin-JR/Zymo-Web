@@ -45,6 +45,7 @@ const Listing = () => {
     const [transmission, setTransmission] = useState("");
     const [filteredList, setFilteredList] = useState(carList);
     const [carCount, setCarCount] = useState("");
+   
 
     const calculateFreeKM = (rateBasis, tripDuration) => {
         switch (rateBasis) {
@@ -58,18 +59,6 @@ const Listing = () => {
             return "0 KM"; // Default case
         }
       };
-      const calculatePackagePrice = (rateBasis, tripDuration, basePrice,ExKMRate)=> {
-        switch (rateBasis) {
-            case "DR": // Daily Rental - Unlimited KM
-                return basePrice;
-            case "FF": // Fixed Fare - 120 KM/Day
-                return ((120 / 24) * tripDuration) * ExKMRate; 
-            case "MP": // Monthly Plan - 300 KM/Day
-                return ((300 / 24) * tripDuration) * ExKMRate;
-            default:
-                return basePrice;
-        }
-    };
       
 
     // Errors
@@ -188,28 +177,44 @@ const Listing = () => {
                 }
     
                 if (mychoizeData.status === "fulfilled" && mychoizeData.value.SearchBookingModel) {
-                    const mychoizeCarData = mychoizeData.value.SearchBookingModel
-                    .filter((car) => car.RateBasis !== "MLK" && car.BrandName) 
-                    .map((car) => ({
-                      id: car.TariffKey,
-                      brand: car.BrandName,
-                      name: "",
-                      options: [car.TransMissionType, car.FuelType, car.SeatingCapacity],
-                      address: car.LocationName,
-                      location_id: car.LocationKey,
-                      fare: `₹${car.TotalExpCharge}`,
-                      actual_fare: car.TotalExpCharge,
-                      hourly_amount: car.PerUnitCharges,
-                      images: [car.VehicleBrandImageName],
-                      ratingData: { text: "No ratings available" },
-                      freekm: calculateFreeKM(car.RateBasis, tripDuration), 
-                      extrakm_charge: car.ExKMRate,
-                      trips: car.TotalBookinCount,
-                      dailyRentalPrice: `₹${calculatePackagePrice("DR", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
-                fixedFarePrice: `₹${calculatePackagePrice("FF", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
-                monthlyPlanPrice: `₹${calculatePackagePrice("MP", tripDuration, car.TotalExpCharge,car.ExKMRate)}`,
-                      source: "mychoize",
+                    const groupedCars = {};
+                
+                    mychoizeData.value.SearchBookingModel
+                        .filter((car) => car.RateBasis !== "MLK" && car.BrandName)
+                        .forEach((car) => {
+                            const key = car.GroupKey; // Grouping cars by GroupKey
+                
+                            if (!groupedCars[key]) {
+                                groupedCars[key] = {
+                                    id: car.TariffKey,
+                                    brand: car.BrandName,
+                                    name: "",
+                                    options: [car.TransMissionType, car.FuelType, car.SeatingCapacity],
+                                    address: car.LocationName,
+                                    location_id: car.LocationKey,
+                                    hourly_amount: car.PerUnitCharges,
+                                    images: [car.VehicleBrandImageName],
+                                    ratingData: { text: "No ratings available" },
+                                    freekm: calculateFreeKM(car.RateBasis, tripDuration),
+                                    extrakm_charge: car.ExKMRate,
+                                    trips: car.TotalBookinCount,
+                                    source: "mychoize",
+                                    all_fares: [car.TotalExpCharge] // Store all prices
+                                };
+                            } else {
+                                // Add new fare to the existing group (avoid duplicates)
+                                if (!groupedCars[key].all_fares.includes(car.TotalExpCharge)) {
+                                    groupedCars[key].all_fares.push(car.TotalExpCharge);
+                                }
+                            }
+                        });
+                
+                    // Convert grouped object back to an array
+                    const mychoizeCarData = Object.values(groupedCars).map((car) => ({
+                        ...car,
+                        fare: `₹${Math.min(...car.all_fares)} - ₹${Math.max(...car.all_fares)}`, // Show fare range
                     }));
+                
                     console.log(mychoizeCarData);
                     allCarData = [...allCarData, ...mychoizeCarData];
                 } else {
