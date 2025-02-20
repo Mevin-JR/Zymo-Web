@@ -3,10 +3,10 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { calculateFreeKM, fetchMyChoizeCars } from "../utils/mychoize";
+
 
 const Listing = () => {
-    // Location State
-    const vendor = { currentRate: 1.1, discountRate: 0.9 };
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration } =
         location.state || {};
@@ -45,21 +45,7 @@ const Listing = () => {
     const [transmission, setTransmission] = useState("");
     const [filteredList, setFilteredList] = useState(carList);
     const [carCount, setCarCount] = useState("");
-   
-
-    const calculateFreeKM = (rateBasis, tripDuration) => {
-        switch (rateBasis) {
-          case "DR": // Daily Rental - Unlimited KM
-            return "Unlimited";
-          case "FF": // Fixed Fare - 120 KM/Day
-            return `${(120 / 24) * tripDuration} KM`;
-          case "MP": // Monthly Plan - 300 KM/Day
-            return `${(300 / 24) * tripDuration} KM`;
-          default:
-            return "0 KM"; // Default case
-        }
-      };
-      
+     
 
     // Errors
     const noCarsFound = () => {
@@ -76,171 +62,118 @@ const Listing = () => {
         });
     };
 
+
     useEffect(() => {
-        if (hasRun.current) return;
-        hasRun.current = true;
+      if (hasRun.current) return;
+      hasRun.current = true;
     
-        const startDateEpoc = Date.parse(startDate);
-        const endDateEpoc = Date.parse(endDate);
-        const CityName = address.split(",")[0].trim();
-        const formattedPickDate = formatDateForMyChoize(startDate);
-        const formattedDropDate = formatDateForMyChoize(endDate);
-       
+      const startDateEpoc = Date.parse(startDate);
+      const endDateEpoc = Date.parse(endDate);
+      const CityName = address.split(",")[0].trim();
+      const formattedPickDate = formatDateForMyChoize(startDate);
+      const formattedDropDate = formatDateForMyChoize(endDate);
     
-        if (!formattedPickDate || !formattedDropDate) {
-            toast.error("Invalid date format!", { position: "top-center" });
-            return;
+      if (!formattedPickDate || !formattedDropDate) {
+        toast.error("Invalid date format!", { position: "top-center" });
+        return;
+      }
+    
+      if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
+        return;
+      }
+    
+      if (sessionStorage.getItem("fromSearch") !== "true") {
+        sessionStorage.setItem("fromSearch", false);
+        if (localStorage.getItem("carList")) {
+          setCarList(JSON.parse(localStorage.getItem("carList")));
+          setLoading(false);
+          return;
         }
+      }
     
-        if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
-            return;
+      const search = async () => {
+        setLoading(true);
+        try {
+          const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+         
+    
+          // Fetch Zoomcar API
+          const zoomPromise = fetch(`${url}/zoomcar/search`, {
+            method: "POST",
+            body: JSON.stringify({
+              data: {
+                city,
+                lat,
+                lng,
+                fromDate: startDateEpoc,
+                toDate: endDateEpoc,
+              },
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
+    
+          
+          const mychoizePromise = fetchMyChoizeCars( CityName, formattedPickDate, formattedDropDate, tripDuration);
+    
+          // Execute both API calls in parallel
+          const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
+          console.log(mychoizeData);
+    
+          let allCarData = [];
+    
+          if (zoomData.status === "fulfilled" && zoomData.value.sections) {
+            const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
+              id: car.car_data.car_id,
+              brand: car.car_data.brand,
+              name: car.car_data.name,
+              options: car.car_data.accessories,
+              address: car.car_data.location.address,
+              location_id: car.car_data.location.location_id,
+              location_est: car.car_data.location.text,
+              lat: car.car_data.location.lat,
+              lng: car.car_data.location.lng,
+              fare: `₹${car.car_data.pricing.revenue}`,
+              actual_fare: car.car_data.pricing.fare_breakup
+                ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
+                : "000",
+              hourly_amount: car.car_data.pricing.payable_amount,
+              images: car.car_data.image_urls,
+              ratingData: car.car_data.rating_v3,
+              trips: car.car_data.trip_count,
+              source: "zoomcar",
+            }));
+            allCarData = [...allCarData, ...zoomCarData];
+          } else {
+            console.error("Zoomcar API failed:", zoomData.reason);
+          }
+    
+          if (mychoizeData.status === "fulfilled") {
+            allCarData = [...allCarData, ...mychoizeData.value];
+          } else {
+            console.error("MyChoize API failed:", mychoizeData.reason);
+          }
+    
+          if (allCarData.length === 0) {
+            toast.error("No cars found, Please try modifying input...", {
+              position: "top-center",
+              autoClose: 1000 * 5,
+            });
+          }
+    
+          setCarList(allCarData);
+          setCarCount(allCarData.length);
+          setLoading(false);
+    
+          localStorage.setItem("carList", JSON.stringify(allCarData));
+        } catch (error) {
+          console.error("Unexpected error:", error);
         }
+      };
     
-        if (sessionStorage.getItem("fromSearch") !== "true") {
-            sessionStorage.setItem("fromSearch", false);
-            if (localStorage.getItem("carList")) {
-                setCarList(JSON.parse(localStorage.getItem("carList")));
-                setLoading(false);
-                return;
-            }
-        }
-        
-    
-        const search = async () => {
-            setLoading(true);
-            try {
-                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
-                const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
-    
-                // Fetch Zoomcar API
-                const zoomPromise = fetch(`${url}/zoomcar/search`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        data: {
-                            city,
-                            lat,
-                            lng,
-                            fromDate: startDateEpoc,
-                            toDate: endDateEpoc,
-                        },
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
-    
-                // Fetch MyChoize API
-                const mychoizePromise = fetch(`${apiUrl}/mychoize/search-cars`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        data: {
-                            CityName,
-                            PickDate: formattedPickDate,
-                            DropDate: formattedDropDate,
-                        },
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then((res) => (res.ok ? res.json() : Promise.reject("MyChoize API error")));
-    
-                // Execute both API calls in parallel, but handle failures separately
-                const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
-    
-                let allCarData = [];
-    
-                if (zoomData.status === "fulfilled" && zoomData.value.sections) {
-                    const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
-                        id: car.car_data.car_id,
-                        brand: car.car_data.brand,
-                        name: car.car_data.name,
-                        options: car.car_data.accessories,
-                        address: car.car_data.location.address,
-                        location_id: car.car_data.location.location_id,
-                        location_est: car.car_data.location.text,
-                        lat: car.car_data.location.lat,
-                        lng: car.car_data.location.lng,
-                        fare: `₹${car.car_data.pricing.revenue}`,
-                        actual_fare: car.car_data.pricing.fare_breakup
-                            ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
-                            : "000",
-                        hourly_amount: car.car_data.pricing.payable_amount,
-                        images: car.car_data.image_urls,
-                        ratingData: car.car_data.rating_v3,
-                        trips: car.car_data.trip_count,
-                        
-                        source: "zoomcar", // Indicating the data source
-                    }));
-                    allCarData = [...allCarData, ...zoomCarData];
-                } else {
-                    console.error("Zoomcar API failed:", zoomData.reason);
-                }
-    
-                if (mychoizeData.status === "fulfilled" && mychoizeData.value.SearchBookingModel) {
-                    const groupedCars = {};
-                
-                    mychoizeData.value.SearchBookingModel
-                        .filter((car) => car.RateBasis !== "MLK" && car.BrandName)
-                        .forEach((car) => {
-                            const key = car.GroupKey; // Grouping cars by GroupKey
-                
-                            if (!groupedCars[key]) {
-                                groupedCars[key] = {
-                                    id: car.TariffKey,
-                                    brand: car.BrandName,
-                                    name: "",
-                                    options: [car.TransMissionType, car.FuelType, car.SeatingCapacity],
-                                    address: car.LocationName,
-                                    location_id: car.LocationKey,
-                                    hourly_amount: car.PerUnitCharges,
-                                    images: [car.VehicleBrandImageName],
-                                    ratingData: { text: "No ratings available" },
-                                    freekm: calculateFreeKM(car.RateBasis, tripDuration),
-                                    extrakm_charge: car.ExKMRate,
-                                    trips: car.TotalBookinCount,
-                                    source: "mychoize",
-                                    all_fares: [car.TotalExpCharge] // Store all prices
-                                };
-                            } else {
-                                // Add new fare to the existing group (avoid duplicates)
-                                if (!groupedCars[key].all_fares.includes(car.TotalExpCharge)) {
-                                    groupedCars[key].all_fares.push(car.TotalExpCharge);
-                                }
-                            }
-                        });
-                
-                    // Convert grouped object back to an array
-                    const mychoizeCarData = Object.values(groupedCars).map((car) => ({
-                        ...car,
-                        fare: `₹${Math.min(...car.all_fares)} - ₹${Math.max(...car.all_fares)}`, // Show fare range
-                    }));
-                
-                    console.log(mychoizeCarData);
-                    allCarData = [...allCarData, ...mychoizeCarData];
-                } else {
-                    console.error("MyChoize API failed:", mychoizeData.reason);
-                }
-    
-                if (allCarData.length === 0) {
-                    toast.error("No cars found, Please try modifying input...", {
-                        position: "top-center",
-                        autoClose: 1000 * 5,
-                    });
-                }
-    
-                setCarList(allCarData);
-                setCarCount(allCarData.length);
-                setLoading(false);
-    
-                // Cache data in localStorage
-                localStorage.setItem("carList", JSON.stringify(allCarData));
-            } catch (error) {
-                console.error("Unexpected error:", error);
-            }
-        };
-    
-        search();
-    }, [city, startDate, endDate]);   
+      search();
+    }, [city, startDate, endDate]);
     
 
     // Filter functionality
