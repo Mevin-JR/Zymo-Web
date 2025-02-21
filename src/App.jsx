@@ -21,7 +21,9 @@ import UploadDocuments from "./pages/Buy/UploadDocuments";
 import DatePicker from "./pages/Buy/DatePicker";
 import CareerForm from "./pages/Career";
 import Summary from "./pages/Buy/Summary";
-
+import NearestCar from "./pages/Buy/NearestCar";
+import CarDetails from "./pages/Buy/CarDetails";
+import TestDrivePopup from "./components/buycomponent/TestDrivePopup";
 const App = () => {
     return (
         <>
@@ -63,7 +65,10 @@ const App = () => {
                     />
 
                     {/* Buy Page Routes*/}
-                    <Route path="/buy/summary" element={<Summary />} />
+                    <Route path="/buy" element={<NearestCar />} />
+                    <Route path="/testdrive" element={<TestDrivePopup />} />
+                    <Route path="/buy/car-details/:id" element={<CarDetails />} />
+                    <Route path="/buy/summary/:id" element={<Summary />} />
                     <Route path="/buy/date-picker" element={<DatePicker />} />
                     <Route path="/buy/upload-info" element={<FormPage />} />
                     <Route

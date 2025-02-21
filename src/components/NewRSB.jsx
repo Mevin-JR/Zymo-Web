@@ -74,7 +74,14 @@ const NewRSB = () => {
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
         const start = new Date(currentStartDate);
-        const end = new Date(currentEndDate);
+        let end;
+        if (activeTab === "subscribe") {
+            end = new Date(start);
+            end.setDate(end.getDate() + 30); // Set end date to 30 days from start date
+            setEndDate(end); // Automatically set the end date
+        } else {
+            end = new Date(currentEndDate);
+        }
 
         if (isNaN(start) || isNaN(end)) {
             setTripDuration("Invalid Date");
@@ -94,15 +101,6 @@ const NewRSB = () => {
         setTripDuration(`${days} Day(s) ${hours} Hour(s)`);
     };
 
-    //   const handleStartDateChange = (date) => {
-    //     setStartDate(date);
-    //     if (endDate) calculateDuration(date, endDate);
-    //   };
-
-    //   const handleEndDateChange = (date) => {
-    //     setEndDate(date);
-    //     if (startDate) calculateDuration(startDate, date);
-    //   };
 
     const handleSearch = () => {
         if (city && startDate && endDate) {
@@ -130,6 +128,23 @@ const NewRSB = () => {
             });
         }
     };
+
+
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+        if (tab === "buy") {
+          navigate("/buy"); // Navigate to the buy page
+        }
+        
+        if (tab === "subscribe") {
+          //calculate current date + 30 days
+          const newEndDate = new Date(startDate);
+          newEndDate.setDate(newEndDate.getDate() + 30);
+          setEndDate(newEndDate);
+          calculateDuration(startDate, newEndDate);
+        }
+        
+      };
 
     return (
         <>
@@ -159,7 +174,7 @@ const NewRSB = () => {
                     {["rent", "subscribe", "buy"].map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => setActiveTab(tab)}
+                            onClick={() => handleTabClick(tab)}
                             className={`text-lg ${
                                 activeTab === tab
                                     ? "text-white border-b-2 border-gray-200"
@@ -239,13 +254,17 @@ const NewRSB = () => {
                     </div>
 
                     {/* End Date Picker */}
-                    <div className="relative w-full">
+                    {}
+                    <div className={` ${(activeTab == "subscribe")? "hidden" : "relative w-full"}`}>
                         <div
-                            className="rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10"
+                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${ activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
                             onClick={() => {
+                                if (activeTab !== "subscribe") {
                                 setIsEndPickerOpen(true);
                                 setIsStartPickerOpen(false);
+                                }
                             }}
+                            disabled={activeTab === "subscribe"}
                         >
                             <CalendarIcon className="w-6 h-4 text-gray-400 absolute left-4" />
                             <span className="text-gray-200 pl-10">

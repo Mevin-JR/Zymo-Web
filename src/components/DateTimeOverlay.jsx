@@ -51,6 +51,7 @@ const DateTimeOverlay = ({
                         onChange={(e) =>
                             setSelectedDate(new Date(e.target.value))
                         }
+                        min={selectedDate.toISOString().split("T")[0]} 
                     />
                 </div>
 
