@@ -3,15 +3,15 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { calculateFreeKM, fetchMyChoizeCars } from "../utils/mychoize";
+import { fetchMyChoizeCars } from "../utils/mychoize";
 
 
 const Listing = () => {
     const location = useLocation();
-    const { address, lat, lng, startDate, endDate, tripDuration } =
+    const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours } =
         location.state || {};
     const { city } = useParams();
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
+    const startDateFormatted = new Date(startDate).toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "long",
         year: "numeric",
@@ -19,7 +19,7 @@ const Listing = () => {
         // hour: "numeric", // TODO: Adjust this part of start date display
         // minute: "numeric",
     });
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
+    const endDateFormatted = new Date(endDate).toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "long",
         year: "numeric",
@@ -84,8 +84,10 @@ const Listing = () => {
 
         if (sessionStorage.getItem("fromSearch") !== "true") {
             sessionStorage.setItem("fromSearch", false);
-            if (localStorage.getItem("carList")) {
-                setCarList(JSON.parse(localStorage.getItem("carList")));
+            const cachedCarList = localStorage.getItem("carList");
+            if (cachedCarList) {
+                setCarList(JSON.parse(cachedCarList));
+                setCarCount(JSON.parse(cachedCarList).length)
                 setLoading(false);
                 return;
             }
@@ -115,10 +117,13 @@ const Listing = () => {
                 }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
 
-                const mychoizePromise = fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDuration);
+                const mychoizePromise = tripDurationHours >= 24 ? fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours) : null;
 
                 // Execute both API calls in parallel
-                const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
+                const [zoomData, mychoizeData] = await Promise.allSettled([
+                    zoomPromise ? zoomPromise : Promise.resolve(null),
+                    mychoizePromise ? mychoizePromise : Promise.resolve(null)
+                ]);
                 console.log(mychoizeData);
 
                 let allCarData = [];
@@ -233,6 +238,8 @@ const Listing = () => {
     const goToPackages = (car) => {
         navigate(`/self-drive-car-rentals/${city}/cars/packages`, {
             state: {
+                startDate,
+                endDate,
                 car
             }
         })
@@ -409,7 +416,7 @@ const Listing = () => {
                                             {car.fare}
                                         </p>
                                         <p className="text-[10px] text-gray-400">
-                                            (GST incl)
+                                            {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
                                         </p>
                                     </div>
                                 </div>
@@ -450,7 +457,7 @@ const Listing = () => {
                                                 {car.options[2]}
                                             </p>
                                             <p className="text-xs text-[#faffa4]">
-                                                {car.location_est} away
+                                                {car.location_est}
                                             </p>
                                         </div>
                                     </div>
@@ -474,7 +481,7 @@ const Listing = () => {
                                                 {car.fare}
                                             </p>
                                             <p className="text-xs text-gray-400">
-                                                (GST incl)
+                                                {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
                                             </p>
                                         </div>
                                         {car.source === "zoomcar" ? (

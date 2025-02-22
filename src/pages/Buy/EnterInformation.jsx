@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState  } from 'react';
+import { useNavigate ,useLocation} from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 export default function FormPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +15,7 @@ export default function FormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
+  const { car , startDate } = location.state || {};
 
   const validateForm = () => {
     const newErrors = {};
@@ -54,10 +56,10 @@ export default function FormPage() {
   const handleNext = () => {
     if (validateForm()) {
       localStorage.setItem('formData', JSON.stringify(formData));
-      navigate('/buy/upload-doc');
+      navigate('/buy/upload-doc', { state: { car, startDate , userData:formData } });
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">

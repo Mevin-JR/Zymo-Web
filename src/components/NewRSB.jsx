@@ -16,6 +16,7 @@ const NewRSB = () => {
     const [startDate, setStartDate] = useState(new Date(getCurrentTime()));
     const [endDate, setEndDate] = useState(null);
     const [tripDuration, setTripDuration] = useState("Select both dates");
+    const [tripDurationHours, setTripDurationHours] = useState("");
     const [fade, setFade] = useState(false);
     const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
     const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
@@ -105,6 +106,7 @@ const NewRSB = () => {
         }
 
         const totalHours = Math.floor(timeDifference / (1000 * 60 * 60));
+        setTripDurationHours(totalHours);
         const days = Math.floor(totalHours / 24);
         const hours = totalHours % 24;
 
@@ -126,6 +128,7 @@ const NewRSB = () => {
                 startDate,
                 endDate,
                 tripDuration,
+                tripDurationHours
             };
 
             sessionStorage.setItem("fromSearch", true);
@@ -145,18 +148,18 @@ const NewRSB = () => {
     const handleTabClick = (tab) => {
         setActiveTab(tab);
         if (tab === "buy") {
-          navigate("/buy"); // Navigate to the buy page
+            navigate("/buy"); // Navigate to the buy page
         }
-        
+
         if (tab === "subscribe") {
-          //calculate current date + 30 days
-          const newEndDate = new Date(startDate);
-          newEndDate.setDate(newEndDate.getDate() + 30);
-          setEndDate(newEndDate);
-          calculateDuration(startDate, newEndDate);
+            //calculate current date + 30 days
+            const newEndDate = new Date(startDate);
+            newEndDate.setDate(newEndDate.getDate() + 30);
+            setEndDate(newEndDate);
+            calculateDuration(startDate, newEndDate);
         }
-        
-      };
+
+    };
 
     return (
         <>
@@ -186,11 +189,10 @@ const NewRSB = () => {
                         <button
                             key={tab}
                             onClick={() => handleTabClick(tab)}
-                            className={`text-lg ${
-                                activeTab === tab
+                            className={`text-lg ${activeTab === tab
                                     ? "text-white border-b-2 border-gray-200"
                                     : "text-gray-400"
-                            }`}
+                                }`}
                         >
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </button>
@@ -280,14 +282,14 @@ const NewRSB = () => {
                     </div>
 
                     {/* End Date Picker */}
-                    {}
-                    <div className={` ${(activeTab == "subscribe")? "hidden" : "relative w-full"}`}>
+                    { }
+                    <div className={` ${(activeTab == "subscribe") ? "hidden" : "relative w-full"}`}>
                         <div
-                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${ activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
                             onClick={() => {
                                 if (activeTab !== "subscribe") {
-                                setIsEndPickerOpen(true);
-                                setIsStartPickerOpen(false);
+                                    setIsEndPickerOpen(true);
+                                    setIsStartPickerOpen(false);
                                 }
                             }}
                             disabled={activeTab === "subscribe"}
