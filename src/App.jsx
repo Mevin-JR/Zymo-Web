@@ -50,7 +50,7 @@ const App = () => {
 
                     {/* Page3 */}
                     {/* Temporarily disabled */}
-                    <Route path="/booking-card" element={<BookingCard />} />
+                    <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
 
                     {/* Page4 */}
                     <Route
