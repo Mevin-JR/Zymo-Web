@@ -1,6 +1,7 @@
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
 
 const carData={
     name: "Nexon EV",
@@ -47,7 +48,10 @@ const Summary = () => {
         >
           <ArrowLeft size={28} />
         </button>
-
+        <div className="ext-test-benf flex justify-center my-3 mb-5">
+        <ExtendedTestDriveBenefits/>
+        </div>
+ 
         {/* Summary */}
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl md:text-4xl font-bold text-appColor">

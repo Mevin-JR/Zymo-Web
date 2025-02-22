@@ -7,7 +7,7 @@ export const carData = [
         rating: 4.8,
         passengers: 4,
         transmission: "Automatic",
-        price: "12.49L",
+        price: "12.49",
         range: "312 km",
         battery: "30 kWh",
         power: "129 bhp",

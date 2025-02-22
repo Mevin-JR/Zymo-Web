@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-export default function FormPage() {
+export default function TestDriveInputForm() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -54,12 +54,10 @@ export default function FormPage() {
   const handleNext = () => {
     if (validateForm()) {
       localStorage.setItem('formData', JSON.stringify(formData));
-      if(currentTab == "buy"){
-        navigate("Thanks for test drive !")
-    }
-    else{
-      navigate('/buy/upload-doc');
-    }
+    
+   //redirect to test drive is confirm !
+      navigate('/buy/test-drive-confirmpage');
+  
     }
   };
 
@@ -75,7 +73,7 @@ export default function FormPage() {
 
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl p-2 md:text-4xl font-bold">
-            Extended Test Drive Booking
+             Test Drive Booking
           </h1>
         </div>
 

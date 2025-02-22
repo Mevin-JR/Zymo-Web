@@ -25,6 +25,8 @@ import Summary from "./pages/Buy/Summary";
 import NearestCar from "./pages/Buy/NearestCar";
 import CarDetails from "./pages/Buy/CarDetails";
 import TestDrivePopup from "./components/buycomponent/TestDrivePopup";
+import TestDriveInputForm from "./components/buycomponent/TestDriveInputForm";
+import TestDriveConfirmPage from "./components/buycomponent/TestDriveConfirmPage";
 import MyBookings from "./pages/MyBookings";
 
 const App = () => {
@@ -78,6 +80,11 @@ const App = () => {
                         path="/buy/upload-doc"
                         element={<UploadDocuments />}
                     />
+                    {/* Test Drive input form and confirm page */}
+                    <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
+                    <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage />} />
+
+
 
                     {/* NavBar Pages */}
                     {/* About Us */}
