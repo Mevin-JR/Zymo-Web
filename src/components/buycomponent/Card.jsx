@@ -43,7 +43,7 @@ const Card = ({ car }) => {
             <div className="flex md:flex-col items-center md:items-end text-center md:text-right justify-between w-full md:w-1/3 mt-4 md:mt-0">
                 <div>
                     <p className="text-xs text-gray-400">Starts at</p>
-                    <p className="text-lg font-semibold">&#8377;{car.price}*</p>
+                    <p className="text-lg font-semibold">₹ {car.price}*</p>
                     <p className="text-xs text-[#faffa4]">t&c apply</p>
                 </div>
                 <Link to={`/buy/car-details/${car.id}`} className="mt-3">
