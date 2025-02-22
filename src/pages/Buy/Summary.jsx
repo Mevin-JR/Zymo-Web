@@ -60,9 +60,9 @@ const Summary = () => {
             <div className="mt-4">
                 <div className="mt-4 flex justify-center">
                     <img 
-                    src="https://picsum.photos/200/300" 
+                    src="/images/Cars/tnex.jpeg" 
                     alt="Nexon EV"
-                    className="w-[300px] h-[250px] border border-white/10 rounded-lg"
+                    className="w-3/4 border border-white/10 rounded-lg"
                     />
                 </div>            
             </div>
