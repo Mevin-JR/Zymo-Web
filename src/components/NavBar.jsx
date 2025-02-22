@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { IoPersonCircleOutline } from "react-icons/io5";
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -61,6 +62,11 @@ const NavBar = () => {
                                 Contact Us
                             </Link>
                         </li>
+                        <li>
+                        <Link to="/profile">
+                            <IoPersonCircleOutline size={24} className="text-[#faffa4] cursor-pointer" />
+                        </Link>
+                    </li>
                     </ul>
                 </div>
 
@@ -84,6 +90,11 @@ const NavBar = () => {
                     <li>
                         <Link to="/contact-us" className="hover:text-[#faffa4]">
                             Contact Us
+                        </Link>
+                    </li>
+                    <li>
+                        <Link to="/profile">
+                            <IoPersonCircleOutline size={24} className="text-[#faffa4] cursor-pointer" />
                         </Link>
                     </li>
                 </ul>

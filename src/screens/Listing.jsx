@@ -3,9 +3,10 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { calculateFreeKM, fetchMyChoizeCars } from "../utils/mychoize";
+
 
 const Listing = () => {
-    // Location State
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration } =
         location.state || {};
@@ -26,6 +27,12 @@ const Listing = () => {
         // hour: "numeric", // TODO: Adjust this part of end date display
         // minute: "numeric",
     });
+    const formatDateForMyChoize = (dateString) => {
+        const date = new Date(dateString);
+        if (isNaN(date)) return null; // Handle invalid date input
+        return `\/Date(${date.getTime()}+0530)\/`;
+    };
+
 
     const hasRun = useRef(false);
     let searchCount = 0;
@@ -38,6 +45,7 @@ const Listing = () => {
     const [transmission, setTransmission] = useState("");
     const [filteredList, setFilteredList] = useState(carList);
     const [carCount, setCarCount] = useState("");
+
 
     // Errors
     const noCarsFound = () => {
@@ -54,20 +62,28 @@ const Listing = () => {
         });
     };
 
+
     useEffect(() => {
         if (hasRun.current) return;
         hasRun.current = true;
 
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
-
         if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
+            return;
+        }
+
+        const CityName = city;
+        const formattedPickDate = formatDateForMyChoize(startDate);
+        const formattedDropDate = formatDateForMyChoize(endDate);
+
+        if (!formattedPickDate || !formattedDropDate) {
+            toast.error("Invalid date format!", { position: "top-center" });
             return;
         }
 
         if (sessionStorage.getItem("fromSearch") !== "true") {
             sessionStorage.setItem("fromSearch", false);
-            // Load from cache if exists
             if (localStorage.getItem("carList")) {
                 setCarList(JSON.parse(localStorage.getItem("carList")));
                 setLoading(false);
@@ -79,7 +95,10 @@ const Listing = () => {
             setLoading(true);
             try {
                 const url = import.meta.env.VITE_FUNCTIONS_API_URL;
-                const response = await fetch(`${url}/zoomcar/search`, {
+
+
+                // Fetch Zoomcar API
+                const zoomPromise = fetch(`${url}/zoomcar/search`, {
                     method: "POST",
                     body: JSON.stringify({
                         data: {
@@ -93,72 +112,68 @@ const Listing = () => {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                });
+                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
-                if (!response.ok) {
-                    if (searchCount <= 2) {
-                        searchCount += 1;
-                        search();
-                        return;
-                    }
-                    setLoading(false);
-                    unknownError();
-                    searchCount = 0;
-                    throw new Error(
-                        `Error: ${response.status} - ${response.statusText}`
-                    );
+
+                const mychoizePromise = fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDuration);
+
+                // Execute both API calls in parallel
+                const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
+                console.log(mychoizeData);
+
+                let allCarData = [];
+
+                if (zoomData.status === "fulfilled" && zoomData.value.sections) {
+                    const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
+                        id: car.car_data.car_id,
+                        brand: car.car_data.brand,
+                        name: car.car_data.name,
+                        options: car.car_data.accessories,
+                        address: car.car_data.location.address,
+                        location_id: car.car_data.location.location_id,
+                        location_est: car.car_data.location.text,
+                        lat: car.car_data.location.lat,
+                        lng: car.car_data.location.lng,
+                        fare: `₹${car.car_data.pricing.revenue}`,
+                        actual_fare: car.car_data.pricing.fare_breakup
+                            ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
+                            : "000",
+                        hourly_amount: car.car_data.pricing.payable_amount,
+                        images: car.car_data.image_urls,
+                        ratingData: car.car_data.rating_v3,
+                        trips: car.car_data.trip_count,
+                        source: "zoomcar",
+                    }));
+                    allCarData = [...allCarData, ...zoomCarData];
+                } else {
+                    console.error("Zoomcar API failed:", zoomData.reason);
                 }
 
-                searchCount = 0;
-                const data = await response.json();
-                if (!data.sections) {
-                    // setLoading(false);
-                    toast.error(
-                        "No cars found, Please try modifying input...",
-                        {
-                            position: "top-center",
-                            autoClose: 1000 * 5,
-                        }
-                    );
-                    return;
+                if (mychoizeData.status === "fulfilled") {
+                    allCarData = [...allCarData, ...mychoizeData.value];
+                } else {
+                    console.error("MyChoize API failed:", mychoizeData.reason);
                 }
-                const sections = data.sections;
-                const carCards = sections[sections.length - 1].cards;
 
-                const carData = carCards.map((car) => ({
-                    id: car.car_data.car_id,
-                    cargroup_id: car.car_data.cargroup_id,
-                    brand: car.car_data.brand,
-                    name: car.car_data.name,
-                    options: car.car_data.accessories,
-                    address: car.car_data.location.address,
-                    location_id: car.car_data.location.location_id,
-                    location_est: car.car_data.location.text,
-                    lat: car.car_data.location.lat,
-                    lng: car.car_data.location.lng,
-                    fare: `₹${car.car_data.pricing.revenue.toLocaleString("en-IN")}`,
-                    actual_fare: car.car_data.pricing.fare_breakup
-                        ? car.car_data.pricing.fare_breakup[0].fare_item[0]
-                              .value
-                        : "000",
-                    hourly_amount: car.car_data.pricing.payable_amount,
-                    pricing_id: car.car_data.pricing.id,
-                    images: car.car_data.image_urls,
-                    ratingData: car.car_data.rating_v3,
-                    trips: car.car_data.trip_count,
-                }));
+                if (allCarData.length === 0) {
+                    toast.error("No cars found, Please try modifying input...", {
+                        position: "top-center",
+                        autoClose: 1000 * 5,
+                    });
+                }
+
+                setCarList(allCarData);
+                setCarCount(allCarData.length);
                 setLoading(false);
-                setCarList(carData);
-                setCarCount(carCards.length);
 
-                localStorage.setItem("carList", JSON.stringify(carData)); // Storing carList as cache
+                localStorage.setItem("carList", JSON.stringify(allCarData));
             } catch (error) {
-                unknownError();
-                console.error(error);
+                console.error("Unexpected error:", error);
             }
         };
         search();
     }, [city, startDate, endDate]);
+
 
     // Filter functionality
     useEffect(() => {
@@ -214,6 +229,14 @@ const Listing = () => {
             },
         });
     };
+
+    const goToPackages = (car) => {
+        navigate(`/self-drive-car-rentals/${city}/cars/packages`, {
+            state: {
+                car
+            }
+        })
+    }
 
     return (
         <div className="h-100% min-w-screen bg-grey-900 text-white flex flex-col items-center px-4 py-6">
@@ -372,9 +395,9 @@ const Listing = () => {
                                         </p>
                                         <div className="img-container">
                                             <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm mt-2 bg-white p-1"
+                                                src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
+                                                alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
+                                                className="h-6 rounded-sm mt-2 bg-white p-1"
                                             />
                                         </div>
                                     </div>
@@ -417,9 +440,9 @@ const Listing = () => {
                                         </div>
                                         <div className="img-container">
                                             <img
-                                                src="/images/ServiceProvider/zoomcarlogo.png"
-                                                alt="Zoomcar"
-                                                className="h-5 rounded-sm bg-white p-1"
+                                                src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
+                                                alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
+                                                className="h-5 rounded-sm mt-2 bg-white p-1"
                                             />
                                         </div>
                                         <div className="self-auto ">
@@ -454,16 +477,27 @@ const Listing = () => {
                                                 (GST incl)
                                             </p>
                                         </div>
-
-                                        <button
-                                            style={{
-                                                backgroundColor: "#faffa4",
-                                            }}
-                                            className="rounded-md py-1  px-6 ml-auto"
-                                            onClick={() => goToDetails(car)}
-                                        >
-                                            <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
-                                        </button>
+                                        {car.source === "zoomcar" ? (
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#faffa4",
+                                                }}
+                                                className="rounded-md py-1  px-6 ml-auto"
+                                                onClick={() => goToDetails(car)}
+                                            >
+                                                <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
+                                            </button>
+                                        ) : (
+                                            <button
+                                                style={{
+                                                    backgroundColor: "#faffa4",
+                                                }}
+                                                className="rounded-md py-1  px-6 ml-auto"
+                                                onClick={() => goToPackages(car)}
+                                            >
+                                                <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
