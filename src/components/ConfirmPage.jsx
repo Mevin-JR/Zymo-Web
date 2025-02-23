@@ -49,7 +49,7 @@ const ConfirmPage = ({ isOpen, close }) => {
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
                 <div className="fixed inset-0 bg-transparent bg-opacity-50 flex justify-center items-center">
                     <div className="bg-darkGrey2 rounded-lg shadow-lg p-6 w-80 text-center">
-                        <div className="font-bold w-16 h-16 bg-[#faffa4] rounded-full flex items-center justify-center mx-auto">
+                        <div className="font-bold w-16 h-16 bg-[#faffa4] rounded-full flex items-center justify-center mx-auto text-darkGrey2">
                             <Check />
                         </div>
                         <h2 className="text-xl font-bold mt-4 text-white">

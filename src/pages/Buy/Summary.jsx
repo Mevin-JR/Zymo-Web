@@ -47,7 +47,7 @@ const Summary = () => {
         </div>
 
         <div className="mx-auto mb-5">
-          <div className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl p-8 border border-white/10">
+          <div className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl p-8 border border-white/10">
             <div className="mt-4">
                 <div className="mt-4 flex justify-center">
                     <img 
@@ -76,7 +76,7 @@ const Summary = () => {
         </div>
 
         <div className="mx-auto mb-7">
-            <div className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl p-5 border border-white/10">
+            <div className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl p-5 border border-white/10">
                 <div className="grid grid-cols-2">
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Free Kilometers</span>
@@ -96,7 +96,7 @@ const Summary = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-[#edff8d]/30"
+              className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-[#edff8d]/30"
             >
               <button
                 className="w-full px-6 py-4 text-left flex justify-between items-center"

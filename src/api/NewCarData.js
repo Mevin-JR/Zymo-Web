@@ -24,7 +24,7 @@ export const carData = [
         priceRange: "₹ 12.0L - ₹ 14.0L",
         monthlyTestDriveFee: "4000",
         securityDeposit: "15,000",
-        totalAmount: "13,00,000",
+        totalAmount: "13,00,0",
         freeKilometers: "1200",
         vendor: "TATA",
       },

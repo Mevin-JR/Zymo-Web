@@ -12,13 +12,13 @@ const TestDrivePopup = ({ isOpen, close, id , carDetail}) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-[#303030] text-white p-6 rounded-lg w-80 shadow-lg">
+      <div className="bg-[#212121] text-white p-6 rounded-lg w-80 shadow-lg">
         <h2 className="text-xl font-semibold text-center mb-4">
           Choose Test Drive Option
         </h2>
         
         {/* Standard Test Drive */}
-        <div className="bg-[#404040] p-4 rounded-lg text-center mb-4">
+        <div className="bg-[#2d2d2d] border border-white/10 p-4 rounded-lg text-center mb-4">
           <h3 className="text-lg font-semibold">Test Drive</h3>
           <p className="text-sm text-gray-300">
             Visit our showroom for a comprehensive test drive experience

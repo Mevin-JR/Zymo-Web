@@ -15,7 +15,7 @@ export default function FormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
-  const { car , startDate } = location.state || {};
+  const { car , startDate , endDate } = location.state || {};
 
   const validateForm = () => {
     const newErrors = {};
@@ -56,7 +56,7 @@ export default function FormPage() {
   const handleNext = () => {
     if (validateForm()) {
       localStorage.setItem('formData', JSON.stringify(formData));
-      navigate('/buy/upload-doc', { state: { car, startDate , userData:formData } });
+      navigate('/buy/upload-doc', { state: { car, startDate , endDate , userData:formData } });
     }
   };
   
