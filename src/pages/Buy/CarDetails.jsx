@@ -4,11 +4,13 @@ import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TestDrivePopup from '../../components/buycomponent/TestDrivePopup';
+import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
 
 const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [isTestDrivePopupOpen, setIsTestDrivePopupOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   // Finding car from carData based on the id from URL
   const carDetail = carData.find((car) => car.id === parseInt(id));
@@ -129,13 +131,51 @@ const CarDetails = () => {
               </div>
 
               {/* Price and Test Drive Button */}
-              <p className="text-2xl font-bold text-gray-300 m-4">Starts at {price}</p>
-              <button
-                className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88]"
-                onClick={() => setIsTestDrivePopupOpen(true)}
-              >
-                Book Test Drive
-              </button>
+              {/* <p className="text-2xl font-bold text-gray-300 m-4">Starts at &#8377;{price}*</p> */}
+              <div className=''>
+                <p className="text-md font-semibold mx-2">Rs. {price} Lakh*  <span className="text-xs text-gray-400">onwards</span> </p>
+              </div>
+
+              <p className="text-sm text-gray- m-2 mb-4">Avg. Ex-Showroom price</p>
+
+              <div className='flex'>
+                <div className='flex flex-col'>
+                  <Link to={"/buy/test-drive-inputform"}>
+                    <button
+                      className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
+                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                    >
+                      Test Drive
+                    </button>
+                  </Link>
+
+                </div>
+
+                <div className='flex flex-col'>
+                  <Link to={`/buy/summary/${id}`} className="block">
+                    <div className="relative inline-block">
+                      {/* Show Popup on Hover */}
+                      {showPopup && (
+                        <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-[300px] sm:w-[400px] lg:w-[500px]">
+                          <ExtendedTestDriveBenefits />
+                        </div>
+                      )}
+
+                      {/* Button to hover */}
+                      <button
+                        className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
+                        onMouseEnter={() => setShowPopup(true)}
+                        onMouseLeave={() => setShowPopup(false)}
+                      >
+                        Extended Test Drive
+                      </button>
+                    </div>
+                  </Link>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>( Try Before You Buy -</p>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>Book Your Extended Test Drive Now! )</p>
+
+                </div>
+              </div>
             </div>
           </div>
 
@@ -151,7 +191,7 @@ const CarDetails = () => {
               <div className="name-rating flex justify-between items-center px-3 mt-4">
                 <h1 className="text-3xl font-bold">{`${name} ${model}`}</h1>
                 <div className="flex items-center space-x-2">
-                  <span className="text-[#e8ff81] text-lg bg-darkGrey2 px-1 rounded-lg">&#9733; {rating}</span>
+                  <span className="text-[#e8ff81] text-sm  px-1 rounded-lg">&#9733; {rating}</span>
                 </div>
               </div>
             </div>
@@ -238,25 +278,56 @@ const CarDetails = () => {
 
             {/* Price and Test Drive Button */}
             <div className="p-3 bg-darkGrey flex flex-col items-center">
-              <p className="text-2xl font-bold mb-4">starts at {price}</p>
-              <button
-                className="bg-[#e8ff81] text-darkGrey2 px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88]"
-                onClick={() => setIsTestDrivePopupOpen(true)}
-              >
-                Book Test Drive
-              </button>
+              <p className="text-2xl font-bold mb-4">starts at &#8377;{price}*</p>
+              <div className='flex'>
+                <div className='flex flex-col'>
+                  <Link to={`/buy/test-drive-inputform`}>
+                    <button
+                      className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] m-1"
+                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                    >
+                      Test Drive
+                    </button>
+                  </Link>
+
+                </div>
+
+                <div className='flex flex-col'>
+                <Link to={`/buy/summary/${id}`} className="block">
+                    <div className="relative inline-block">
+                      {/* Show Popup on Hover */}
+                      {showPopup && (
+                        <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-[300px] sm:w-[400px] lg:w-[500px]">
+                          <ExtendedTestDriveBenefits />
+                        </div>
+                      )}
+
+                      {/* Button to hover */}
+                      <button
+                        className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
+                        onMouseEnter={() => setShowPopup(true)}
+                        onMouseLeave={() => setShowPopup(false)}
+                      >
+                        Extended Test Drive
+                      </button>
+                    </div>
+                  </Link>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>( Try Before You Buy -</p>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>Book Your Extended Test Drive Now! )</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Test Drive Popup */}
-      <TestDrivePopup
+      {/* <TestDrivePopup
         isOpen={isTestDrivePopupOpen}
         close={() => setIsTestDrivePopupOpen(false)}
-        id={id} 
-        carDetail={carDetail}
-      />
+        id={id}
+      /> */}
+
     </>
   );
 };

@@ -13,8 +13,7 @@ const Card = ({ car }) => {
                 </div>
                 <div className="mt-2">
                     <div className="text-center md:text-start mb-1">
-                        <i className="fa-solid fa-star text-[#e8ff81] text-xs"></i>
-                        <span className="text-xs"> {car.rating}</span>
+                        <span className="text-xs text-[#faffa4]">&#9733; {car.rating}</span>
                     </div>
                     {/* Vehicle details */}
                     <div className="text-xs text-gray-400 flex flex-col items-center md:items-start">
@@ -41,9 +40,13 @@ const Card = ({ car }) => {
 
             {/* Right Section: Price & CTA */}
             <div className="flex md:flex-col items-center md:items-end text-center md:text-right justify-between w-full md:w-1/3 mt-4 md:mt-0">
-                <div>
-                    <p className="text-xs text-gray-400">Starts at</p>
-                    <p className="text-lg font-semibold">₹ {car.price}*</p>
+                <div>                    
+                    <div className=''>
+                    <p className="text-md font-semibold">Rs.{car.price} L* </p>
+                    <p className="text-xs text-gray-400">onwards</p>
+                    </div>
+                    
+                    {/* <p className="text-xs text-gray-400">Avg. Ex-Showroom price</p> */}
                     <p className="text-xs text-[#faffa4]">t&c apply</p>
                 </div>
                 <Link to={`/buy/car-details/${car.id}`} className="mt-3">

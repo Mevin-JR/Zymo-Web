@@ -1,10 +1,9 @@
-import { useState  } from 'react';
-import { useNavigate ,useLocation} from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-export default function FormPage() {
+export default function TestDriveInputForm() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +14,6 @@ export default function FormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
-  const { car , startDate } = location.state || {};
 
   const validateForm = () => {
     const newErrors = {};
@@ -56,15 +54,13 @@ export default function FormPage() {
   const handleNext = () => {
     if (validateForm()) {
       localStorage.setItem('formData', JSON.stringify(formData));
-      if(currentTab == "buy"){
-        navigate("Thanks for test drive !")
-    }
-    else{
-      navigate('/buy/upload-doc');
-    }
+    
+   //redirect to test drive is confirm !
+      navigate('/buy/test-drive-confirmpage');
+  
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
@@ -77,7 +73,7 @@ export default function FormPage() {
 
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl p-2 md:text-4xl font-bold">
-            Extended Test Drive Booking
+             Test Drive Booking
           </h1>
         </div>
 
