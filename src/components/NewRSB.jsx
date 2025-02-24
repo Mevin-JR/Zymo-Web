@@ -202,46 +202,28 @@ const NewRSB = () => {
                 {/* Input Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
-                    <LoadScriptNext
-                        googleMapsApiKey={placesAPIKey}
-                        libraries={placesAPILibraries}
-                    >
-                        <div className="relative rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
-                            <MapPinIcon className="w-6 h-5 text-gray-400 pr-1" />
-                            <div className="flex-1">
-                                <Autocomplete
-                                    onLoad={setAutocomplete}
-                                    onPlaceChanged={handlePlaceSelect}
-                                    options={{
-                                        componentRestrictions: {
-                                            country: "IN",
-                                        },
-                                    }}
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Location"
-                                        // value={placeInput}
-                                        // onChange={(e) => setPlaceInput(e.target.value)}
-                                        className="bg-transparent text-white outline-none w-full h-full"
-                                        id="location-input"
-                                    />
-                                </Autocomplete>
-
-                                {/* Get current location option */}
-                                {/* {placeInput && (
-                                    <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
-                                        <li
-                                            className="flex items-center justify-center p-2 cursor-pointer hover:bg-gray-700 text-white"
-                                            onClick={getCurrentLocation}
-                                        >
-                                            <LocateFixed className="inline-block w-5 h-5 mr-2" /> Get Current Location
-                                        </li>
-                                    </ul>
-                                )} */}
-                            </div>
-                        </div>
-                    </LoadScriptNext>
+                    <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
+  <div className="bg-[#303030] rounded-full py-3 px-6 flex justify-between items-center mb-4">
+    <div className="flex items-center flex-grow">
+      <MapPinIcon className="w-6 h-5 text-gray-400 mr-2" />
+      <Autocomplete
+        onLoad={setAutocomplete}
+        onPlaceChanged={handlePlaceSelect}
+        options={{ componentRestrictions: { country: "IN" } }}
+      >
+        <input
+          type="text"
+          placeholder="Enter a location"
+          className="bg-[#303030] text-white outline-none w-full pl-2"
+        />
+      </Autocomplete>
+    </div>
+    <button className="flex flex-col items-center text-white text-xs hover:text-[#faffa4]">
+    <img src="../public/images/Benefits/Group_1-removebg-preview.png" alt="Current Location" className="w-5 h-5" />
+    <span>Current Location</span>
+</button>
+  </div>
+</LoadScriptNext>
 
                     {/* Start Date Picker */}
                     <div className="relative w-full">
