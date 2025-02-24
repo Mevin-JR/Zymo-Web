@@ -1,23 +1,33 @@
+import { toPascalCase } from "./helperFunctions";
+
 const getTotalKms = (tripDurationHours) => {
     return {
         FF: `${(120 / 24) * tripDurationHours} KMs`, // Fixed Fare - 120 KM/Day
         MP: `${(300 / 24) * tripDurationHours} KMs`, // Monthly Plan - 300 KM/Day
-        DR: "Unlimited", // Daily Rental - Unlimited KM
+        DR: "Unlimited KMs", // Daily Rental - Unlimited KM
     };
 };
 
-const toPascalCase = (str) => {
-    return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+const findPackage = (rateBasis) => {
+    if (rateBasis === "FF") {
+        return "120km/day";
+    } else if (rateBasis === "MP") {
+        return "300km/day";
+    } else if (rateBasis === "DR") {
+        return "Unlimited Kms";
+    } else {
+        return "Undefined";
+    }
 };
 
-export const fetchMyChoizeCars = async (
+const fetchMyChoizeCars = async (
     CityName,
     formattedPickDate,
     formattedDropDate,
     tripDurationHours
 ) => {
-    // const apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-    const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+    const apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    // const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
     try {
         const response = await fetch(`${apiUrl}/mychoize/search-cars`, {
@@ -52,8 +62,8 @@ export const fetchMyChoizeCars = async (
             if (!groupedCars[key]) {
                 groupedCars[key] = {
                     id: car.TariffKey,
-                    brand: toPascalCase(car.BrandName),
-                    name: "",
+                    brand: toPascalCase(car.BrandName.split(" ")[0]),
+                    name: toPascalCase(car.BrandName.split(" ")[1]),
                     options: [
                         car.TransMissionType,
                         car.FuelType,
@@ -65,9 +75,10 @@ export const fetchMyChoizeCars = async (
                     images: [car.VehicleBrandImageName],
                     ratingData: { text: "No ratings available" },
                     total_km: getTotalKms(tripDurationHours),
-                    extrakm_charge: `Extra kms will be charged at ₹${car.ExKMRate}/km`,
+                    extrakm_charge: `₹${car.ExKMRate}/km`,
                     trips: car.TotalBookinCount,
                     source: "mychoize",
+                    sourceImg: "/images/ServiceProvider/mychoize.png",
                     rateBasisFare: {},
                     all_fares: [],
                 };
@@ -92,3 +103,5 @@ export const fetchMyChoizeCars = async (
         return [];
     }
 };
+
+export { findPackage, fetchMyChoizeCars };

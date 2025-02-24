@@ -4,6 +4,7 @@ import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchMyChoizeCars } from "../utils/mychoize";
+import { formatDate } from "../utils/helperFunctions";
 
 
 const Listing = () => {
@@ -11,22 +12,10 @@ const Listing = () => {
     const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours } =
         location.state || {};
     const { city } = useParams();
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of start date display
-        // minute: "numeric",
-    });
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of end date display
-        // minute: "numeric",
-    });
+
+    const startDateFormatted = formatDate(startDate);
+    const endDateFormatted = formatDate(endDate);
+
     const formatDateForMyChoize = (dateString) => {
         const date = new Date(dateString);
         if (isNaN(date)) return null; // Handle invalid date input
@@ -148,16 +137,18 @@ const Listing = () => {
                         ratingData: car.car_data.rating_v3,
                         trips: car.car_data.trip_count,
                         source: "zoomcar",
+                        sourceImg: "/images/ServiceProvider/zoomcarlogo.png",
+                        rateBasis: "DR"
                     }));
                     allCarData = [...allCarData, ...zoomCarData];
                 } else {
                     console.error("Zoomcar API failed:", zoomData.reason);
                 }
 
-                if (mychoizeData.status === "fulfilled") {
+                if (mychoizeData.status === "fulfilled" && mychoizeData.value) {
                     allCarData = [...allCarData, ...mychoizeData.value];
                 } else {
-                    console.error("MyChoize API failed:", mychoizeData.reason);
+                    console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
                 }
 
                 if (allCarData.length === 0) {
@@ -394,8 +385,8 @@ const Listing = () => {
                                 <div className="mt-3 flex justify-between items-start">
                                     <div>
                                         <h3 className="text-md font-semibold">
-                                            {car.brand.split(" ")[0]}{" "}
-                                            {car.name.split(" ")[0]}
+                                            {car.source === "zoomcar" ? car.brand.split(" ")[0] : car.brand}{" "}
+                                            {car.source === "zoomcar" ? car.name.split(" ")[0] : car.name}
                                         </h3>
                                         <p className="text-md text-gray-400">
                                             {car.options[2]}
