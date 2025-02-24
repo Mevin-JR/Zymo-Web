@@ -1,4 +1,4 @@
-import { useState ,useRef } from "react";
+import { useState  } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
@@ -6,7 +6,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 import ConfirmPage from "../../components/ConfirmPage";
-import PaymentConfirmationPage from "../../components/buycomponent/PaymentConfirmationPage";
 import UploadSection from "../../components/buycomponent/UploadSection";
 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -42,7 +41,7 @@ const dataURLtoFile = (dataURL, filename) => {
 
 
 
-const UploadDocuments = () => {
+const ExtendedTestDriveUploadDocuments = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -53,12 +52,9 @@ const UploadDocuments = () => {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [currentDocType, setCurrentDocType] = useState("aadhar");
   const [currentPage, setCurrentPage] = useState("front");
-
-  const [isLoading, setIsLoading] = useState(false); 
+  // const [allImages , setAllImages]=useState([])
   const [isConfirmed, setIsConfirmed] = useState(false); 
 
-  const orderIdRef = useRef(null);  // Using useRef to store orderId persistently
-  const paymentIdRef = useRef(null);  // Using useRef to store paymentId persistently
   const { car, startDate, endDate, userData } = location.state || {};
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
@@ -75,16 +71,9 @@ const UploadDocuments = () => {
       setDrivingBackImage(null);
       setCameraOpen(false);
       setCurrentDocType("aadhar");
-      setCurrentPage("front");
-  
-      setIsLoading(false);
-      setIsConfirmed(false);
-  
-      orderIdRef.current = null;
-      paymentIdRef.current = null;
+      setCurrentPage("front");  
     };
-      
-
+    
   // To handle image upload
   const handleImageUpload = (type, page, docType) => {
     setCurrentDocType(docType);
@@ -201,95 +190,92 @@ const UploadDocuments = () => {
   //Handle Payment
   const handlePayment = async () => {
     await delay(1000);
-    const res = await loadScript(
-      "https://checkout.razorpay.com/v1/checkout.js"
-    );
-
+    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+  
     if (!res) {
       console.error("Razorpay SDK failed to load!");
-      toast.error("Could not load razorpay, Please try again later...", {
+      toast.error("Could not load Razorpay, Please try again later...", {
         position: "top-center",
-        autoClose: 1000 * 5,
+        autoClose: 5000,
       });
       return false;
     }
-
+  
     try {
-      const amount = parseInt(car.totalAmount); //pass the amount
+      const amount = parseInt(car.totalAmount);
       const orderData = await createOrder(amount, "INR");
+  
+      return new Promise((resolve, reject) => {
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
+          amount: orderData.amount,
+          currency: "INR",
+          name: "Zymo",
+          description: "Zymo is India's largest aggregator for self-drive car rentals.",
+          image: "/images/AppLogo/zymo2.jpg",
+          order_id: orderData.id,
+          handler: async function (response) {
+            try {
+              const data = { ...response };
+  
+              // console.log("Order ID:", response.razorpay_order_id);
+              // console.log("Payment ID:", response.razorpay_payment_id);
 
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
-        amount: orderData.amount,
-        currency: "INR",
-        name: "Zymo",
-        description:
-          "Zymo is India's largest aggregator for self-drive car rentals.",
-        image: "/images/AppLogo/zymo2.jpg",
-        order_id: orderData.id,
-        handler: async function (response) {
-          const data = {
-            ...response,
-          };
-
-          // console.log("Order ID:", response.razorpay_order_id);
-          // console.log("Payment ID:", response.razorpay_payment_id);
-
-          orderIdRef.current = response.razorpay_order_id;
-          paymentIdRef.current = response.razorpay_payment_id;
-      
-          const res = await axios.post(
-            `${functionsUrl}/payment/verifyPayment`,
-            data
-          );
-
-          // Payment successful
-          if (res.data.success) {
-            // console.log("Payment successful:", res.data.message);
-            setIsLoading(true);
-            return true;
-          } else {
-            toast.error("Payment error, Please try again...", {
-              position: "top-center",
-              autoClose: 1000 * 5,
-            });
-            setIsLoading(false);
-            resetAllState(); // Reset all states
-            return false;
-          }
-        },
-        theme: {
-          color: "#edff8d",
-          backdrop_color: "#212121",
-        },
-        prefill: {
-          name: userData.name,
-          email: userData.email,
-          contact: userData.phone,
-        },
-      };
-
-      var rzp1 = new window.Razorpay(options);
-      rzp1.on("payment.failed", function (response) {
-        console.log("Payment failed:", response.error);
-        return false;  
+              const res = await axios.post(`${functionsUrl}/payment/verifyPayment`, data);
+  
+              if (res.data.success) {
+                resolve({
+                  success: true,
+                  orderId: response.razorpay_order_id,
+                  paymentId: response.razorpay_payment_id,
+                });
+              } else {
+                toast.error("Payment error, Please try again...", {
+                  position: "top-center",
+                  autoClose: 5000,
+                });
+                resetAllState();
+                resolve(false); 
+              }
+            } catch (error) {
+              console.error("Error verifying payment:", error);
+              resolve(false);
+            }
+          },
+          theme: {
+            color: "#edff8d",
+            backdrop_color: "#212121",
+          },
+          prefill: {
+            name: userData.name,
+            email: userData.email,
+            contact: userData.phone,
+          },
+        };
+  
+        var rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          console.log("Payment failed:", response.error);
+          reject(false);
+        });
+  
+        rzp1.on("payment.error", function (response) {
+          console.log("Payment error:", response.error);
+          reject(false);
+        });
+  
+        rzp1.open();
       });
-
-      rzp1.on("payment.error", function (response) {
-        console.log("Payment error:", response.error);
-        return false;
-      });
-
-      rzp1.open();
     } catch (error) {
       console.error("Error during payment initiation:", error);
       return false;
     }
   };
+  
 
 
   //Firebase Upload Logic
-  const uploadDataToFirebase = async (images) => {
+  const uploadDataToFirebase = async (images,orderId, paymentId) => {
     try {      
       // Create a timestamp for the folder name once
       const timestamp = Date.now();
@@ -305,9 +291,12 @@ const UploadDocuments = () => {
 
       //Extract URLs of uploaded images
       const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
-
+      
       const data = {
         carId: car.id,
+        carName: car.name,
+        carModel: car.model,
+        carType: car.type,
         startDate: startDate,
         endDate: endDate,
         userName: userData.name,
@@ -323,22 +312,20 @@ const UploadDocuments = () => {
           licenseFront: licenseFrontUrl,
           licenseBack: licenseBackUrl,
         },
-        orderId: orderIdRef.current,
-        paymentId: paymentIdRef.current,
+        orderId: orderId,
+        paymentId: paymentId,
         price: car.totalAmount,
         createdAt: new Date(),
       };
 
-      // Add the data to a collection
+      // Add data to Firebase collection
       await addDoc(collection(webDB, "webBuyPaymentSuccessDetail"), data);
-      setIsLoading(false);
-      setIsConfirmed(true);
-
       // console.log("Data uploaded to Firebase:", data);
-      resetAllState(); // Reset all states
+
+      setIsConfirmed(true);          
+      resetAllState();
     } catch (error) {
       console.error("Error uploading documents to Firebase:", error);
-      setIsLoading(false); 
     }
   };
 
@@ -375,16 +362,19 @@ const UploadDocuments = () => {
         });
         return;
       }
-      
       // Proceed with payment first & After payment is successful, upload the data to Firebase
-
-      await handlePayment();
-      await uploadDataToFirebase(convertedImages);
+      const paymentSuccess = await handlePayment();
     
+      if (!paymentSuccess.success) {
+        console.error("Payment failed, not proceeding with Firebase upload.");
+        return; 
+      }
+
+      await uploadDataToFirebase(convertedImages,paymentSuccess.orderId, paymentSuccess.paymentId);
+      
     } catch (error) {
       console.error("Error uploading images:", error);
-      resetAllState();  // Reset all states
-      setIsLoading(false); 
+      resetAllState();   
     }
   };
 
@@ -469,18 +459,20 @@ const UploadDocuments = () => {
         </div>
       )}
 
-      {isLoading && (
+      {/* {isLoading && (
         <PaymentConfirmationPage
           isOpen={isLoading}
           close={() => setIsLoading(false)}
         />
-      )}
+      )} */}
       
 
       {isConfirmed && (
         <ConfirmPage
           isOpen={isConfirmed}
           close={() => setIsConfirmed(false)}
+          car={car}
+          userData={userData}
         />
       )}
 
@@ -488,4 +480,4 @@ const UploadDocuments = () => {
   );
 };
 
-export default UploadDocuments;
+export default ExtendedTestDriveUploadDocuments;

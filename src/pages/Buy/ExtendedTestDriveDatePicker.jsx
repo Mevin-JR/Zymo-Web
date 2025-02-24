@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate,useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-const DatePicker = () => {
+const ExtendedTestDriveDatePicker = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -89,4 +89,4 @@ const DatePicker = () => {
 };
 
 
-export default DatePicker;
+export default ExtendedTestDriveDatePicker;
