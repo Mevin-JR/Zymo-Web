@@ -1,9 +1,13 @@
-import { ArrowLeft, MapPin, Calendar, IndianRupee } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, IndianRupee, Car } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
+import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
+import { findPackage } from "../utils/mychoize";
+import { doc, getDoc } from "firebase/firestore";
+import { appDB } from "../utils/firebase";
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
@@ -20,47 +24,85 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 function BookingPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { formattedCity } = useParams();
+    const { city } = useParams();
     const { startDate, endDate, userData, car } = location.state || {};
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
+
+    const startDateFormatted = formatDate(startDate);
+    const endDateFormatted = formatDate(endDate)
 
     const [customerName, setCustomerName] = useState(userData.name);
     const [customerPhone, setCustomerPhone] = useState(userData.phone);
     const [customerEmail, setCustomerEmail] = useState(userData.email);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
+    const [vendorDetails, setVendorDetails] = useState(null);
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
 
+    useEffect(() => {
+        const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
+        const fetchVendorDetails = async () => {
+            const docRef = doc(appDB, "carvendors", vendor);
+            const docSnap = await getDoc(docRef);
+
+            setVendorDetails(docSnap.data());
+        }
+
+        fetchVendorDetails();
+    }, [car.source]);
+
+    const calcGST = (fare) => {
+        const rawFare = parseInt(fare.slice(1));
+        const gstPercent = parseFloat(vendorDetails?.TaxSd);
+        return parseFloat(rawFare * gstPercent);
+    }
+
+    const calcDiscount = (fare) => {
+        const rawFare = parseInt(fare.slice(1));
+        const discountPrecent = 1 - parseFloat(vendorDetails?.DiscountSd);
+        return parseFloat(rawFare * discountPrecent);
+    }
+
+    const calcPayableAmount = (fare) => {
+        const rawFare = parseInt(fare.slice(1));
+        const gst = calcGST(fare) === rawFare ? 0 : calcGST(fare);
+        const deposit = parseInt(vendorDetails?.Securitydeposit);
+        const discount = calcDiscount(fare);
+        return (rawFare + gst + deposit) - discount;
+    }
+
+    const formattedFare = formatFare(car.fare);
+
     const bookingData = {
-        carDetails: {
+        headerDetails: {
             name: `${car.brand} ${car.name}`,
-            type: car.options[0],
-            range: "Unlimited KM",
+            type: car.options.slice(0, 3).join(" | "),
+            range: `${findPackage(car.rateBasis)}`,
             image: car.images[0],
         },
         pickup: {
             startDate: startDateFormatted,
             endDate: endDateFormatted,
-            city: formattedCity,
+            city: city,
+        },
+        carDetails: {
+            registration: vendorDetails?.plateColor || "N/A",
+            package: car.rateBasis === "DR" ? "Unlimited KMs" : findPackage(car.rateBasis),
+            transmission: car.options[0],
+            fuel: car.options[1],
+            seats: car.options[2],
+        },
+        fareDetails: {
+            base: car.actual_fare ? car.actual_fare : formattedFare,
+            fare: formattedFare,
+            gst: car.source === "zoomcar" ? "Included in Base Fare" : formatFare(calcGST(car.fare)),
+            deposit: car.source === "zoomcar" ? "₹0" : formatFare(vendorDetails?.Securitydeposit),
+            discount: formatFare(calcDiscount(car.fare)),
+            payable_amount: formatFare(calcPayableAmount(car.fare)),
         },
         customer: {
             name: userData.name === null ? "N/A" : userData.name,
             mobile: userData.phone === null ? "N/A" : userData.phone,
             email: userData.email === null ? "N/A" : userData.email,
-        },
-        fare: {
-            // base: cardetails.actual_fare,
-            // discount: ,
-            deposit: car.fare,
         },
         voucher: {
             amount: 75,
@@ -86,7 +128,7 @@ function BookingPage() {
                         type: "normal",
                         cargroup_id: car.cargroup_id,
                         car_id: car.id,
-                        city: formattedCity,
+                        city: city,
                         search_location_id: car.location_id,
                         ends: endDateEpoc,
                         fuel_included: false,
@@ -146,7 +188,7 @@ function BookingPage() {
                     phone: customerPhone,
                     email: customerEmail,
                 },
-                city: formattedCity,
+                city: city,
                 bookingData: {
                     booking_id: bookingId,
                     amount: amount,
@@ -351,66 +393,69 @@ function BookingPage() {
 
             {/* Main Content */}
             <div className="mx-auto p-6 sm:p-10 lg:p-20 space-y-5 text-white">
-                {/* Car Details */}
+                {/* Header Details */}
                 <div className="flex flex-wrap justify-between items-center gap-5 rounded-lg p-6 shadow-sm w-full">
                     <div className="flex-1 min-w-[200px] text-xl">
                         <h2 className="font-semibold mb-2">
-                            {bookingData.carDetails.name}
+                            {bookingData.headerDetails.name}
                         </h2>
-                        <p className="text-muted-foreground mb-1">
-                            {bookingData.carDetails.type}
+                        {/* <p className="text-[18px] text-gray-400 mb-1">
+                            {bookingData.headerDetails.type}
                         </p>
-                        <p className="text-muted-foreground">
-                            {bookingData.carDetails.range}
-                        </p>
+                        <p className="text-[18px] text-gray-400">
+                            {bookingData.headerDetails.range}
+                        </p> */}
                     </div>
 
                     <div className="flex-1 flex justify-center -mt-10">
                         <img
                             src={
-                                bookingData.carDetails.image ||
+                                bookingData.headerDetails.image ||
                                 "/placeholder.svg"
                             }
-                            alt={`${bookingData.carDetails.name}`}
+                            alt={`${bookingData.headerDetails.name}`}
                             className="w-full sm:w-96 lg:w-80 h-[200px] sm:h-[280px] lg:h-[200px] object-cover rounded-lg"
                         />
                     </div>
 
                     <div className="flex-1 flex justify-end items-end gap-1 text-xl">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-row items-center gap-2">
                             <p className="text-muted-foreground whitespace-nowrap">
                                 Fulfilled by:{" "}
-                                <span className="text-xl text-[#eeff87]">
-                                    Zoomcar
-                                </span>
+                                <img
+                                    src={car.sourceImg}
+                                    alt={car.source}
+                                    className="h-10"
+                                />
                             </p>
                         </div>
                     </div>
                 </div>
-                <hr className="my-1 border-gray-400" />
+
 
                 {/* Pickup Details */}
-                <div className="max-w-3xl mx-auto rounded-lg">
-                    <h3 className="text-center mb-6 text-white text-3xl font-bold">
+                <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
+                    <h3 className="text-center mb-3 text-white text-3xl font-bold">
                         Pickup
                     </h3>
+                    <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
                         {/* Pickup Location */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <MapPin className="w-5 h-5 text-[#eeff87]" />
-                                <p>Pickup Location:</p>
+                                <p>Pickup City</p>
                             </div>
-                            <p className="ml-auto">{bookingData.pickup.city}</p>
+                            <p className="ml-auto text-gray-300">{toPascalCase(bookingData.pickup.city)}</p>
                         </div>
 
                         {/* Start Date */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#eeff87]" />
-                                <p>Start Date:</p>
+                                <p>Start Date</p>
                             </div>
-                            <p className="ml-auto">
+                            <p className="ml-auto text-gray-300">
                                 {bookingData.pickup.startDate}
                             </p>
                         </div>
@@ -419,15 +464,76 @@ function BookingPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-[#eeff87]" />
-                                <p>End Date:</p>
+                                <p>End Date</p>
                             </div>
-                            <p className="ml-auto">
+                            <p className="ml-auto text-gray-300">
                                 {bookingData.pickup.endDate}
                             </p>
                         </div>
                     </div>
                 </div>
-                <hr className="my-0 border-gray-400" />
+
+                {/* Car Details */}
+                <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
+                    <h3 className="text-center mb-6 text-white text-3xl font-bold">
+                        Car Details
+                    </h3>
+                    <hr className="my-1 mb-5 border-gray-500" />
+                    <div className="space-y-2">
+                        {/* Registeration */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Car className="w-5 h-5 text-[#eeff87]" />
+                                <p>Registeration</p>
+                            </div>
+                            <p className="ml-auto text-gray-300">{bookingData.carDetails.registration}</p>
+                        </div>
+
+                        {/* Package */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Car className="w-5 h-5 text-[#eeff87]" />
+                                <p>Package</p>
+                            </div>
+                            <p className="ml-auto text-gray-300">
+                                {bookingData.carDetails.package}
+                            </p>
+                        </div>
+
+                        {/* Transmission */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Car className="w-5 h-5 text-[#eeff87]" />
+                                <p>Transmission</p>
+                            </div>
+                            <p className="ml-auto text-gray-300">
+                                {bookingData.carDetails.transmission}
+                            </p>
+                        </div>
+
+                        {/* Fuel */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Car className="w-5 h-5 text-[#eeff87]" />
+                                <p>Fuel Type</p>
+                            </div>
+                            <p className="ml-auto text-gray-300">
+                                {bookingData.carDetails.fuel}
+                            </p>
+                        </div>
+
+                        {/* Seats */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Car className="w-5 h-5 text-[#eeff87]" />
+                                <p>Seats</p>
+                            </div>
+                            <p className="ml-auto text-gray-300">
+                                {bookingData.carDetails.seats}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Customer Details */}
                 {/* <div className="max-w-3xl mx-auto rounded-lg">
@@ -440,7 +546,7 @@ function BookingPage() {
                                 <User className="w-5 h-5 text-[#eeff87]" />
                                 <p>Name:</p>
                             </div>
-                            <p className="ml-auto">
+                            <p className="ml-auto text-gray-300">
                                 {bookingData.customer.name}
                             </p>
                         </div>
@@ -450,7 +556,7 @@ function BookingPage() {
                                 <Phone className="w-5 h-5 text-[#eeff87]" />
                                 <p>Mobile No:</p>
                             </div>
-                            <p className="ml-auto">
+                            <p className="ml-auto text-gray-300">
                                 {bookingData.customer.mobile}
                             </p>
                         </div>
@@ -460,19 +566,19 @@ function BookingPage() {
                                 <Mail className="w-5 h-5 text-[#eeff87]" />
                                 <p>Email Id:</p>
                             </div>
-                            <p className="ml-auto">
+                            <p className="ml-auto text-gray-300">
                                 {bookingData.customer.email}
                             </p>
                         </div>
                     </div>
                 </div>
-                <hr className="my-0 border-gray-400" /> */}
 
                 {/* Fare Details */}
-                <div className="max-w-3xl mx-auto rounded-lg">
+                <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
                     <h3 className="text-center mb-6 text-white text-3xl font-bold">
                         Fare Details
                     </h3>
+                    <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
                         {/* Base Fare */}
                         <div className="flex items-center justify-between">
@@ -480,35 +586,56 @@ function BookingPage() {
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>Base Fare</span>
                             </div>
-                            <span className="ml-auto">
-                                {bookingData.fare.base}
+                            <span className="ml-auto text-gray-300">
+                                {bookingData.fareDetails.base}
                             </span>
                         </div>
-
-                        {/* Discount */}
-                        {/* <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <IndianRupee className="w-5 h-5 text-[#eeff87]" />
-                                    <span>Discount</span>
-                                </div>
-                                <span className="ml-auto">
-                                    {bookingData.fare.discount}
-                                </span>
-                            </div> */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <IndianRupee className="w-5 h-5 text-[#eeff87]" />
+                                <span>GST {car.source !== "zoomcar" ? `(${(vendorDetails?.TaxSd * 100).toFixed(0)}%)` : ""}</span>
+                            </div>
+                            <span className="ml-auto text-gray-300">
+                                {bookingData.fareDetails.gst}
+                            </span>
+                        </div>
 
                         {/* Refundable Deposit */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
+                                <span>Security Deposit</span>
+                            </div>
+                            <span className="ml-auto text-gray-300">
+                                {bookingData.fareDetails.deposit}
+                            </span>
+                        </div>
+
+                        {/* Discount */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <IndianRupee className="w-5 h-5 text-[#eeff87]" />
+                                <span>Discount {`(${((1 - vendorDetails?.DiscountSd) * 100).toFixed(0)}%)`}</span>
+                            </div>
+                            <span className="ml-auto text-gray-300">
+                                {`- ${bookingData.fareDetails.discount}`}
+                            </span>
+                        </div>
+
+                        <hr className="my-0 border-gray-600" />
+
+                        {/* Payable Amount */}
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>Payable Amount</span>
                             </div>
-                            <span className="ml-auto">
-                                {bookingData.fare.deposit}
+                            <span className="ml-auto text-[#eeff87]">
+                                {bookingData.fareDetails.payable_amount}
                             </span>
                         </div>
                     </div>
                 </div>
-                <hr className="my-0 border-gray-400" />
 
                 {/* Voucher Notice */}
                 {/* <div className="text-center">
@@ -551,74 +678,92 @@ function BookingPage() {
                     </div> */}
 
                 {/* Customer Input Fields */}
-                <div className="max-w-lg mx-auto rounded-lg">
-                    <h3 className="text-center mb-6 text-white text-3xl font-bold">
+                <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
+                    <h3 className="text-center mb-1 text-white text-3xl font-bold">
                         Customer Details
                     </h3>
-                    <div className="space-y-4">
-                        {/* Name Input */}
-                        <div className="flex flex-col">
-                            <label className="text-lg text-[#eeff87]">
-                                Name
-                            </label>
-                            <input
-                                type="text"
-                                value={customerName}
-                                onChange={(e) =>
-                                    setCustomerName(e.target.value)
-                                }
-                                className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
-                                placeholder="Enter your name"
-                            />
-                        </div>
+                    {car.source !== "zoomcar" ? (
+                        <p className="text-center text-gray-400 text-sm mb-4">
+                            (You must add your details and documents to continue)
+                        </p>
+                    ) : ""}
+                    <hr className="my-1 mb-5 border-gray-500" />
+                    {car.source === "zoomcar" ? (
+                        <div className="space-y-4">
+                            {/* Name Input */}
+                            <div className="flex flex-col">
+                                <label className="text-lg text-[#eeff87]">
+                                    Name
+                                </label>
+                                <input
+                                    type="text"
+                                    value={customerName}
+                                    onChange={(e) =>
+                                        setCustomerName(e.target.value)
+                                    }
+                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    placeholder="Enter your name"
+                                />
+                            </div>
 
-                        {/* Phone Input */}
-                        <div className="flex flex-col">
-                            <label className="text-lg text-[#eeff87]">
-                                Phone
-                            </label>
-                            <input
-                                type="text"
-                                pattern="[0-9]{10}"
-                                maxLength={10}
-                                value={customerPhone}
-                                onChange={(e) =>
-                                    setCustomerPhone(e.target.value)
-                                }
-                                className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
-                                placeholder="Enter your phone number"
-                            />
-                        </div>
+                            {/* Phone Input */}
+                            <div className="flex flex-col">
+                                <label className="text-lg text-[#eeff87]">
+                                    Phone
+                                </label>
+                                <input
+                                    type="text"
+                                    pattern="[0-9]{10}"
+                                    maxLength={10}
+                                    value={customerPhone}
+                                    onChange={(e) =>
+                                        setCustomerPhone(e.target.value)
+                                    }
+                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    placeholder="Enter your phone number"
+                                />
+                            </div>
 
-                        {/* Email Input */}
-                        <div className="flex flex-col">
-                            <label className="text-lg text-[#eeff87]">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                value={customerEmail}
-                                onChange={(e) =>
-                                    setCustomerEmail(e.target.value)
-                                }
-                                className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
-                                placeholder="Enter your email"
-                            />
+                            {/* Email Input */}
+                            <div className="flex flex-col">
+                                <label className="text-lg text-[#eeff87]">
+                                    Email
+                                </label>
+                                <input
+                                    type="email"
+                                    value={customerEmail}
+                                    onChange={(e) =>
+                                        setCustomerEmail(e.target.value)
+                                    }
+                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    placeholder="Enter your email"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex justify-center items-center">
+                            <button
+                                className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                                onClick={handlePayment}
+                            >
+                                Upload Documents
+                            </button>
+                        </div>
+                    )}
                 </div>
 
-                <hr className="my-0 border-gray-400" />
 
                 {/* Book Button */}
-                <div className="flex justify-center items-center">
-                    <button
-                        className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
-                        onClick={handlePayment}
-                    >
-                        Book & Pay
-                    </button>
-                </div>
+                {car.source === "zoomcar" ? (
+                    <div className="flex justify-center items-center">
+                        <button
+                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                            onClick={handlePayment}
+                        >
+                            Book & Pay
+                        </button>
+                    </div>
+                ) : ""}
             </div>
 
             <ConfirmPage

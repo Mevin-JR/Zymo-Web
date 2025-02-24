@@ -216,33 +216,28 @@ const RSB = () => {
                     </div>
 
                     {/* Location Input */}
-                    <LoadScriptNext
-                        googleMapsApiKey={placesAPIKey}
-                        libraries={placesAPILibraries}
-                    >
-                        <div className="bg-[#303030] rounded-full py-3 px-6 flex items-center mb-4 ">
-                            <MapPinIcon className="w-6 h-5 text-gray-400 mr-2" />
-
-                            <div className="flex-1 ">
-                                <Autocomplete
-                                    onLoad={setAutocomplete}
-                                    onPlaceChanged={handlePlaceSelect}
-                                    options={{
-                                        componentRestrictions: {
-                                            country: "IN",
-                                        },
-                                    }}
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Enter a location"
-                                        className="bg-[#303030] text-white outline-none w-full"
-                                        id="location-input"
-                                    />
-                                </Autocomplete>
-                            </div>
-                        </div>
-                    </LoadScriptNext>
+                    <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
+  <div className="bg-[#303030] rounded-full py-3 px-6 flex justify-between items-center mb-4">
+    <div className="flex items-center flex-grow">
+      <MapPinIcon className="w-6 h-5 text-gray-400 mr-2" />
+      <Autocomplete
+        onLoad={setAutocomplete}
+        onPlaceChanged={handlePlaceSelect}
+        options={{ componentRestrictions: { country: "IN" } }}
+      >
+        <input
+          type="text"
+          placeholder="Enter a location"
+          className="bg-[#303030] text-white outline-none w-full pl-2"
+        />
+      </Autocomplete>
+    </div>
+    <button className="flex flex-col items-center text-white text-xs hover:text-[#faffa4]">
+    <img src="../public/images/Benefits/Group_1-removebg-preview.png" alt="Current Location" className="w-5 h-5" />
+    <span>Current Location</span>
+</button>
+  </div>
+</LoadScriptNext>
 
                     {/* Date Inputs */}
                     <div className="grid grid-cols-2 gap-4 mb-4">

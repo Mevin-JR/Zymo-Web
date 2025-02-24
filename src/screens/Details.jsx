@@ -11,23 +11,17 @@ import {
 import { appAuth } from "../utils/firebase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
+import { formatDate, toPascalCase } from "../utils/helperFunctions";
+import { findPackage } from "../utils/mychoize";
 
 const CarDetails = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
     const { startDate, endDate, car } = location.state || {};
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
 
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-    });
+    const startDateFormatted = formatDate(startDate)
+    const endDateFormatted = formatDate(endDate);
 
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State to control modal visibility
     const [authUser, setAuthUser] = useState(null);
@@ -117,21 +111,22 @@ const CarDetails = () => {
                 },
             ],
             bookingInfo: {
-                city: city,
+                city: toPascalCase(city),
                 startDate: startDateFormatted,
                 endDate: endDateFormatted,
                 driveType: "Self Drive",
-                logo: car.source === "zoomcar" 
-                ? "/images/ServiceProvider/zoomcarlogo.png" 
-                : "/images/ServiceProvider/mychoize.png",
+                logo: car.sourceImg,
             },
             specifications: [
                 { label: "Car Brand", value: car.brand },
-                { label: "Car Name", value: car.name || car.brand},
-                { label: "Hourly Amount", value: car.hourly_amount },
+                { label: "Car Name", value: car.name },
+                { label: "Hourly Amount", value: car.source === "mychoize" ? `₹${car.hourly_amount}/hr` : car.hourly_amount },
                 { label: "Seats", value: car.options[2] },
                 { label: "Fuel Type", value: car.options[1] },
                 { label: "Transmission", value: car.options[0] },
+                { label: "Package", value: car.source === "zoomcar" ? "Unlimited KMs" : findPackage(car.rateBasis) },
+                { label: "Available KMs", value: car.source === "zoomcar" ? "Unlimited KMs" : car.total_km[car.rateBasis] },
+                { label: "Extra KM Charge", value: car.rateBasis === "DR" ? "No Charge" : car.extrakm_charge }
             ],
             price: car.fare,
         },
@@ -194,28 +189,24 @@ const CarDetails = () => {
                                         <div
                                             className="img-scroller inline-flex transition-transform duration-700 ease-in-out"
                                             style={{
-                                                width: `${
-                                                    car.image.length * 100
-                                                }%`,
-                                                transform: `translateX(-${
-                                                    (currentIndex * 100) /
+                                                width: `${car.image.length * 100
+                                                    }%`,
+                                                transform: `translateX(-${(currentIndex * 100) /
                                                     car.image.length
-                                                }%)`,
+                                                    }%)`,
                                             }}
                                         >
                                             {car.image.map((image, idx) => (
                                                 <img
                                                     key={idx}
                                                     src={image}
-                                                    alt={`${car.name} ${
-                                                        idx + 1
-                                                    }`}
+                                                    alt={`${car.name} ${idx + 1
+                                                        }`}
                                                     className="w-full flex-none rounded-2xl shadow-xl"
                                                     style={{
-                                                        width: `${
-                                                            100 /
+                                                        width: `${100 /
                                                             car.image.length
-                                                        }%`,
+                                                            }%`,
                                                     }}
                                                 />
                                             ))}
@@ -227,7 +218,7 @@ const CarDetails = () => {
                                             onClick={() => {
                                                 setCurrentIndex((prevIndex) =>
                                                     prevIndex ===
-                                                    car.image.length - 1
+                                                        car.image.length - 1
                                                         ? 0
                                                         : prevIndex + 1
                                                 );
@@ -346,10 +337,13 @@ const CarDetails = () => {
                 </div>
 
                 {/* Price and Booking */}
-                <div className="mt-8 flex items-center justify-between lg:flex-col lg:space-y-4 lg:justify-center">
+                <div className="mt-10 flex items-center justify-between lg:flex-col lg:space-y-4 lg:justify-center">
                     <p className="text-3xl font-semibold text-appColor">
                         {carDetails[0].price}
                     </p>
+                    <span className="text-sm text-gray-400">
+                        {car.source === "zoomcar" ? "GST Included" : "GST Not Included"}
+                    </span>
                     <button
                         onClick={handleBooking}
                         className="bg-appColor lg:w-48 text-black px-6 py-3 rounded-xl font-bold shadow-lg duration-300 ease-in-out transform hover:scale-110"
