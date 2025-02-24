@@ -1,10 +1,10 @@
 import  { useState } from 'react';
 import { carData } from "../../api/NewCarData";
-import { useParams } from 'react-router-dom';
+import { useParams , Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import TestDrivePopup from '../../components/buycomponent/TestDrivePopup';
 import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
+
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -205,7 +205,7 @@ const CarDetails = () => {
                     <i className="fa-solid fa-car"></i>
                     <div>
                       <p className="font-semibold text-gray-300">Range</p>
-                      <p className="text-lg">{range}</p>
+                      <p className="text-lg">{range} Km</p>
                     </div>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ const CarDetails = () => {
                     <i className="fa-solid fa-battery-full"></i>
                     <div>
                       <p className="font-semibold text-gray-300">Battery</p>
-                      <p className="text-lg">{battery}</p>
+                      <p className="text-lg">{battery} kWh</p>
                     </div>
                   </div>
                 </div>
@@ -223,7 +223,7 @@ const CarDetails = () => {
                     <i className="fa-solid fa-plug"></i>
                     <div>
                       <p className="font-semibold text-gray-300">Power</p>
-                      <p className="text-lg">{power}</p>
+                      <p className="text-lg">{power} bhp</p>
                     </div>
                   </div>
                 </div>
@@ -232,7 +232,7 @@ const CarDetails = () => {
                     <i className="fa-solid fa-stopwatch"></i>
                     <div>
                       <p className="font-semibold text-gray-300">Charging</p>
-                      <p className="text-lg">{charging}</p>
+                      <p className="text-lg">{charging} hrs</p>
                     </div>
                   </div>
                 </div>
@@ -253,19 +253,19 @@ const CarDetails = () => {
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Length :</span>
-                  <span>{length}</span>
+                  <span>{length} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Width :</span>
-                  <span>{width}</span>
+                  <span>{width} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Height :</span>
-                  <span>{height}</span>
+                  <span>{height} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Cargo Volume :</span>
-                  <span>{cargoVolume}</span>
+                  <span>{cargoVolume} L</span>
                 </li>
               </ul>
             </div>
@@ -283,7 +283,7 @@ const CarDetails = () => {
                 <div className='flex flex-col'>
                   <Link to={`/buy/test-drive-inputform`}>
                     <button
-                      className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] m-1"
+                      className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] mx-1"
                     // onClick={() => setIsTestDrivePopupOpen(true)}
                     >
                       Test Drive
@@ -304,7 +304,7 @@ const CarDetails = () => {
 
                       {/* Button to hover */}
                       <button
-                        className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
+                        className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg  font-semibold hover:bg-[#e8ff88] mx-1 "
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
                       >

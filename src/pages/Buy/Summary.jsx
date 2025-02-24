@@ -1,39 +1,11 @@
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
+import { useState , useEffect } from 'react';
+import { useNavigate , useLocation } from 'react-router-dom';
 
-const carData={
-    name: "Nexon EV",
-    monthlyFee: 92500,
-    securityDeposit: 40000,
-    totalAmount:74514,
-    freeKm: 1500,
-    freekilometers:1200,
-    vendor:"MyChoice"
-}
-const faqs = [
-    {
-      question: "How do I charge the vehicle at home?",
-      answer: "You can charge your vehicle using the provided home charging unit. Installation by a certified electrician is recommended.",
-    },
-    {
-      question: "Can OEM create a charging point for me?",
-      answer: "Yes, we can assist in setting up a charging point at your location. Contact our service team for installation.",
-    },
-    {
-      question: "What if the charger is damaged?",
-      answer: "If your charger is damaged, please contact our 24/7 support immediately. We'll arrange for repair or replacement under warranty.",
-    },
-    {
-      question: "What is the range for a 100% charged vehicle?",
-      answer: "The vehicle has a range of approximately 500 km on a full charge under optimal conditions.",
-    },
-    {
-      question: "What is the range for a 100% charged vehicle?",
-      answer: "The vehicle has a range of approximately 500 km on a full charge under optimal conditions.",
-    }
-];
+import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
+import { collection  , getDocs} from "firebase/firestore";
+import { appDB } from "../../utils/firebase";
+
 
 const Summary = () => {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import React from 'react'
 const ExtendedTestDriveBenefits = () => {
   return (
     <>
-       <div className=" mt-2 w-[85%] p-4 bg-[#212121] border border-[#faffa4] rounded-lg shadow-lg text-sm text-gray-200 ">
+       <div className=" mt-2 w-[85%] p-4 bg-[#2d2d2d] border border-[#faffa4] rounded-lg shadow-lg text-sm text-gray-200 ">
           <p className="font-bold text-2xl text-white text-center mb-4">Benefits of Extended Test Drive with Zymo</p>
           <ul className="mt-2 space-y-2">
             <li>🚗 <b>Experience the Car in Real Life</b> – Drive it on your daily routes, not just for a few minutes at a showroom.</li>
