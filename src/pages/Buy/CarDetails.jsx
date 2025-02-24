@@ -20,7 +20,7 @@ const CarDetails = () => {
   }
 
   // Destructuring car details for easier use
-  const { name, model, rating, range, battery, power, charging, bodyStyle, warranty, length, width, height, cargoVolume, price, image, about } = carDetail;
+  const { name, model, rating, range, battery, power, charging, bodyStyle, warranty_years,warranty_km, length, width, height, cargoVolume, price, image, about } = carDetail;
 
   return (
     <>
@@ -104,7 +104,7 @@ const CarDetails = () => {
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Warranty :</span>
-                  <span>{warranty}</span>
+                  <span>{`${warranty_years} yrs / ${warranty_km} Km`}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Length :</span>
@@ -152,7 +152,10 @@ const CarDetails = () => {
                 </div>
 
                 <div className='flex flex-col'>
-                  <Link to={`/buy/summary/${id}`} className="block">
+                <Link
+                  to={`/buy/summary/${id}`}
+                  state={{ car: carDetail }} 
+                  className="block">
                     <div className="relative inline-block">
                       {/* Show Popup on Hover */}
                       {showPopup && (
@@ -249,7 +252,7 @@ const CarDetails = () => {
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Warranty :</span>
-                  <span>{warranty}</span>
+                  <span>{`${warranty_years} yrs / ${warranty_km} Km`}</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Length :</span>
@@ -293,7 +296,10 @@ const CarDetails = () => {
                 </div>
 
                 <div className='flex flex-col'>
-                <Link to={`/buy/summary/${id}`} className="block">
+                <Link 
+                  to={`/buy/summary/${id}`} 
+                  state={{ car: carDetail }} 
+                  className="block">
                     <div className="relative inline-block">
                       {/* Show Popup on Hover */}
                       {showPopup && (

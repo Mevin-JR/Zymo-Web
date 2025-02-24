@@ -7,12 +7,14 @@ import { collection  , getDocs} from "firebase/firestore";
 import { appDB } from "../../utils/firebase";
 
 
-const Summary = () => {
+const ExtendedTestDriveSummary = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openIndex, setOpenIndex] = useState(null);
   const [faqs, setFaqs] = useState([]); 
   const { car } = location.state || {};
+  
+  console.log(car);
   
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -141,4 +143,4 @@ const Summary = () => {
   );
 };
 
-export default Summary;
+export default ExtendedTestDriveSummary;
