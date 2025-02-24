@@ -203,25 +203,32 @@ const NewRSB = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
                     <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
-  <div className="bg-[#303030] rounded-full py-3 px-6 flex justify-between items-center mb-4">
-    <div className="flex items-center flex-grow">
-      <MapPinIcon className="w-6 h-5 text-gray-400 mr-2" />
-      <Autocomplete
-        onLoad={setAutocomplete}
-        onPlaceChanged={handlePlaceSelect}
-        options={{ componentRestrictions: { country: "IN" } }}
-      >
-        <input
-          type="text"
-          placeholder="Enter a location"
-          className="bg-[#303030] text-white outline-none w-full pl-2"
-        />
-      </Autocomplete>
-    </div>
-    <button className="flex flex-col items-center text-white text-xs hover:text-[#faffa4]">
-    <img src="../public/images/Benefits/Group_1-removebg-preview.png" alt="Current Location" className="w-5 h-5" />
-    <span>Current Location</span>
-</button>
+  <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
+    {/* Icon */}
+    <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
+
+    {/* Input Field */}
+    <Autocomplete
+      onLoad={setAutocomplete}
+      onPlaceChanged={handlePlaceSelect}
+      options={{ componentRestrictions: { country: "IN" } }}
+    >
+      <input
+        type="text"
+        placeholder="Enter a location"
+        className="bg-transparent text-white outline-none w-full placeholder-gray-400"
+      />
+    </Autocomplete>
+
+    {/* Current Location Button */}
+    <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
+      <img
+        src="/images/Benefits/Group_1-removebg-preview.png"
+        alt="Current Location"
+        className="w-5 h-5 mr-1"
+      />
+      <span className="text-sm">Current Location</span>
+    </button>
   </div>
 </LoadScriptNext>
 
