@@ -238,6 +238,7 @@ const CarDetails = () => {
 
             {/* Price and Test Drive Button */}
             <div className="p-3 bg-darkGrey flex flex-col items-center">
+
               <p className="text-2xl font-bold mb-4">starts at {price}</p>
               <button
                 className="bg-[#e8ff81] text-darkGrey2 px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -245,7 +246,45 @@ const CarDetails = () => {
               >
                 Book Test Drive
               </button>
-            </div>
+              
+              <p className="text-2xl font-bold mb-4">starts at &#8377;{price}*</p>
+              <div className='flex'>
+                <div className='flex flex-col'>
+                  <Link to={`/buy/test-drive-inputform`}>
+                    <button
+                      className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] m-1"
+                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                    >
+                      Test Drive
+                    </button>
+                  </Link>
+
+                </div>
+
+                <div className='flex flex-col'>
+                <Link to={`/buy/summary/${id}`} className="block">
+                    <div className="relative inline-block">
+                      {/* Show Popup on Hover */}
+                      {showPopup && (
+                        <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-[300px] sm:w-[400px] lg:w-[500px]">
+                          <ExtendedTestDriveBenefits />
+                        </div>
+                      )}
+
+                      {/* Button to hover */}
+                      <button
+                        className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
+                        onMouseEnter={() => setShowPopup(true)}
+                        onMouseLeave={() => setShowPopup(false)}
+                      >
+                        Extended Test Drive
+                      </button>
+                    </div>
+                  </Link>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>( Try Before You Buy -</p>
+                  <p className='text-xs mx-2 my-1 overflow-y-auto'>Book Your Extended Test Drive Now! )</p>
+                </div>
+              </div>
           </div>
         </div>
       </div>
