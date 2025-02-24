@@ -56,36 +56,36 @@ const CarDetails = () => {
               <div className="p-3">
                 <h2 className="text-xl font-semibold text-gray-300 mb-4">Key Features</h2>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-darkGrey2 p-3 rounded-lg">
+                  <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                     <div className="box flex items-center gap-5">
-                      <i className="fa-solid fa-car text-lg text-gray-300 pl-2"></i>
+                      <i className="fa-solid fa-car text-xl text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Range</p>
                         <p className="text-lg">{range} Km</p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-darkGrey2 p-3 rounded-lg">
+                  <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                     <div className="box flex items-center gap-5">
-                      <i className="fa-solid fa-battery-full text-lg text-gray-300 pl-2"></i>
+                      <i className="fa-solid fa-battery-full text-xl text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Battery</p>
                         <p className="text-lg">{battery} kWh</p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-darkGrey2 p-3 rounded-lg">
+                  <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                     <div className="box flex items-center gap-5">
-                      <i className="fa-solid fa-plug text-lg text-gray-300 pl-2"></i>
+                      <i className="fa-solid fa-plug text-xl text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Power</p>
                         <p className="text-lg">{power} bhp</p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-darkGrey2 p-3 rounded-lg">
+                  <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                     <div className="box flex items-center gap-5">
-                      <i className="fa-solid fa-stopwatch text-lg text-gray-300 pl-2"></i>
+                      <i className="fa-solid fa-stopwatch text-xl text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Charging</p>
                         <p className="text-lg">{charging} hrs</p>
@@ -200,7 +200,7 @@ const CarDetails = () => {
             <div className="p-3">
               <h2 className="text-xl font-semibold text-gray-300 mb-4">Key Features</h2>
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-darkGrey2 p-3 rounded-lg">
+                <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                   <div className="box flex items-center gap-3">
                     <i className="fa-solid fa-car"></i>
                     <div>
@@ -209,7 +209,7 @@ const CarDetails = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-darkGrey2 p-3 rounded-lg">
+                <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                   <div className="box flex items-center gap-3">
                     <i className="fa-solid fa-battery-full"></i>
                     <div>
@@ -218,7 +218,7 @@ const CarDetails = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-darkGrey2 p-3 rounded-lg">
+                <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                   <div className="box flex items-center gap-3">
                     <i className="fa-solid fa-plug"></i>
                     <div>
@@ -227,7 +227,7 @@ const CarDetails = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-darkGrey2 p-3 rounded-lg">
+                <div className="bg-[#2d2d2d] border border-white/10 p-3 rounded-lg">
                   <div className="box flex items-center gap-3">
                     <i className="fa-solid fa-stopwatch"></i>
                     <div>
@@ -271,7 +271,7 @@ const CarDetails = () => {
             </div>
 
             {/* About Section */}
-            <div className="p-3 bg-darkGrey2 border border-[#e8ff81] rounded-lg mt-4">
+            <div className="p-3 bg-[#2d2d2d] border border-[#e8ff81] rounded-lg mt-4">
               <h2 className="text-xl font-semibold text-gray-300 mb-4">About {model}</h2>
               <p className="text-gray-300">{about}</p>
             </div>

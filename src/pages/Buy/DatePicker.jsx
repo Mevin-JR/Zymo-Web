@@ -11,7 +11,11 @@ const DatePicker = () => {
     const { car } = location.state || {};
     const dates = Array.from({ length: 90 }, (_, i) => addDays(new Date(), i));
 
-    const startDateFormatted = format(selectedDate, "MMMM dd, yyyy");
+    const startDateFormatted = format(selectedDate, "dd MMMM, yyyy");
+
+    const endDate = new Date(selectedDate);
+    endDate.setDate(selectedDate.getDate() + 30);
+    const endDateFormatted = format(endDate, "dd MMMM, yyyy");
   
   return (
     <div className="min-h-screen bg-[#212121] text-white p-6">
@@ -23,7 +27,7 @@ const DatePicker = () => {
         {/* Header */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
+          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2d2d2d] bg-transparent transition-all "
           >
           <ArrowLeft size={28} />
         </button>
@@ -34,7 +38,7 @@ const DatePicker = () => {
         </div>
 
 
-        <div className="bg-[#212121]  md:bg-[#2A2A2A]  p-6 md:p-8 rounded-xl shadow-xl border border-white/10">
+        <div className="bg-[#2d2d2d]  p-6 md:p-8 rounded-xl shadow-xl border border-white/10">
             {/* Date Selection */}
             <div className="mb-6">
               <h2 className="text-xl mb-4">Pick-up Date</h2>
@@ -74,7 +78,7 @@ const DatePicker = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
-            onClick={() => navigate('/buy/upload-info',{ state: { car, startDate:startDateFormatted } })}
+            onClick={() => navigate('/buy/upload-info',{ state: { car, startDate:startDateFormatted , endDate:endDateFormatted } })}
             >
             Next
             </motion.button>

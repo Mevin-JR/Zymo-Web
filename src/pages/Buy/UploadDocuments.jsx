@@ -1,23 +1,46 @@
-import { useState,useEffect } from 'react';
-import {ArrowLeft,X,} from 'lucide-react';
-import { useNavigate,useLocation } from 'react-router-dom';
-import Webcam from 'react-webcam';
-import { toast } from "react-toastify";
+import { useState ,useRef } from "react";
+import { ArrowLeft, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import Webcam from "react-webcam";
 import axios from "axios";
-import ConfirmPage from '../../components/ConfirmPage';
-import UploadSection from '../../components/buycomponent/UploadSection';
+import { toast } from "react-toastify";
+
+import ConfirmPage from "../../components/ConfirmPage";
+import PaymentConfirmationPage from "../../components/buycomponent/PaymentConfirmationPage";
+import UploadSection from "../../components/buycomponent/UploadSection";
+
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
+import { webDB, webStorage } from "../../utils/firebase";
+
+
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
   return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
+    const script = document.createElement("script");
+    script.src = src;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
   });
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const dataURLtoFile = (dataURL, filename) => {
+  const arr = dataURL.split(","),
+    mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+};
+
+
 
 const UploadDocuments = () => {
   const navigate = useNavigate();
@@ -28,46 +51,77 @@ const UploadDocuments = () => {
   const [drivingFrontImage, setDrivingFrontImage] = useState(null);
   const [drivingBackImage, setDrivingBackImage] = useState(null);
   const [cameraOpen, setCameraOpen] = useState(false);
-  const [currentDocType, setCurrentDocType] = useState('aadhar');
-  const [currentPage, setCurrentPage] = useState('front');
-  const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
-  const { car , startDate , userData} = location.state || {};
+  const [currentDocType, setCurrentDocType] = useState("aadhar");
+  const [currentPage, setCurrentPage] = useState("front");
+
+  const [isLoading, setIsLoading] = useState(false); 
+  const [isConfirmed, setIsConfirmed] = useState(false); 
+
+  const orderIdRef = useRef(null);  // Using useRef to store orderId persistently
+  const paymentIdRef = useRef(null);  // Using useRef to store paymentId persistently
+  const { car, startDate, endDate, userData } = location.state || {};
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+  const allImagesUploaded =
+    drivingFrontImage &&
+    drivingBackImage &&
+    aadharFrontImage &&
+    aadharBackImage;
+
+    const resetAllState = () => {
+      setAadharFrontImage(null);
+      setAadharBackImage(null);
+      setDrivingFrontImage(null);
+      setDrivingBackImage(null);
+      setCameraOpen(false);
+      setCurrentDocType("aadhar");
+      setCurrentPage("front");
   
-const handleImageUpload = (type, page, docType) => {
+      setIsLoading(false);
+      setIsConfirmed(false);
+  
+      orderIdRef.current = null;
+      paymentIdRef.current = null;
+    };
+      
+
+  // To handle image upload
+  const handleImageUpload = (type, page, docType) => {
     setCurrentDocType(docType);
     setCurrentPage(page);
-    
-    if (type === 'camera') {
-      setCameraOpen(true); // Open the webcam modal
+
+    if (type === "camera") {
+      setCameraOpen(true); 
     } else {
-      // Handle gallery selection here
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-  
+      // Handle Gallery
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+
       input.onchange = (e) => {
         const file = e.target?.files?.[0];
         if (file) {
+          if (!file.type.startsWith("image/")) {
+            toast.error("Please upload an image file", {
+              position: "top-center",
+              autoClose: 1000,
+            });
+            return;
+          }
           const reader = new FileReader();
           reader.onloadend = () => {
             const imageUrl = reader.result;
-            if (docType === 'driving') {
-              if (page === 'front') {
+            if (docType === "driving") {
+              if (page === "front") {
                 setDrivingFrontImage(imageUrl);
-                console.log('Driving Front Image:', imageUrl); // Log the captured image URL
               } else {
                 setDrivingBackImage(imageUrl);
-                console.log('Driving Back Image:', imageUrl); // Log the captured image URL
               }
-            } else if (docType === 'aadhar') {
-              if (page === 'front') {
+            } else if (docType === "aadhar") {
+              if (page === "front") {
                 setAadharFrontImage(imageUrl);
-                console.log('Aadhar Front Image:', imageUrl); // Log the captured image URL
               } else {
                 setAadharBackImage(imageUrl);
-                console.log('Aadhar Back Image:', imageUrl); // Log the captured image URL
               }
             }
           };
@@ -76,30 +130,28 @@ const handleImageUpload = (type, page, docType) => {
       };
       input.click();
     }
-};
-  
-const capturePhoto = (imageSrc) => {
-    if (currentDocType === 'driving') {
-      if (currentPage === 'front') {
+  };
+
+  //Capture Photo
+  const capturePhoto = (imageSrc) => {
+    if (currentDocType === "driving") {
+      if (currentPage === "front") {
         setDrivingFrontImage(imageSrc);
-        console.log('Driving Front Image:', imageSrc); // Log the captured image URL
       } else {
         setDrivingBackImage(imageSrc);
-        console.log('Driving Back Image:', imageSrc); // Log the captured image URL
       }
-    } else if (currentDocType === 'aadhar') {
-      if (currentPage === 'front') {
+    } else if (currentDocType === "aadhar") {
+      if (currentPage === "front") {
         setAadharFrontImage(imageSrc);
-        console.log('Aadhar Front Image:', imageSrc); // Log the captured image URL
       } else {
         setAadharBackImage(imageSrc);
-        console.log('Aadhar Back Image:', imageSrc); // Log the captured image URL
       }
     }
-    setCameraOpen(false); // Close the camera modal after capturing the photo
-};
+    setCameraOpen(false);
+  };
 
-const WebcamCapture = () => {
+  //Webcam Capture
+  const WebcamCapture = () => {
     return (
       <Webcam
         audio={false}
@@ -123,222 +175,236 @@ const WebcamCapture = () => {
         )}
       </Webcam>
     );
-};
-  
-const allImagesUploaded = drivingFrontImage && drivingBackImage && aadharFrontImage && aadharBackImage;
+  };
 
-//Create order
-const createOrder = async (amount, currency) => {
+  //Create order
+  const createOrder = async (amount, currency) => {
     try {
-        const response = await axios.post(
-            `${functionsUrl}/payment/create-order`,
-              {
-                amount,
-                currency,
-              }
-          );
-          return response.data.data;
-      } catch (error) {
-          console.error("Error creating order:", error);
-          toast.error("Error creating payment", {
-              position: "top-center",
-              autoClose: 1000 * 5,
-          });
-          throw error;
-    }
-};
-
-const handlePayment = async () => {
-
-  await delay(1000);
-  const res = await loadScript(
-    "https://checkout.razorpay.com/v1/checkout.js"
-  );
-
-  if (!res) {
-    console.error("Razorpay SDK failed to load!");
-    toast.error("Could not load razorpay, Please try again later...", {
+      const response = await axios.post(
+        `${functionsUrl}/payment/create-order`,
+        {
+          amount,
+          currency,
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast.error("Error creating payment", {
         position: "top-center",
         autoClose: 1000 * 5,
-    });
-    return;
-  }
+      });
+      throw error;
+    }
+  };
 
-  try {
-      const amount = parseInt(car.totalAmount);  //pass the amount
+  //Handle Payment
+  const handlePayment = async () => {
+    await delay(1000);
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
+    if (!res) {
+      console.error("Razorpay SDK failed to load!");
+      toast.error("Could not load razorpay, Please try again later...", {
+        position: "top-center",
+        autoClose: 1000 * 5,
+      });
+      return false;
+    }
+
+    try {
+      const amount = parseInt(car.totalAmount); //pass the amount
       const orderData = await createOrder(amount, "INR");
-      console.log("Order Data:", orderData);
-      const options = {
-          key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
-          amount: orderData.amount,
-          currency: "INR",
-          name: "Zymo",
-          description: "Zymo is India's largest aggregator for self-drive car rentals.",
-          image: "/images/AppLogo/zymo2.jpg",
-          order_id: orderData.id,
-          handler: async function (response) {
-              const data = {
-                  ...response,
-              };
-              const res = await axios.post(
-                  `${functionsUrl}/payment/verifyPayment`,
-                  data
-              );
 
-              // Payment successful
-              if (res.data.success) {
-                  setIsConfirmPopupOpen(true);
-                  // Create booking
-                  // createBooking(data).catch((error) => {
-                  //     console.error("Booking error:", error);
-                  //     console.log(
-                  //         "Initiating refund due to booking failure"
-                  //     );
-                  //     initiateRefund(data.razorpay_payment_id).then(
-                  //         (refundResponse) => {
-                  //             if (refundResponse.status === "processed") {
-                  //                 navigate("/");
-                  //                 toast.success(
-                  //                     "A refund has been processed, please check your mail for more details",
-                  //                     {
-                  //                         position: "top-center",
-                  //                         autoClose: 1000 * 10,
-                  //                     }
-                  //                 );
-                  //             }
-                  //         }
-                  //     );
-                  // });
-              } else {
-                  toast.error("Payment error, Please try again...", {
-                      position: "top-center",
-                      autoClose: 1000 * 5,
-                  });
-              }
-          },
-          theme: {
-            color: "#000",
-            backdrop_color: "#000",
-          },
-          prefill: {
-            name: userData.name,
-            email: userData.email,
-            contact: userData.phone,
-          },
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
+        amount: orderData.amount,
+        currency: "INR",
+        name: "Zymo",
+        description:
+          "Zymo is India's largest aggregator for self-drive car rentals.",
+        image: "/images/AppLogo/zymo2.jpg",
+        order_id: orderData.id,
+        handler: async function (response) {
+          const data = {
+            ...response,
+          };
+
+          // console.log("Order ID:", response.razorpay_order_id);
+          // console.log("Payment ID:", response.razorpay_payment_id);
+
+          orderIdRef.current = response.razorpay_order_id;
+          paymentIdRef.current = response.razorpay_payment_id;
+      
+          const res = await axios.post(
+            `${functionsUrl}/payment/verifyPayment`,
+            data
+          );
+
+          // Payment successful
+          if (res.data.success) {
+            // console.log("Payment successful:", res.data.message);
+            setIsLoading(true);
+            return true;
+          } else {
+            toast.error("Payment error, Please try again...", {
+              position: "top-center",
+              autoClose: 1000 * 5,
+            });
+            setIsLoading(false);
+            resetAllState(); // Reset all states
+            return false;
+          }
+        },
+        theme: {
+          color: "#edff8d",
+          backdrop_color: "#212121",
+        },
+        prefill: {
+          name: userData.name,
+          email: userData.email,
+          contact: userData.phone,
+        },
       };
 
       var rzp1 = new window.Razorpay(options);
-      rzp1.on("payment.failed", async function (response) {
-          console.log("Payment failed:", response.error);
-          console.log(response.error.metadata.order_id);
-          console.log(response.error.metadata.payment_id);
+      rzp1.on("payment.failed", function (response) {
+        console.log("Payment failed:", response.error);
+        return false;  
       });
 
       rzp1.on("payment.error", function (response) {
-          console.log("Payment error:", response.error);
+        console.log("Payment error:", response.error);
+        return false;
       });
 
       rzp1.open();
-  } catch (error) {
+    } catch (error) {
       console.error("Error during payment initiation:", error);
-  }
-};
-const uploadDataToFirebase = async () => {
-  try {
+      return false;
+    }
+  };
 
-      // Upload the images to Firebase Storage
-      // const imageUrls = await Promise.all(
-      //     images.map(async (image) => {
-      //         const storageRef = firebase.storage().ref();
-      //         const fileRef = storageRef.child(`documents/${image.name}_${Date.now()}`);
-      //         await fileRef.put(image.file);
-      //         return await fileRef.getDownloadURL(); // Get the download URL of the uploaded file
-      //     })
-      // );
 
-      // Extract URLs of uploaded images
-      // const [aadharFrontUrl, aadharBackUrl, drivingFrontUrl, drivingBackUrl] = imageUrls;
+  //Firebase Upload Logic
+  const uploadDataToFirebase = async (images) => {
+    try {      
+      // Create a timestamp for the folder name once
+      const timestamp = Date.now();
+      const folderPath = `documents/${userData.email}_${timestamp}`;
 
-      // Prepare the data to send to Firestore
-      // const data = {
-      //     aadharFrontUrl,
-      //     aadharBackUrl,
-      //     drivingFrontUrl,
-      //     drivingBackUrl,
-      //     userId: userData.id, // Example: Send user ID or other data to Firestore
-      //     userName: userData.name,
-      //     userEmail: userData.email,
-      //     userPhone: userData.phone,
-      //     createdAt: firebase.firestore.FieldValue.serverTimestamp(), // Save the timestamp
-      // };
+      const imageUrls = await Promise.all(
+        images.map(async (image) => {
+          const fileRef = ref(webStorage, `${folderPath}/${image.name}`);
+          await uploadBytes(fileRef, image.file_object);
+          return await getDownloadURL(fileRef);
+        })
+      );
 
-      // // Get a reference to Firestore
-      // const db = firebase.firestore();
-      
-      // Add the data to a collection (e.g., 'userDocuments')
-      // await db.collection('userDocuments').add(data);
+      //Extract URLs of uploaded images
+      const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
 
-      toast.success('Documents uploaded successfully!', {
-          position: 'top-center',
-          autoClose: 3000,
-      });
-      
-  } catch (error) {
-      console.error('Error uploading documents to Firebase:', error);
-      toast.error('Error uploading documents. Please try again.', {
-          position: 'top-center',
-          autoClose: 3000,
-      });
-  }
-};
+      const data = {
+        carId: car.id,
+        startDate: startDate,
+        endDate: endDate,
+        userName: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        dob: userData.dob,
+        address: userData.address,
+        city: userData.city,
+        pincode: userData.pincode,
+        documents: {
+          aadhaarFront: aadharFrontUrl,
+          aadhaarBack: aadharBackUrl,
+          licenseFront: licenseFrontUrl,
+          licenseBack: licenseBackUrl,
+        },
+        orderId: orderIdRef.current,
+        paymentId: paymentIdRef.current,
+        price: car.totalAmount,
+        createdAt: new Date(),
+      };
 
-const handleSubmit =async()=>{
-    try{
+      // Add the data to a collection
+      await addDoc(collection(webDB, "webBuyPaymentSuccessDetail"), data);
+      setIsLoading(false);
+      setIsConfirmed(true);
+
+      // console.log("Data uploaded to Firebase:", data);
+      resetAllState(); // Reset all states
+    } catch (error) {
+      console.error("Error uploading documents to Firebase:", error);
+      setIsLoading(false); 
+    }
+  };
+
+
+  //On Submit 
+  const handleSubmit = async () => {
+    try {
       // Check if all required documents are uploaded
       const images = [
-        { file: aadharFrontImage, name: 'aadhar_front' },
-        { file: aadharBackImage, name: 'aadhar_back' },
-        { file: drivingFrontImage, name: 'driving_front' },
-        { file: drivingBackImage, name: 'driving_back' }
+        { file: aadharFrontImage, name: "front_page_aadhar_license" },
+        { file: aadharBackImage, name: "back_page_aadhar_license" },
+        { file: drivingFrontImage, name: "front_page_driving_license" },
+        { file: drivingBackImage, name: "back_page_driving_license" },
       ];
 
-      const missingImages = images.filter(img => !img.file);
+      // Convert base64 strings to File objects and add a 'file_object' property
+      const convertedImages = images.map((img) => {
+        if (img.file && img.file.startsWith("data:image")) {
+          return {
+            file: img.file,
+            name: img.name,
+            file_object: dataURLtoFile(img.file, img.name),
+          };
+        }
+        return img;
+      });
+
+      const missingImages = convertedImages.filter((img) => !img.file_object);
 
       if (missingImages.length > 0) {
-          console.log('Please upload all the required documents!');
-          toast.error('Please upload all the required documents', {
-              position: 'top-center',
-              autoClose: 3000,
-          });
-          return;
+        toast.error("Please upload all the required documents", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        return;
       }
+      
+      // Proceed with payment first & After payment is successful, upload the data to Firebase
 
-      // Proceed with payment first
-      await handlePayment(); 
-
-      // After payment is successful, upload the data to Firebase
-      await uploadDataToFirebase(); 
-
-    }catch(error){
-        console.error('Error uploading images:', error);
+      await handlePayment();
+      await uploadDataToFirebase(convertedImages);
+    
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      resetAllState();  // Reset all states
+      setIsLoading(false); 
     }
-}
+  };
+
+
 
   return (
     <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
         <button
-            onClick={() => navigate(-1)}
-            className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
-            >
-            <ArrowLeft size={30} />
+          onClick={() => navigate(-1)}
+          className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
+        >
+          <ArrowLeft size={30} />
         </button>
 
         <div className="text-center mb-6 md:mb-10">
-            <h1 className="text-xl md:text-4xl font-bold">
-                You're just one step away from{' '}
-                <span className="text-[#edff8d]">Booking</span>
-            </h1>
+          <h1 className="text-xl md:text-4xl font-bold">
+            You&apos;re just one step away from{" "}
+            <span className="text-[#edff8d]">Booking</span>
+          </h1>
         </div>
 
         <div className="bg-[#2A2A2A] p-6 md:p-8 rounded-xl shadow-2xl border border-white/10">
@@ -346,25 +412,25 @@ const handleSubmit =async()=>{
             <UploadSection
               title="Upload Driving License Front Page"
               image={drivingFrontImage}
-              onUpload={(type) => handleImageUpload(type, 'front', 'driving')}
+              onUpload={(type) => handleImageUpload(type, "front", "driving")}
             />
 
             <UploadSection
               title="Upload Driving License Back Page"
               image={drivingBackImage}
-              onUpload={(type) => handleImageUpload(type, 'back', 'driving')}
+              onUpload={(type) => handleImageUpload(type, "back", "driving")}
             />
 
             <UploadSection
               title="Upload Aadhar Card Front Page"
               image={aadharFrontImage}
-              onUpload={(type) => handleImageUpload(type, 'front', 'aadhar')}
+              onUpload={(type) => handleImageUpload(type, "front", "aadhar")}
             />
 
             <UploadSection
               title="Upload Aadhar Card Back Page"
               image={aadharBackImage}
-              onUpload={(type) => handleImageUpload(type, 'back', 'aadhar')}
+              onUpload={(type) => handleImageUpload(type, "back", "aadhar")}
             />
           </div>
 
@@ -373,8 +439,8 @@ const handleSubmit =async()=>{
             className={`w-full p-4 rounded-lg font-semibold text-lg transition-transform bg-[#edff8d] text-black 
               ${
                 allImagesUploaded
-                  ? 'hover:scale-[1.02] active:scale-[0.98] cursor-pointer'
-                  : 'cursor-not-allowed'
+                  ? "hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  : "cursor-not-allowed"
               }
               mt-8`}
             disabled={!allImagesUploaded}
@@ -392,7 +458,7 @@ const handleSubmit =async()=>{
               onClick={() => setCameraOpen(false)}
               className="absolute top-2 right-2 text-white"
             >
-              <X size={24} /> {/* The X icon */}
+              <X size={24} />
             </button>
 
             <h3 className="text-xl mb-4">Take a Photo</h3>
@@ -403,10 +469,21 @@ const handleSubmit =async()=>{
         </div>
       )}
 
-      <ConfirmPage
-        isOpen={isConfirmPopupOpen}
-        close={() => setIsConfirmPopupOpen(false)}
-      />
+      {isLoading && (
+        <PaymentConfirmationPage
+          isOpen={isLoading}
+          close={() => setIsLoading(false)}
+        />
+      )}
+      
+
+      {isConfirmed && (
+        <ConfirmPage
+          isOpen={isConfirmed}
+          close={() => setIsConfirmed(false)}
+        />
+      )}
+
     </div>
   );
 };
