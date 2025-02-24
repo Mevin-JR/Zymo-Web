@@ -203,7 +203,7 @@ const NewRSB = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
                     <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
-  <div className="flex items-center border border-gray-500 bg-[#181818] rounded-md px-4 py-2 w-full">
+  <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
     {/* Icon */}
     <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
 
@@ -223,7 +223,7 @@ const NewRSB = () => {
     {/* Current Location Button */}
     <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
       <img
-        src="../public/images/Benefits/Group_1-removebg-preview.png"
+        src="/images/Benefits/Group_1-removebg-preview.png"
         alt="Current Location"
         className="w-5 h-5 mr-1"
       />
