@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { carData } from "../../api/NewCarData";
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TestDrivePopup from '../../components/buycomponent/TestDrivePopup';
@@ -61,7 +61,7 @@ const CarDetails = () => {
                       <i className="fa-solid fa-car text-lg text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Range</p>
-                        <p className="text-lg">{range}</p>
+                        <p className="text-lg">{range} Km</p>
                       </div>
                     </div>
                   </div>
@@ -70,7 +70,7 @@ const CarDetails = () => {
                       <i className="fa-solid fa-battery-full text-lg text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Battery</p>
-                        <p className="text-lg">{battery}</p>
+                        <p className="text-lg">{battery} kWh</p>
                       </div>
                     </div>
                   </div>
@@ -79,7 +79,7 @@ const CarDetails = () => {
                       <i className="fa-solid fa-plug text-lg text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Power</p>
-                        <p className="text-lg">{power}</p>
+                        <p className="text-lg">{power} bhp</p>
                       </div>
                     </div>
                   </div>
@@ -88,7 +88,7 @@ const CarDetails = () => {
                       <i className="fa-solid fa-stopwatch text-lg text-gray-300 pl-2"></i>
                       <div>
                         <p className="font-semibold text-gray-300">Charging</p>
-                        <p className="text-lg">{charging}</p>
+                        <p className="text-lg">{charging} hrs</p>
                       </div>
                     </div>
                   </div>
@@ -108,19 +108,19 @@ const CarDetails = () => {
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Length :</span>
-                  <span>{length}</span>
+                  <span>{length} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Width :</span>
-                  <span>{width}</span>
+                  <span>{width} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Height :</span>
-                  <span>{height}</span>
+                  <span>{height} mm</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="font-semibold text-gray-300">Cargo Volume :</span>
-                  <span>{cargoVolume}</span>
+                  <span>{cargoVolume} L</span>
                 </li>
               </ul>
 
@@ -327,6 +327,7 @@ const CarDetails = () => {
         close={() => setIsTestDrivePopupOpen(false)}
         id={id}
       /> */}
+
     </>
   );
 };

@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { format, addDays } from "date-fns";
 import { motion } from "framer-motion";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
 const DatePicker = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [selectedDate, setSelectedDate] = useState(new Date());
-
+    const { car } = location.state || {};
     const dates = Array.from({ length: 90 }, (_, i) => addDays(new Date(), i));
 
+    const startDateFormatted = format(selectedDate, "MMMM dd, yyyy");
+  
   return (
     <div className="min-h-screen bg-[#212121] text-white p-6">
       <motion.div
@@ -71,7 +74,7 @@ const DatePicker = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
-            onClick={() => navigate('/buy/upload-info')}
+            onClick={() => navigate('/buy/upload-info',{ state: { car, startDate:startDateFormatted } })}
             >
             Next
             </motion.button>

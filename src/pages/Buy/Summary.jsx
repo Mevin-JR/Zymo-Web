@@ -34,11 +34,32 @@ const faqs = [
       answer: "The vehicle has a range of approximately 500 km on a full charge under optimal conditions.",
     }
 ];
-  
 
 const Summary = () => {
-  const [openIndex, setOpenIndex] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openIndex, setOpenIndex] = useState(null);
+  const [faqs, setFaqs] = useState([]); 
+  const { car } = location.state || {};
+  
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const subCollectionRef = collection(appDB, "EV FAQ", "MYChoize", "Nexon EV");
+
+        const subCollectionSnapshot = await getDocs(subCollectionRef);
+
+        if (!subCollectionSnapshot.empty) {
+          const fetchedFaqs = subCollectionSnapshot.docs.map(doc => doc.data());
+          setFaqs(fetchedFaqs); 
+        } 
+      } catch (error) {
+        console.error("Error fetching data from sub-collection:", error);
+      }
+    };
+    fetchFaqs(); 
+  }, []);
+  
   return (
     <div className="min-h-screen bg-[#212121] px-4 md:px-8 animate-fade-in">
       <div className="container mx-auto max-w-4xl py-8">
@@ -74,15 +95,15 @@ const Summary = () => {
             <div className="mt-8 space-y-4">
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Monthly Test Drive Fee</span>
-                    <span className="text-white font-medium">₹ {carData?.monthlyFee}</span>
+                    <span className="text-white font-medium">₹ {car?.monthlyTestDriveFee}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Security Deposit</span>
-                    <span className="text-white font-medium">₹ {carData?.securityDeposit}</span>
+                    <span className="text-white font-medium">₹ {car?.securityDeposit}</span>
                 </div>
                 <div className="flex justify-between items-center pt-4 border-t border-white/10">
                     <span className="text-gray-300">Total Amount</span>
-                    <span className="text-white font-medium">₹ {carData?.totalAmount}</span>
+                    <span className="text-white font-medium">₹ {car?.totalAmount}</span>
                 </div>
             </div>
           </div>
@@ -93,11 +114,11 @@ const Summary = () => {
                 <div className="grid grid-cols-2">
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Free Kilometers</span>
-                        <span className="text-white font-medium">{carData?.freekilometers} Km</span>
+                        <span className="text-white font-medium">{car?.freeKilometers} Km</span>
                     </div>
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Vendor</span>
-                        <span className="text-white font-medium">{carData?.vendor}</span>
+                        <span className="text-white font-medium">{car?.vendor}</span>
                     </div>
                 </div>
             </div>
@@ -136,7 +157,7 @@ const Summary = () => {
         {/* Next Button */}
         <div className="mt-6 md:mt-8">
             <button
-              onClick={() => navigate('/buy/date-picker')}
+              onClick={() => navigate('/buy/date-picker',{ state: { car:car } })}
               className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
             >
               Next

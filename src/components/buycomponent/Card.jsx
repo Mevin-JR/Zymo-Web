@@ -40,8 +40,7 @@ const Card = ({ car }) => {
 
             {/* Right Section: Price & CTA */}
             <div className="flex md:flex-col items-center md:items-end text-center md:text-right justify-between w-full md:w-1/3 mt-4 md:mt-0">
-                <div>
-                    
+                <div>                    
                     <div className=''>
                     <p className="text-md font-semibold">Rs.{car.price} L* </p>
                     <p className="text-xs text-gray-400">onwards</p>

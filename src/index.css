@@ -19,10 +19,11 @@ body {
 
 /* Google places dropdown */
 .pac-container {
+    margin-top: 50px !important;
     width: 500px !important;
     background-color: #303030 !important;
     border: none !important;
-    border-radius: 8px !important;
+    border-radius: 0 0 8px 8px !important;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5) !important;
     font-family: "Poppins", sans-serif;
 }
@@ -47,10 +48,9 @@ body {
 /* Add this to your global styles or component-specific styles */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
-  }
-  
-  .hide-scrollbar {
-    -ms-overflow-style: none;  /* For Internet Explorer 10+ */
-    scrollbar-width: none;  /* For Firefox */
-  }
-  
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none; /* For Internet Explorer 10+ */
+    scrollbar-width: none; /* For Firefox */
+}

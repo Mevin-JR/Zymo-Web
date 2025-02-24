@@ -1,9 +1,14 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate  } from "react-router-dom";
 
-const TestDrivePopup = ({ isOpen, close, id }) => {
+const TestDrivePopup = ({ isOpen, close, id , carDetail}) => {
+  const navigate = useNavigate(); // Get the navigate function
   if (!isOpen) return null;
-  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    navigate(`/buy/summary/${id}`, {
+      state: { car: carDetail}, 
+    });
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
@@ -21,15 +26,14 @@ const TestDrivePopup = ({ isOpen, close, id }) => {
         </div>
 
         {/* Extended Test Drive */}
-        <Link to={`/buy/summary/${id}`} className="block">
+        <button onClick={handleNavigate} className="block w-full">
           <div className="bg-[#faffa4] text-black p-4 rounded-lg text-center">
             <h3 className="text-lg font-semibold">Extended Test Drive</h3>
             <p className="text-sm">
               Starts @₹52,500/-. Experience the car for a month with a refundable security deposit
             </p>
           </div>
-        </Link>
-
+        </button>
         <button
           className="mt-4 w-full bg-red-400 hover:bg-red-500 text-black py-2 rounded-lg"
           onClick={close}

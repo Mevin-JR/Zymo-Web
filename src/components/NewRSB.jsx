@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { MapPinIcon, CalendarIcon, SparklesIcon } from "lucide-react";
+import { MapPinIcon, CalendarIcon, SparklesIcon, LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadScriptNext, Autocomplete } from "@react-google-maps/api";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ const NewRSB = () => {
     const [startDate, setStartDate] = useState(new Date(getCurrentTime()));
     const [endDate, setEndDate] = useState(null);
     const [tripDuration, setTripDuration] = useState("Select both dates");
+    const [tripDurationHours, setTripDurationHours] = useState("");
     const [fade, setFade] = useState(false);
     const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
     const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
@@ -72,12 +73,13 @@ const NewRSB = () => {
         }
     };
 
-    // const handlePlacesAutocomplete = async () => {
-    //     const locationInput = document.getElementById("location-input");
-    //     const autocomplete = new google.maps.places.Autocomplete(locationInput, {
-    //         types: ['geocode'],
-    //     })
-    //     console.log(autocomplete.getPredictions());
+    // const getCurrentLocation = () => {
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition((position) => {
+    //             const { latitude, longitude } = position.coords;
+
+    //         })
+    //     }
     // }
 
     // Calculate Trip Duration
@@ -104,6 +106,7 @@ const NewRSB = () => {
         }
 
         const totalHours = Math.floor(timeDifference / (1000 * 60 * 60));
+        setTripDurationHours(totalHours);
         const days = Math.floor(totalHours / 24);
         const hours = totalHours % 24;
 
@@ -125,7 +128,10 @@ const NewRSB = () => {
                 startDate,
                 endDate,
                 tripDuration,
+                tripDurationHours
             };
+
+            sessionStorage.setItem("fromSearch", true);
 
             navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
@@ -142,18 +148,18 @@ const NewRSB = () => {
     const handleTabClick = (tab) => {
         setActiveTab(tab);
         if (tab === "buy") {
-          navigate("/buy"); // Navigate to the buy page
+            navigate("/buy"); // Navigate to the buy page
         }
-        
+
         if (tab === "subscribe") {
-          //calculate current date + 30 days
-          const newEndDate = new Date(startDate);
-          newEndDate.setDate(newEndDate.getDate() + 30);
-          setEndDate(newEndDate);
-          calculateDuration(startDate, newEndDate);
+            //calculate current date + 30 days
+            const newEndDate = new Date(startDate);
+            newEndDate.setDate(newEndDate.getDate() + 30);
+            setEndDate(newEndDate);
+            calculateDuration(startDate, newEndDate);
         }
-        
-      };
+
+    };
 
     return (
         <>
@@ -183,11 +189,10 @@ const NewRSB = () => {
                         <button
                             key={tab}
                             onClick={() => handleTabClick(tab)}
-                            className={`text-lg ${
-                                activeTab === tab
+                            className={`text-lg ${activeTab === tab
                                     ? "text-white border-b-2 border-gray-200"
                                     : "text-gray-400"
-                            }`}
+                                }`}
                         >
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </button>
@@ -226,13 +231,13 @@ const NewRSB = () => {
                                 {/* Get current location option */}
                                 {/* {placeInput && (
                                     <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
-                                    <li
-                                        className="p-2 cursor-pointer hover:bg-gray-700 text-white"
-                                        onClick={handlePlacesAutocomplete}
-                                    >
-                                        📍 Get Current Location
-                                    </li>
-                                </ul>
+                                        <li
+                                            className="flex items-center justify-center p-2 cursor-pointer hover:bg-gray-700 text-white"
+                                            onClick={getCurrentLocation}
+                                        >
+                                            <LocateFixed className="inline-block w-5 h-5 mr-2" /> Get Current Location
+                                        </li>
+                                    </ul>
                                 )} */}
                             </div>
                         </div>
@@ -277,14 +282,14 @@ const NewRSB = () => {
                     </div>
 
                     {/* End Date Picker */}
-                    {}
-                    <div className={` ${(activeTab == "subscribe")? "hidden" : "relative w-full"}`}>
+                    { }
+                    <div className={` ${(activeTab == "subscribe") ? "hidden" : "relative w-full"}`}>
                         <div
-                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${ activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
+                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
                             onClick={() => {
                                 if (activeTab !== "subscribe") {
-                                setIsEndPickerOpen(true);
-                                setIsStartPickerOpen(false);
+                                    setIsEndPickerOpen(true);
+                                    setIsStartPickerOpen(false);
                                 }
                             }}
                             disabled={activeTab === "subscribe"}
