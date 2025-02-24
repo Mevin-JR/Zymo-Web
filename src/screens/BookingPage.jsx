@@ -682,9 +682,11 @@ function BookingPage() {
                     <h3 className="text-center mb-1 text-white text-3xl font-bold">
                         Customer Details
                     </h3>
-                    <p className="text-center text-gray-400 text-sm mb-4">
-                        (You must add your details and documents to continue)
-                    </p>
+                    {car.source !== "zoomcar" ? (
+                        <p className="text-center text-gray-400 text-sm mb-4">
+                            (You must add your details and documents to continue)
+                        </p>
+                    ) : ""}
                     <hr className="my-1 mb-5 border-gray-500" />
                     {car.source === "zoomcar" ? (
                         <div className="space-y-4">
@@ -752,14 +754,16 @@ function BookingPage() {
 
 
                 {/* Book Button */}
-                {/* <div className="flex justify-center items-center">
-                    <button
-                        className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
-                        onClick={handlePayment}
-                    >
-                        Book & Pay
-                    </button>
-                </div> */}
+                {car.source === "zoomcar" ? (
+                    <div className="flex justify-center items-center">
+                        <button
+                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                            onClick={handlePayment}
+                        >
+                            Book & Pay
+                        </button>
+                    </div>
+                ) : ""}
             </div>
 
             <ConfirmPage
