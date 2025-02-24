@@ -202,46 +202,35 @@ const NewRSB = () => {
                 {/* Input Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
-                    <LoadScriptNext
-                        googleMapsApiKey={placesAPIKey}
-                        libraries={placesAPILibraries}
-                    >
-                        <div className="relative rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
-                            <MapPinIcon className="w-6 h-5 text-gray-400 pr-1" />
-                            <div className="flex-1">
-                                <Autocomplete
-                                    onLoad={setAutocomplete}
-                                    onPlaceChanged={handlePlaceSelect}
-                                    options={{
-                                        componentRestrictions: {
-                                            country: "IN",
-                                        },
-                                    }}
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Location"
-                                        // value={placeInput}
-                                        // onChange={(e) => setPlaceInput(e.target.value)}
-                                        className="bg-transparent text-white outline-none w-full h-full"
-                                        id="location-input"
-                                    />
-                                </Autocomplete>
+                    <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
+  <div className="flex items-center border border-gray-500 bg-[#181818] rounded-md px-4 py-2 w-full">
+    {/* Icon */}
+    <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
 
-                                {/* Get current location option */}
-                                {/* {placeInput && (
-                                    <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
-                                        <li
-                                            className="flex items-center justify-center p-2 cursor-pointer hover:bg-gray-700 text-white"
-                                            onClick={getCurrentLocation}
-                                        >
-                                            <LocateFixed className="inline-block w-5 h-5 mr-2" /> Get Current Location
-                                        </li>
-                                    </ul>
-                                )} */}
-                            </div>
-                        </div>
-                    </LoadScriptNext>
+    {/* Input Field */}
+    <Autocomplete
+      onLoad={setAutocomplete}
+      onPlaceChanged={handlePlaceSelect}
+      options={{ componentRestrictions: { country: "IN" } }}
+    >
+      <input
+        type="text"
+        placeholder="Enter a location"
+        className="bg-transparent text-white outline-none w-full placeholder-gray-400"
+      />
+    </Autocomplete>
+
+    {/* Current Location Button */}
+    <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
+      <img
+        src="../public/images/Benefits/Group_1-removebg-preview.png"
+        alt="Current Location"
+        className="w-5 h-5 mr-1"
+      />
+      <span className="text-sm">Current Location</span>
+    </button>
+  </div>
+</LoadScriptNext>
 
                     {/* Start Date Picker */}
                     <div className="relative w-full">
