@@ -19,7 +19,7 @@ body {
 
 /* Google places dropdown */
 .pac-container {
-    margin-top: 50px !important;
+    /* margin-top: 50px !important; */
     width: 500px !important;
     background-color: #303030 !important;
     border: none !important;

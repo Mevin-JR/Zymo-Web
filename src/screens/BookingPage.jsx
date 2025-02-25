@@ -37,6 +37,7 @@ function BookingPage() {
     const [vendorDetails, setVendorDetails] = useState(null);
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
     useEffect(() => {
         const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
@@ -143,6 +144,8 @@ function BookingPage() {
                 },
             }
         );
+
+        console.log(response);
 
         if (!response.ok) {
             toast.error("Booking creation failed, Please try again later...", {
@@ -319,28 +322,28 @@ function BookingPage() {
 
                     // Payment successful
                     if (res.data.success) {
-                        setIsConfirmPopupOpen(true);
+                        // setIsConfirmPopupOpen(true);
                         // Create booking
-                        // createBooking(data).catch((error) => {
-                        //     console.error("Booking error:", error);
-                        //     console.log(
-                        //         "Initiating refund due to booking failure"
-                        //     );
-                        //     initiateRefund(data.razorpay_payment_id).then(
-                        //         (refundResponse) => {
-                        //             if (refundResponse.status === "processed") {
-                        //                 navigate("/");
-                        //                 toast.success(
-                        //                     "A refund has been processed, please check your mail for more details",
-                        //                     {
-                        //                         position: "top-center",
-                        //                         autoClose: 1000 * 10,
-                        //                     }
-                        //                 );
-                        //             }
-                        //         }
-                        //     );
-                        // });
+                        createBooking(data).catch((error) => {
+                            console.error("Booking error:", error);
+                            console.log(
+                                "Initiating refund due to booking failure"
+                            );
+                            initiateRefund(data.razorpay_payment_id).then(
+                                (refundResponse) => {
+                                    if (refundResponse.status === "processed") {
+                                        navigate("/");
+                                        toast.success(
+                                            "A refund has been processed, please check your mail for more details",
+                                            {
+                                                position: "top-center",
+                                                autoClose: 1000 * 10,
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        });
                     } else {
                         toast.error("Payment error, Please try again...", {
                             position: "top-center",

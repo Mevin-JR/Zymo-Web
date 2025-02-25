@@ -4,13 +4,13 @@ const axios = require("axios");
 const router = express.Router();
 
 // Zoom credentials
-let prod = true;
+let prod = false;
 const zoomApiKey = prod
     ? process.env.ZOOMCAR_PROD_API_KEY
     : process.env.ZOOMCAR_TEST_API_KEY;
 const zoomApiUrl = prod
     ? process.env.ZOOMCAR_PROD_API_URL
-    : process.env.ZOOMCAR_TEST_URL;
+    : process.env.ZOOMCAR_TEST_API_URL;
 const apiVer = "v2/";
 const zoomId = prod ? process.env.ZOOMCAR_PROD_ID : process.env.ZOOMCAR_TEST_ID;
 const zoomPass = prod
@@ -42,7 +42,7 @@ async function getZoomToken() {
     }
 }
 
-async function getUserToken(token) {
+async function getUserToken(token, uid) {
     try {
         const authURL = `${zoomApiUrl}${apiVer}users/auth`;
         const header = {
@@ -53,7 +53,7 @@ async function getUserToken(token) {
         };
 
         const body = {
-            user_hash_id: "M2TXKD4i2CgfCPH4QFjmocmUALr2",
+            user_hash_id: uid,
         };
         const response = await axios.post(authURL, body, { headers: header });
         return response.data.user_token;
@@ -74,9 +74,9 @@ const noUserTokenHeader = async () => {
     };
 };
 
-const userTokenHeader = async () => {
+const userTokenHeader = async (uid) => {
     const token = await getZoomToken();
-    const userToken = await getUserToken(token);
+    const userToken = await getUserToken(token, uid);
     return {
         "Content-Type": "application/json",
         "x-api-key": zoomApiKey,
@@ -96,7 +96,7 @@ router.post("/search", async (req, res) => {
 
         res.json(response.data);
     } catch (error) {
-        console.error(error.response.data);
+        console.error(error);
         res.status(error.response?.status || 500).json({
             error: error.response.data,
         });
@@ -105,9 +105,11 @@ router.post("/search", async (req, res) => {
 
 router.post("/bookings/create-booking", async (req, res) => {
     try {
-        const createBookingURL = `${zoomApiUrl}${apiVer}bookings?city=${req.body.booking_params.city}`;
-        const header = await userTokenHeader();
-        const response = await axios.post(createBookingURL, req.body, {
+        const body = req.body;
+        const createBookingURL = `${zoomApiUrl}${apiVer}bookings?city=${body.booking_params.city}`;
+        const header = await userTokenHeader(body.customer.uid);
+        console.log(createBookingURL, header, body);
+        const response = await axios.post(createBookingURL, body, {
             headers: header,
         });
 

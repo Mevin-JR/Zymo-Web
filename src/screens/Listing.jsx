@@ -5,7 +5,8 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchMyChoizeCars } from "../utils/mychoize";
 import { formatDate } from "../utils/helperFunctions";
-
+import { collectionGroup, getDocs } from "firebase/firestore";
+import { appDB } from "../utils/firebase";
 
 const Listing = () => {
     const location = useLocation();
@@ -85,8 +86,38 @@ const Listing = () => {
         const search = async () => {
             setLoading(true);
             try {
-                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+                // const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+                const url = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
+                // Fetch Firebase Cars
+                const fetchFirebaseCars = async () => {
+                    try {
+                        const snapshot = await getDocs(collectionGroup(appDB, "uploadedCars"));
+                        console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
+
+                        const filterdData = snapshot.docs
+                            .map(doc => ({ id: doc.id, ...doc.data() }))
+                            // .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
+                            .map(car => ({
+                                id: car.id,
+                                name: car.name,
+                                options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
+                                address: car.pickupLocation,
+                                fare: `₹${car.hourlyRate}/km`,
+                                actual_fare: car.kmRate,
+                                images: car.images,
+                                ratingData: { rating: 4.5 },
+                                trips: Math.floor(Math.random() * 50),
+                                type: "firebase",
+                                location_est: "Local Owner",
+                            }));
+
+                        return filterdData;
+                    } catch (error) {
+                        console.error("Error fetching Firebase cars:", error);
+                        return [];
+                    }
+                };
 
                 // Fetch Zoomcar API
                 const zoomPromise = fetch(`${url}/zoomcar/search`, {
@@ -107,13 +138,14 @@ const Listing = () => {
 
 
                 const mychoizePromise = tripDurationHours >= 24 ? fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours) : null;
+                const firebasePromise = fetchFirebaseCars();
 
                 // Execute both API calls in parallel
-                const [zoomData, mychoizeData] = await Promise.allSettled([
+                const [zoomData, mychoizeData, firebaseData] = await Promise.allSettled([
                     zoomPromise ? zoomPromise : Promise.resolve(null),
-                    mychoizePromise ? mychoizePromise : Promise.resolve(null)
+                    mychoizePromise ? mychoizePromise : Promise.resolve(null),
+                    firebasePromise ? firebasePromise : Promise.resolve(null)
                 ]);
-                console.log(mychoizeData);
 
                 let allCarData = [];
 
@@ -149,6 +181,12 @@ const Listing = () => {
                     allCarData = [...allCarData, ...mychoizeData.value];
                 } else {
                     console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
+                }
+
+                if (firebaseData.status === "fulfilled") {
+                    allCarData = [...allCarData, ...firebaseData.value];
+                } else {
+                    console.error("Firebase API failed:", firebaseData.reason);
                 }
 
                 if (allCarData.length === 0) {

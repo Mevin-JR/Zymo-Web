@@ -190,8 +190,8 @@ const NewRSB = () => {
                             key={tab}
                             onClick={() => handleTabClick(tab)}
                             className={`text-lg ${activeTab === tab
-                                    ? "text-white border-b-2 border-gray-200"
-                                    : "text-gray-400"
+                                ? "text-white border-b-2 border-gray-200"
+                                : "text-gray-400"
                                 }`}
                         >
                             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -203,34 +203,34 @@ const NewRSB = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
                     <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
-  <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
-    {/* Icon */}
-    <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
+                        <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
+                            {/* Icon */}
+                            <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
 
-    {/* Input Field */}
-    <Autocomplete
-      onLoad={setAutocomplete}
-      onPlaceChanged={handlePlaceSelect}
-      options={{ componentRestrictions: { country: "IN" } }}
-    >
-      <input
-        type="text"
-        placeholder="Enter a location"
-        className="bg-transparent text-white outline-none w-full placeholder-gray-400"
-      />
-    </Autocomplete>
+                            {/* Input Field */}
+                            <Autocomplete
+                                onLoad={setAutocomplete}
+                                onPlaceChanged={handlePlaceSelect}
+                                options={{ componentRestrictions: { country: "IN" } }}
+                            >
+                                <input
+                                    type="text"
+                                    placeholder="Enter a location"
+                                    className="bg-transparent text-white outline-none w-full placeholder-gray-400"
+                                />
+                            </Autocomplete>
 
-    {/* Current Location Button */}
-    <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
-      <img
-        src="/images/Benefits/Group_1-removebg-preview.png"
-        alt="Current Location"
-        className="w-5 h-5 mr-1"
-      />
-      <span className="text-sm">Current Location</span>
-    </button>
-  </div>
-</LoadScriptNext>
+                            {/* Current Location Button */}
+                            <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
+                                <img
+                                    src="/images/Benefits/Group_1-removebg-preview.png"
+                                    alt="Current Location"
+                                    className="w-5 h-5 mr-1"
+                                />
+                                <span className="text-sm">Current Location</span>
+                            </button>
+                        </div>
+                    </LoadScriptNext>
 
                     {/* Start Date Picker */}
                     <div className="relative w-full">
