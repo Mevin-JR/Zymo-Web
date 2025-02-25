@@ -2,7 +2,6 @@ import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { webDB, webStorage } from "../utils/firebase";
-
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 
