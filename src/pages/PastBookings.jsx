@@ -3,10 +3,6 @@ import React from 'react';
 export default function PastBookings() {
     return (
         <div>
-           
-                
-                
-        
                 {/* Booking Card */}
                 <div className="bg-[#363636] mt-4 p-4 rounded-lg flex items-center space-x-4">
                   <img
