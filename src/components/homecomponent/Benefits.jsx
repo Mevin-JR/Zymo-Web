@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const benefits = [
-    { title: "Wide Range of Cars", imgSrc: "/images/Benefits/img-1.png" },
-    { title: "Quick and Easy Booking", imgSrc: "/images/Benefits/img-2.png" },
-    { title: "No Hidden Charges", imgSrc: "/images/Benefits/img-3.png" },
-    { title: "Trusted by 100,00+ Happy Customers",imgSrc:"/images/Benefits/img-4.png   " },
+    { title: "Wide Range of Cars", imgSrc: "/images/Benefits/img-1-removebg-preview.png" },
+    { title: "Quick and Easy Booking", imgSrc: "/images/Benefits/book.png" },
+    { title: "No Hidden Charges", imgSrc: "/images/Benefits/img-9-removebg-preview.png" },
+    { title: "Trusted by 100,00+ Happy Customers",imgSrc:"/images/Benefits/img-7.png   " },
 ];
 
 const Benefits = () => {

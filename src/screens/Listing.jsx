@@ -3,30 +3,20 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { calculateFreeKM, fetchMyChoizeCars } from "../utils/mychoize";
-
+import { fetchMyChoizeCars } from "../utils/mychoize";
+import { formatDate } from "../utils/helperFunctions";
+import { collectionGroup, getDocs } from "firebase/firestore";
+import { appDB } from "../utils/firebase";
 
 const Listing = () => {
     const location = useLocation();
-    const { address, lat, lng, startDate, endDate, tripDuration } =
+    const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours } =
         location.state || {};
     const { city } = useParams();
-    const startDateFormatted = new Date(startDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of start date display
-        // minute: "numeric",
-    });
-    const endDateFormatted = new Date(endDate).toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        // hour12: true,
-        // hour: "numeric", // TODO: Adjust this part of end date display
-        // minute: "numeric",
-    });
+
+    const startDateFormatted = formatDate(startDate);
+    const endDateFormatted = formatDate(endDate);
+
     const formatDateForMyChoize = (dateString) => {
         const date = new Date(dateString);
         if (isNaN(date)) return null; // Handle invalid date input
@@ -84,8 +74,10 @@ const Listing = () => {
 
         if (sessionStorage.getItem("fromSearch") !== "true") {
             sessionStorage.setItem("fromSearch", false);
-            if (localStorage.getItem("carList")) {
-                setCarList(JSON.parse(localStorage.getItem("carList")));
+            const cachedCarList = localStorage.getItem("carList");
+            if (cachedCarList) {
+                setCarList(JSON.parse(cachedCarList));
+                setCarCount(JSON.parse(cachedCarList).length)
                 setLoading(false);
                 return;
             }
@@ -94,8 +86,38 @@ const Listing = () => {
         const search = async () => {
             setLoading(true);
             try {
-                const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+                // const url = import.meta.env.VITE_FUNCTIONS_API_URL;
+                const url = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
+                // Fetch Firebase Cars
+                const fetchFirebaseCars = async () => {
+                    try {
+                        const snapshot = await getDocs(collectionGroup(appDB, "uploadedCars"));
+                        console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
+
+                        const filterdData = snapshot.docs
+                            .map(doc => ({ id: doc.id, ...doc.data() }))
+                            // .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
+                            .map(car => ({
+                                id: car.id,
+                                name: car.name,
+                                options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
+                                address: car.pickupLocation,
+                                fare: `₹${car.hourlyRate}/km`,
+                                actual_fare: car.kmRate,
+                                images: car.images,
+                                ratingData: { rating: 4.5 },
+                                trips: Math.floor(Math.random() * 50),
+                                type: "firebase",
+                                location_est: "Local Owner",
+                            }));
+
+                        return filterdData;
+                    } catch (error) {
+                        console.error("Error fetching Firebase cars:", error);
+                        return [];
+                    }
+                };
 
                 // Fetch Zoomcar API
                 const zoomPromise = fetch(`${url}/zoomcar/search`, {
@@ -115,11 +137,15 @@ const Listing = () => {
                 }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
 
-                const mychoizePromise = fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDuration);
+                const mychoizePromise = tripDurationHours >= 24 ? fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours) : null;
+                const firebasePromise = fetchFirebaseCars();
 
                 // Execute both API calls in parallel
-                const [zoomData, mychoizeData] = await Promise.allSettled([zoomPromise, mychoizePromise]);
-                console.log(mychoizeData);
+                const [zoomData, mychoizeData, firebaseData] = await Promise.allSettled([
+                    zoomPromise ? zoomPromise : Promise.resolve(null),
+                    mychoizePromise ? mychoizePromise : Promise.resolve(null),
+                    firebasePromise ? firebasePromise : Promise.resolve(null)
+                ]);
 
                 let allCarData = [];
 
@@ -143,16 +169,24 @@ const Listing = () => {
                         ratingData: car.car_data.rating_v3,
                         trips: car.car_data.trip_count,
                         source: "zoomcar",
+                        sourceImg: "/images/ServiceProvider/zoomcarlogo.png",
+                        rateBasis: "DR"
                     }));
                     allCarData = [...allCarData, ...zoomCarData];
                 } else {
                     console.error("Zoomcar API failed:", zoomData.reason);
                 }
 
-                if (mychoizeData.status === "fulfilled") {
+                if (mychoizeData.status === "fulfilled" && mychoizeData.value) {
                     allCarData = [...allCarData, ...mychoizeData.value];
                 } else {
-                    console.error("MyChoize API failed:", mychoizeData.reason);
+                    console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
+                }
+
+                if (firebaseData.status === "fulfilled") {
+                    allCarData = [...allCarData, ...firebaseData.value];
+                } else {
+                    console.error("Firebase API failed:", firebaseData.reason);
                 }
 
                 if (allCarData.length === 0) {
@@ -233,6 +267,8 @@ const Listing = () => {
     const goToPackages = (car) => {
         navigate(`/self-drive-car-rentals/${city}/cars/packages`, {
             state: {
+                startDate,
+                endDate,
                 car
             }
         })
@@ -387,8 +423,8 @@ const Listing = () => {
                                 <div className="mt-3 flex justify-between items-start">
                                     <div>
                                         <h3 className="text-md font-semibold">
-                                            {car.brand.split(" ")[0]}{" "}
-                                            {car.name.split(" ")[0]}
+                                            {car.source === "zoomcar" ? car.brand.split(" ")[0] : car.brand}{" "}
+                                            {car.source === "zoomcar" ? car.name.split(" ")[0] : car.name}
                                         </h3>
                                         <p className="text-md text-gray-400">
                                             {car.options[2]}
@@ -409,7 +445,7 @@ const Listing = () => {
                                             {car.fare}
                                         </p>
                                         <p className="text-[10px] text-gray-400">
-                                            (GST incl)
+                                            {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
                                         </p>
                                     </div>
                                 </div>
@@ -450,7 +486,7 @@ const Listing = () => {
                                                 {car.options[2]}
                                             </p>
                                             <p className="text-xs text-[#faffa4]">
-                                                {car.location_est} away
+                                                {car.location_est}
                                             </p>
                                         </div>
                                     </div>
@@ -474,7 +510,7 @@ const Listing = () => {
                                                 {car.fare}
                                             </p>
                                             <p className="text-xs text-gray-400">
-                                                (GST incl)
+                                                {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
                                             </p>
                                         </div>
                                         {car.source === "zoomcar" ? (

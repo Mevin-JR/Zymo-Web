@@ -15,14 +15,20 @@ import BlogDetailPage from "./pages/BlogDetailsPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsofService from "./pages/TermsofService";
 import CancellationPolicy from "./pages/CancellationPolicy";
-import FormPage from "./pages/Buy/EnterInformation";
-import UploadDocuments from "./pages/Buy/UploadDocuments";
-import DatePicker from "./pages/Buy/DatePicker";
 import CareerForm from "./pages/Career";
 import YourDetails from "./pages/details";
 import Profile from "./components/Profile";
-import Summary from "./pages/Buy/Summary";
+import NearestCar from "./pages/Buy/NearestCar";
+import CarDetails from "./pages/Buy/CarDetails";
 import MyBookings from "./pages/MyBookings";
+
+import TestDrivePopup from "./components/buycomponent/TestDrivePopup";
+import TestDriveInputForm from "./components/buycomponent/TestDriveInputForm";
+import TestDriveConfirmPage from "./components/buycomponent/TestDriveConfirmPage";
+import ExtendedTestDriveFormPage from "./pages/Buy/ExtendedTestDriveEnterInformation";
+import ExtendedTestDriveUploadDocuments from "./pages/Buy/ExtendedTestDriveUploadDocuments";
+import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker";
+import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
 
 const App = () => {
     return (
@@ -50,7 +56,7 @@ const App = () => {
 
                     {/* Page3 */}
                     {/* Temporarily disabled */}
-                    <Route path="/booking-card" element={<BookingCard />} />
+                    <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
 
                     {/* Page4 */}
                     <Route
@@ -65,13 +71,21 @@ const App = () => {
                     />
 
                     {/* Buy Page Routes*/}
-                    <Route path="/buy/summary" element={<Summary />} />
-                    <Route path="/buy/date-picker" element={<DatePicker />} />
-                    <Route path="/buy/upload-info" element={<FormPage />} />
-                    <Route
-                        path="/buy/upload-doc"
-                        element={<UploadDocuments />}
-                    />
+                    <Route path="/buy" element={<NearestCar />} />
+                    <Route path="/testdrive" element={<TestDrivePopup />} />
+                    <Route path="/buy/car-details/:id" element={<CarDetails />} />
+
+                    {/* Extended Test Drive Summary & date picker &  input form and confirm page */}
+                    <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
+                    <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
+                    <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
+                    <Route path="/buy/upload-doc"element={<ExtendedTestDriveUploadDocuments />}/>
+
+                    {/* Test Drive input form and confirm page */}
+                    <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
+                    <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage />} />
+
+
 
                     {/* NavBar Pages */}
                     {/* About Us */}

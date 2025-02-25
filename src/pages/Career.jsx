@@ -51,13 +51,13 @@ const CareerForm = () => {
             let resumeURL = "";
             if (formData.resume) {
                 const resumeRef = ref(
-                    appStorage,
+                    webStorage,
                     `resumes/${formData.email}-${Date.now()}`
                 );
                 await uploadBytes(resumeRef, formData.resume);
                 resumeURL = await getDownloadURL(resumeRef);
             }
-            await addDoc(collection(appDB, "careerApplications"), {
+            await addDoc(collection(webDB, "careerApplications"), {
                 ...formData,
                 resume: resumeURL,
                 jobType: selectedType,
@@ -100,21 +100,19 @@ const CareerForm = () => {
                 <p className="text-gray-450 mb-6">Choose your adventure.</p>
                 <div className="flex space-x-4">
                     <button
-                        className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${
-                            selectedType === "Internship"
+                        className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${selectedType === "Internship"
                                 ? "bg-[#faffa4]"
                                 : "bg-gray-300"
-                        }`}
+                            }`}
                         onClick={() => setSelectedType("Internship")}
                     >
                         Internship
                     </button>
                     <button
-                        className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${
-                            selectedType === "Full-time"
+                        className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${selectedType === "Full-time"
                                 ? "bg-[#faffa4]"
                                 : "bg-gray-300"
-                        }`}
+                            }`}
                         onClick={() => setSelectedType("Full-time")}
                     >
                         Full-time

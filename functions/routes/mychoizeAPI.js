@@ -1,7 +1,7 @@
-const express = require('express');
-const axios = require('axios');
+const express = require("express");
+const axios = require("axios");
+
 const router = express.Router();
-require('dotenv').config(); 
 
 // MyChoize API Configuration
 const myChoizeUrl = process.env.MYCHOIZE_URL;
@@ -9,10 +9,11 @@ const myChoizeUserName = process.env.MYCHOIZE_USERNAME;
 const myChoizeKey = process.env.MYCHOIZE_KEY;
 
 const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Basic ${Buffer.from(`${myChoizeUserName}:${myChoizeKey}`).toString('base64')}`
+    "Content-Type": "application/json",
+    Authorization: `Basic ${Buffer.from(
+        `${myChoizeUserName}:${myChoizeKey}`
+    ).toString("base64")}`,
 };
-
 
 async function fetchData(endpoint) {
     try {
@@ -25,9 +26,8 @@ async function fetchData(endpoint) {
     }
 }
 
-
-router.get('/cities', async (req, res) => {
-    const data = await fetchData('ListingService/GetCityList');
+router.get("/cities", async (req, res) => {
+    const data = await fetchData("ListingService/GetCityList");
     res.json(data);
 });
 
@@ -35,19 +35,26 @@ async function getCityKeyFromName(cityName) {
     try {
         const cityData = await fetchData("ListingService/GetCityList");
         if (cityData.ErrorFlag === "Y" || !cityData.CityList) {
-            throw new Error(cityData.ErrorMessage || "Failed to fetch city list");
+            throw new Error(
+                cityData.ErrorMessage || "Failed to fetch city list"
+            );
         }
 
-        const selectedCity = cityData.CityList.find(city => 
-            city.CityDescription.toLowerCase() === cityName.toLowerCase()
+        if (cityName.toLowerCase() === "bangalore") {
+            cityName = "bengaluru";
+        }
+
+        const selectedCity = cityData.CityList.find(
+            (city) =>
+                city.CityDescription.toLowerCase() === cityName.toLowerCase()
         );
         if (!selectedCity) {
             throw new Error("City not found");
         }
-        return selectedCity.CityKey; 
+        return selectedCity.CityKey;
     } catch (error) {
         console.error("Error fetching city key:", error);
-        return null;  
+        return null;
     }
 }
 
@@ -77,7 +84,7 @@ router.post("/search-cars", async (req, res) => {
             PickDate,
             DropDate,
             CityKey: parseInt(CityKey, 10),
-            RentalType :"D",
+            RentalType: "D",
             LocationKey: 0, // Default location key
             PageNo: 1,
             PageSize: 50,

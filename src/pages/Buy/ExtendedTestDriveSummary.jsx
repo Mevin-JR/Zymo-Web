@@ -1,43 +1,39 @@
 import { ArrowLeft, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState , useEffect } from 'react';
+import { useNavigate , useLocation } from 'react-router-dom';
 
-const carData={
-    name: "Nexon EV",
-    monthlyFee: 92500,
-    securityDeposit: 40000,
-    totalAmount:74514,
-    freeKm: 1500,
-    freekilometers:1200,
-    vendor:"MyChoice"
-}
-const faqs = [
-    {
-      question: "How do I charge the vehicle at home?",
-      answer: "You can charge your vehicle using the provided home charging unit. Installation by a certified electrician is recommended.",
-    },
-    {
-      question: "Can OEM create a charging point for me?",
-      answer: "Yes, we can assist in setting up a charging point at your location. Contact our service team for installation.",
-    },
-    {
-      question: "What if the charger is damaged?",
-      answer: "If your charger is damaged, please contact our 24/7 support immediately. We'll arrange for repair or replacement under warranty.",
-    },
-    {
-      question: "What is the range for a 100% charged vehicle?",
-      answer: "The vehicle has a range of approximately 500 km on a full charge under optimal conditions.",
-    },
-    {
-      question: "What is the range for a 100% charged vehicle?",
-      answer: "The vehicle has a range of approximately 500 km on a full charge under optimal conditions.",
-    }
-];
-  
+import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
+import { collection  , getDocs} from "firebase/firestore";
+import { appDB } from "../../utils/firebase";
 
-const Summary = () => {
-  const [openIndex, setOpenIndex] = useState(null);
+
+const ExtendedTestDriveSummary = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openIndex, setOpenIndex] = useState(null);
+  const [faqs, setFaqs] = useState([]); 
+  const { car } = location.state || {};
+  
+  console.log(car);
+  
+  useEffect(() => {
+    const fetchFaqs = async () => {
+      try {
+        const subCollectionRef = collection(appDB, "EV FAQ", "MYChoize", "Nexon EV");
+
+        const subCollectionSnapshot = await getDocs(subCollectionRef);
+
+        if (!subCollectionSnapshot.empty) {
+          const fetchedFaqs = subCollectionSnapshot.docs.map(doc => doc.data());
+          setFaqs(fetchedFaqs); 
+        } 
+      } catch (error) {
+        console.error("Error fetching data from sub-collection:", error);
+      }
+    };
+    fetchFaqs(); 
+  }, []);
+  
   return (
     <div className="min-h-screen bg-[#212121] px-4 md:px-8 animate-fade-in">
       <div className="container mx-auto max-w-4xl py-8">
@@ -47,7 +43,10 @@ const Summary = () => {
         >
           <ArrowLeft size={28} />
         </button>
-
+        <div className="ext-test-benf flex justify-center my-3 mb-5">
+        <ExtendedTestDriveBenefits/>
+        </div>
+ 
         {/* Summary */}
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl md:text-4xl font-bold text-appColor">
@@ -56,13 +55,13 @@ const Summary = () => {
         </div>
 
         <div className="mx-auto mb-5">
-          <div className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl p-8 border border-white/10">
+          <div className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl p-8 border border-white/10">
             <div className="mt-4">
                 <div className="mt-4 flex justify-center">
                     <img 
-                    src="https://picsum.photos/200/300" 
+                    src="/images/Cars/tnex.jpeg" 
                     alt="Nexon EV"
-                    className="w-[300px] h-[250px] border border-white/10 rounded-lg"
+                    className="w-3/4 border border-white/10 rounded-lg"
                     />
                 </div>            
             </div>
@@ -70,30 +69,30 @@ const Summary = () => {
             <div className="mt-8 space-y-4">
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Monthly Test Drive Fee</span>
-                    <span className="text-white font-medium">₹ {carData?.monthlyFee}</span>
+                    <span className="text-white font-medium">₹ {car?.monthlyTestDriveFee}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Security Deposit</span>
-                    <span className="text-white font-medium">₹ {carData?.securityDeposit}</span>
+                    <span className="text-white font-medium">₹ {car?.securityDeposit}</span>
                 </div>
                 <div className="flex justify-between items-center pt-4 border-t border-white/10">
                     <span className="text-gray-300">Total Amount</span>
-                    <span className="text-white font-medium">₹ {carData?.totalAmount}</span>
+                    <span className="text-white font-medium">₹ {car?.totalAmount}</span>
                 </div>
             </div>
           </div>
         </div>
 
         <div className="mx-auto mb-7">
-            <div className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl p-5 border border-white/10">
+            <div className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl p-5 border border-white/10">
                 <div className="grid grid-cols-2">
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Free Kilometers</span>
-                        <span className="text-white font-medium">{carData?.freekilometers} Km</span>
+                        <span className="text-white font-medium">{car?.freeKilometers} Km</span>
                     </div>
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Vendor</span>
-                        <span className="text-white font-medium">{carData?.vendor}</span>
+                        <span className="text-white font-medium">{car?.vendor}</span>
                     </div>
                 </div>
             </div>
@@ -105,7 +104,7 @@ const Summary = () => {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-[#212121] md:bg-[#2A2A2A] backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-[#edff8d]/30"
+              className="bg-[#2d2d2d] backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 transition-all duration-300 hover:border-[#edff8d]/30"
             >
               <button
                 className="w-full px-6 py-4 text-left flex justify-between items-center"
@@ -132,7 +131,7 @@ const Summary = () => {
         {/* Next Button */}
         <div className="mt-6 md:mt-8">
             <button
-              onClick={() => navigate('/buy/date-picker')}
+              onClick={() => navigate('/buy/date-picker',{ state: { car:car } })}
               className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
             >
               Next
@@ -144,4 +143,4 @@ const Summary = () => {
   );
 };
 
-export default Summary;
+export default ExtendedTestDriveSummary;

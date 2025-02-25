@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { MapPinIcon, CalendarIcon, SparklesIcon } from "lucide-react";
+import { MapPinIcon, CalendarIcon, SparklesIcon, LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadScriptNext, Autocomplete } from "@react-google-maps/api";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ const NewRSB = () => {
     const [startDate, setStartDate] = useState(new Date(getCurrentTime()));
     const [endDate, setEndDate] = useState(null);
     const [tripDuration, setTripDuration] = useState("Select both dates");
+    const [tripDurationHours, setTripDurationHours] = useState("");
     const [fade, setFade] = useState(false);
     const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
     const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
@@ -72,18 +73,26 @@ const NewRSB = () => {
         }
     };
 
-    // const handlePlacesAutocomplete = async () => {
-    //     const locationInput = document.getElementById("location-input");
-    //     const autocomplete = new google.maps.places.Autocomplete(locationInput, {
-    //         types: ['geocode'],
-    //     })
-    //     console.log(autocomplete.getPredictions());
+    // const getCurrentLocation = () => {
+    //     if (navigator.geolocation) {
+    //         navigator.geolocation.getCurrentPosition((position) => {
+    //             const { latitude, longitude } = position.coords;
+
+    //         })
+    //     }
     // }
 
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
         const start = new Date(currentStartDate);
-        const end = new Date(currentEndDate);
+        let end;
+        if (activeTab === "subscribe") {
+            end = new Date(start);
+            end.setDate(end.getDate() + 30); // Set end date to 30 days from start date
+            setEndDate(end); // Automatically set the end date
+        } else {
+            end = new Date(currentEndDate);
+        }
 
         if (isNaN(start) || isNaN(end)) {
             setTripDuration("Invalid Date");
@@ -97,21 +106,13 @@ const NewRSB = () => {
         }
 
         const totalHours = Math.floor(timeDifference / (1000 * 60 * 60));
+        setTripDurationHours(totalHours);
         const days = Math.floor(totalHours / 24);
         const hours = totalHours % 24;
 
         setTripDuration(`${days} Day(s) ${hours} Hour(s)`);
     };
 
-    //   const handleStartDateChange = (date) => {
-    //     setStartDate(date);
-    //     if (endDate) calculateDuration(date, endDate);
-    //   };
-
-    //   const handleEndDateChange = (date) => {
-    //     setEndDate(date);
-    //     if (startDate) calculateDuration(startDate, date);
-    //   };
 
     const handleSearch = () => {
         if (city && startDate && endDate) {
@@ -127,7 +128,10 @@ const NewRSB = () => {
                 startDate,
                 endDate,
                 tripDuration,
+                tripDurationHours
             };
+
+            sessionStorage.setItem("fromSearch", true);
 
             navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
@@ -138,6 +142,23 @@ const NewRSB = () => {
                 autoClose: 1000 * 5,
             });
         }
+    };
+
+
+    const handleTabClick = (tab) => {
+        setActiveTab(tab);
+        if (tab === "buy") {
+            navigate("/buy"); // Navigate to the buy page
+        }
+
+        if (tab === "subscribe") {
+            //calculate current date + 30 days
+            const newEndDate = new Date(startDate);
+            newEndDate.setDate(newEndDate.getDate() + 30);
+            setEndDate(newEndDate);
+            calculateDuration(startDate, newEndDate);
+        }
+
     };
 
     return (
@@ -167,7 +188,7 @@ const NewRSB = () => {
                     {["rent", "subscribe", "buy"].map((tab) => (
                         <button
                             key={tab}
-                            onClick={() => setActiveTab(tab)}
+                            onClick={() => handleTabClick(tab)}
                             className={`text-lg ${activeTab === tab
                                 ? "text-white border-b-2 border-gray-200"
                                 : "text-gray-400"
@@ -181,44 +202,33 @@ const NewRSB = () => {
                 {/* Input Fields */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
-                    <LoadScriptNext
-                        googleMapsApiKey={placesAPIKey}
-                        libraries={placesAPILibraries}
-                    >
-                        <div className="relative rounded-lg py-2 px-6 flex items-center border border-gray-500 w-full h-10">
-                            <MapPinIcon className="w-6 h-5 text-gray-400 pr-1" />
-                            <div className="flex-1">
-                                <Autocomplete
-                                    onLoad={setAutocomplete}
-                                    onPlaceChanged={handlePlaceSelect}
-                                    options={{
-                                        componentRestrictions: {
-                                            country: "IN",
-                                        },
-                                    }}
-                                >
-                                    <input
-                                        type="text"
-                                        placeholder="Location"
-                                        // value={placeInput}
-                                        // onChange={(e) => setPlaceInput(e.target.value)}
-                                        className="bg-transparent text-white outline-none w-full h-full"
-                                        id="location-input"
-                                    />
-                                </Autocomplete>
+                    <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
+                        <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
+                            {/* Icon */}
+                            <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
 
-                                {/* Get current location option */}
-                                {/* {placeInput && (
-                                    <ul className="absolute left-0 mt-1 w-full bg-gray-800 border border-gray-600 overflow-hidden">
-                                    <li
-                                        className="p-2 cursor-pointer hover:bg-gray-700 text-white"
-                                        onClick={handlePlacesAutocomplete}
-                                    >
-                                        📍 Get Current Location
-                                    </li>
-                                </ul>
-                                )} */}
-                            </div>
+                            {/* Input Field */}
+                            <Autocomplete
+                                onLoad={setAutocomplete}
+                                onPlaceChanged={handlePlaceSelect}
+                                options={{ componentRestrictions: { country: "IN" } }}
+                            >
+                                <input
+                                    type="text"
+                                    placeholder="Enter a location"
+                                    className="bg-transparent text-white outline-none w-full placeholder-gray-400"
+                                />
+                            </Autocomplete>
+
+                            {/* Current Location Button */}
+                            <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
+                                <img
+                                    src="/images/Benefits/Group_1-removebg-preview.png"
+                                    alt="Current Location"
+                                    className="w-5 h-5 mr-1"
+                                />
+                                <span className="text-sm">Current Location</span>
+                            </button>
                         </div>
                     </LoadScriptNext>
 
@@ -261,13 +271,17 @@ const NewRSB = () => {
                     </div>
 
                     {/* End Date Picker */}
-                    <div className="relative w-full">
+                    { }
+                    <div className={` ${(activeTab == "subscribe") ? "hidden" : "relative w-full"}`}>
                         <div
-                            className="rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10"
+                            className={`rounded-lg p-1 flex items-center relative cursor-pointer text-sm border border-gray-500 w-full h-10  ${activeTab === "subscribe" ? "opacity-50 cursor-not-allowed" : ""}`}
                             onClick={() => {
-                                setIsEndPickerOpen(true);
-                                setIsStartPickerOpen(false);
+                                if (activeTab !== "subscribe") {
+                                    setIsEndPickerOpen(true);
+                                    setIsStartPickerOpen(false);
+                                }
                             }}
+                            disabled={activeTab === "subscribe"}
                         >
                             <CalendarIcon className="w-6 h-4 text-gray-400 absolute left-4" />
                             <span className="text-gray-200 pl-10">
