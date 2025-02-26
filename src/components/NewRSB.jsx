@@ -227,7 +227,7 @@ const NewRSB = () => {
                                     alt="Current Location"
                                     className="w-5 h-5 mr-1"
                                 />
-                                <span className="text-sm">Current Location</span>
+                                <span className="text-xs">Current Location</span>
                             </button>
                         </div>
                     </LoadScriptNext>
