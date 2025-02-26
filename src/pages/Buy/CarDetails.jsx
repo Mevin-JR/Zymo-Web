@@ -28,7 +28,7 @@ const CarDetails = () => {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all"
+          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all z-10"
         >
           <ArrowLeft size={28} />
         </button>
@@ -38,15 +38,15 @@ const CarDetails = () => {
           {/* Desktop Layout */}
           <div className="hidden md:flex">
             {/* Image Section */}
-            <div className="w-1/2 flex justify-center items-center bg-darkGrey p-6">
+            <div className=" fixed w-1/2 top-6 left-3 h-screen flex justify-center items-center  p-2">
               <img
                 src={image}
                 alt={`${name} ${model}`}
-                className="w-3/4 rounded-lg shadow-md"
+                className=" rounded-lg shadow-md"
               />
             </div>
             {/* Details Section */}
-            <div className="w-1/2 p-6">
+            <div className="w-1/2 absolute right-0 top-4 p-4">
               <h1 className="text-3xl font-bold mb-2">{`${name} ${model}`}</h1>
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-[#e8ff81] text-xl">&#9733; {rating}</span>
