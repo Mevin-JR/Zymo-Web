@@ -107,4 +107,33 @@ router.post("/search-cars", async (req, res) => {
     }
 });
 
+// Create Booking API
+router.post("/create-booking", async (req, res) => {
+    try {
+        const { DropDate, PickDate, PickRegionKey, ...rest} = req.body;
+        if (!DropDate || !PickDate || !PickRegionKey ) {
+            return res.status(400).json({ error: "Missing required fields: DropDate, PickDate, PickRegionKey" });
+        }
+
+        const bookingData = {
+            DropDate,
+            PickDate,
+            PickRegionKey,
+            ...rest,
+        };
+        console.log("Booking Data:", bookingData);
+        const response = await axios.post(`${myChoizeUrl}BookingService/CreateBooking`, bookingData, { headers });
+        return res.status(200).json(response.data);
+    } catch (error) {
+        console.error("Error creating booking:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+            headers: error.response?.headers,
+            config: error.config,
+        });
+        return res.status(500).json({ error: "Failed to create booking", details: error.response?.data || error.message });
+    }
+});
+
 module.exports = router;
