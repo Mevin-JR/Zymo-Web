@@ -25,7 +25,7 @@ function BookingPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
-    const { startDate, endDate, userData, car } = location.state || {};
+    const { startDate, endDate, userData, car ,activeTab} = location.state || {};
 
     const startDateFormatted = formatDate(startDate);
     const endDateFormatted = formatDate(endDate)
@@ -89,7 +89,8 @@ function BookingPage() {
         },
         carDetails: {
             registration: vendorDetails?.plateColor || "N/A",
-            package: car.rateBasis === "DR" ? "Unlimited KMs" : findPackage(car.rateBasis),
+            package: activeTab === "subscribe" ? "Subscription" : car.rateBasis === "DR" ? "Unlimited KMs" :
+             findPackag(car.rateBasis),
             transmission: car.options[0],
             fuel: car.options[1],
             seats: car.options[2],
