@@ -1,11 +1,11 @@
-import { useState  } from "react";
+import { useEffect, useState  } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-import ConfirmPage from "../../components/ConfirmPage";
+import ExtendedTestDriveConfirmPage from "../../components/buycomponent/ExtendedTestDriveConfirmPage";
 import UploadSection from "../../components/buycomponent/UploadSection";
 
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -52,11 +52,14 @@ const ExtendedTestDriveUploadDocuments = () => {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [currentDocType, setCurrentDocType] = useState("aadhar");
   const [currentPage, setCurrentPage] = useState("front");
-  // const [allImages , setAllImages]=useState([])
   const [isConfirmed, setIsConfirmed] = useState(false); 
-
+  const [bookingData,setBookingData]=useEffect(null)
   const { car, startDate, endDate, userData } = location.state || {};
 
+// console.log(car);
+// console.log(startDate);
+// console.log(endDate);
+// console.log(userData);
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
   const allImagesUploaded =
     drivingFrontImage &&
@@ -293,7 +296,8 @@ const ExtendedTestDriveUploadDocuments = () => {
       const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
       
       const data = {
-        carId: car.id,
+        carId:car.carId,
+        bookingId: 'Z' + new Date().getTime().toString(), 
         carName: car.name,
         carModel: car.model,
         carType: car.type,
@@ -319,7 +323,8 @@ const ExtendedTestDriveUploadDocuments = () => {
       };
 
       // Add data to Firebase collection
-      await addDoc(collection(webDB, "webBuyPaymentSuccessDetail"), data);
+      const booking_data = await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
+      setBookingData(booking_data)
       // console.log("Data uploaded to Firebase:", data);
 
       setIsConfirmed(true);          
@@ -468,11 +473,10 @@ const ExtendedTestDriveUploadDocuments = () => {
       
 
       {isConfirmed && (
-        <ConfirmPage
+        <ExtendedTestDriveConfirmPage
           isOpen={isConfirmed}
           close={() => setIsConfirmed(false)}
-          car={car}
-          userData={userData}
+          bookingData={bookingData}
         />
       )}
 

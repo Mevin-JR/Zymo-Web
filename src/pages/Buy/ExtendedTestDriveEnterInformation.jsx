@@ -1,13 +1,26 @@
-import { useState  } from 'react';
-import { useNavigate ,useLocation} from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 
-export default function ExtendedTestDriveFormPage() {
+// Common country codes
+const countryCodes = [
+  { code: '+91', country: 'India' },
+  { code: '+1', country: 'USA' },
+  { code: '+44', country: 'UK' },
+  { code: '+61', country: 'Australia' },
+  { code: '+86', country: 'China' },
+  { code: '+971', country: 'UAE' },
+  { code: '+65', country: 'Singapore' },
+  { code: '+49', country: 'Germany' },
+];
+
+export default function Extended_TestDriveFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
-    name: '',
+    userName: '',
     email: '',
+    countryCode: '+91',
     phone: '',
     address: '',
     city: '',
@@ -15,12 +28,13 @@ export default function ExtendedTestDriveFormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
-  const { car , startDate , endDate } = location.state || {};
+  const { car, startDate, endDate } = location.state || {};
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name) newErrors.name = 'Name is required';
+    if (!formData.userName) newErrors.userName = 'Name is required';
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -53,13 +67,36 @@ export default function ExtendedTestDriveFormPage() {
     }
   };
 
+  const handleCountryCodeSelect = (code) => {
+    setFormData((prev) => ({ ...prev, countryCode: code }));
+    setShowCountryDropdown(false);
+  };
+
   const handleNext = () => {
     if (validateForm()) {
-      localStorage.setItem('formData', JSON.stringify(formData));
-      navigate('/buy/upload-doc', { state: { car, startDate , endDate , userData:formData } });
+      // Combine country code and phone for storage/transmission
+      const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
+      const dataToStore = {
+        ...formData,
+        phone: fullPhoneNumber
+      };
+      
+      sessionStorage.setItem('formData', JSON.stringify(dataToStore));
+      
+      navigate('/buy/upload-doc', { 
+        state: { 
+          car, 
+          startDate, 
+          endDate, 
+          userData: {
+            ...formData,
+            phone: fullPhoneNumber
+          } 
+        } 
+      });
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
@@ -71,36 +108,141 @@ export default function ExtendedTestDriveFormPage() {
         </button>
 
         <div className="text-center mb-6 md:mb-10">
-          <h1 className="text-xl p-2 md:text-4xl font-bold">
+          <h1 className="text-xl p-2 md:text-4xl font-bold text-appColor">
             Extended Test Drive Booking
           </h1>
         </div>
 
         <div className="bg-[#2A2A2A] p-5 md:p-8 rounded-xl shadow-xl border border-white/10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            {[
-              { label: 'Name (as on Driving License)', name: 'name', type: 'text', placeholder: 'Enter your Name' },
-              { label: 'Email', name: 'email', type: 'email', placeholder: 'Enter your Email' },
-              { label: 'Phone Number', name: 'phone', type: 'tel', placeholder: 'Enter your Phone Number', maxLength: 10 },
-              { label: 'Date of Birth', name: 'dob', type: 'date', placeholder: '' },
-              { label: 'Street Address', name: 'address', type: 'text', placeholder: 'Enter your Street Address', fullWidth: true },
-              { label: 'City', name: 'city', type: 'text', placeholder: 'Enter your City Name' },
-              { label: 'Pincode', name: 'pincode', type: 'text', placeholder: 'Enter your Pincode', maxLength: 6 }
-            ].map(({ label, name, type, placeholder, fullWidth, maxLength }) => (
-              <div key={name} className={`space-y-2 ${fullWidth ? 'md:col-span-2' : ''}`}>
-                <label className="block text-sm font-medium">{label}</label>
+            {/* Name Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Name (as on Driving License)</label>
+              <input
+                type="text"
+                name="userName"
+                value={formData.userName}
+                onChange={handleChange}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                placeholder="Enter your Name"
+              />
+              {errors.userName && <p className="text-red-500 text-xs md:text-sm">{errors.userName}</p>}
+            </div>
+
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                placeholder="Enter your Email"
+              />
+              {errors.email && <p className="text-red-500 text-xs md:text-sm">{errors.email}</p>}
+            </div>
+
+            {/* Phone Number Field with Country Code */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Phone Number</label>
+              <div className="flex">
+                {/* Country Code Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="flex items-center justify-between p-2 md:p-3 rounded-l-lg bg-[#424242] text-white border border-white/10 border-r-0 focus:outline-none text-sm md:text-base min-w-[80px]"
+                    onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                  >
+                    <span>{formData.countryCode}</span>
+                    <ChevronDown size={16} className="ml-1" />
+                  </button>
+                  
+                  {showCountryDropdown && (
+                    <div className="absolute z-10 mt-1 w-48 bg-[#333333] border border-white/10 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      {countryCodes.map((country) => (
+                        <button
+                          key={country.code}
+                          type="button"
+                          className="block w-full text-left px-4 py-2 text-sm hover:bg-[#424242] transition-colors"
+                          onClick={() => handleCountryCodeSelect(country.code)}
+                        >
+                          {country.code} {country.country}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Phone Number Input */}
                 <input
-                  type={type}
-                  name={name}
-                  value={formData[name]}
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
                   onChange={handleChange}
-                  maxLength={maxLength}
-                  className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none  text-sm md:text-base"
-                  placeholder={placeholder}
+                  maxLength={10}
+                  className="w-full p-2 md:p-3 rounded-r-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                  placeholder="Enter your Phone Number"
                 />
-                {errors[name] && <p className="text-red-500 text-xs md:text-sm">{errors[name]}</p>}
               </div>
-            ))}
+              {errors.phone && <p className="text-red-500 text-xs md:text-sm">{errors.phone}</p>}
+            </div>
+
+            {/* Date of Birth Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Date of Birth</label>
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+              />
+              {errors.dob && <p className="text-red-500 text-xs md:text-sm">{errors.dob}</p>}
+            </div>
+
+            {/* Street Address Field */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="block text-sm font-medium">Street Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                placeholder="Enter your Street Address"
+              />
+              {errors.address && <p className="text-red-500 text-xs md:text-sm">{errors.address}</p>}
+            </div>
+
+            {/* City Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">City</label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                placeholder="Enter your City Name"
+              />
+              {errors.city && <p className="text-red-500 text-xs md:text-sm">{errors.city}</p>}
+            </div>
+
+            {/* Pincode Field */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Pincode</label>
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                maxLength={6}
+                className="w-full p-2 md:p-3 rounded-lg backdrop-blur-md bg-[#424242] text-white border border-white/10 focus:outline-none text-sm md:text-base"
+                placeholder="Enter your Pincode"
+              />
+              {errors.pincode && <p className="text-red-500 text-xs md:text-sm">{errors.pincode}</p>}
+            </div>
           </div>
 
           <div className="mt-6 md:mt-8">
