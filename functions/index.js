@@ -22,7 +22,8 @@ app.use(express.urlencoded({ extended: true })); // Parses form data
 const zoomcarRoutes = require("./routes/zoomcarAPI");
 const paymentRoutes = require("./routes/paymentAPI");
 const messageRoutes = require("./routes/messageAPI");
-const mychoizeRoutes = require("./routes/mychoizeAPI");
+const mychoizeRoutes = require("./routes/mychoizeAPI.js");
+
 
 app.use("/zoomcar", zoomcarRoutes);
 app.use("/payment", paymentRoutes);

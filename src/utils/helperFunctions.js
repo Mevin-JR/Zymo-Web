@@ -12,6 +12,12 @@ const formatDate = (date) => {
         .replace(" at", "");
 };
 
+const formatDateForMyChoize = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date)) return null; // Handle invalid date input
+    return `\/Date(${date.getTime()}+0530)\/`;
+};
+
 // String Formatting
 const toPascalCase = (str) => {
     return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -36,4 +42,4 @@ const formatFare = (fare) => {
     return `₹${formatter.format(fare)}`;
 };
 
-export { formatDate, toPascalCase, formatFare };
+export { formatDate, toPascalCase, formatFare ,formatDateForMyChoize};
