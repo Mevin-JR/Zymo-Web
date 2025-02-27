@@ -1,4 +1,4 @@
-import { useEffect, useState  } from "react";
+import { useState  } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
@@ -53,19 +53,21 @@ const ExtendedTestDriveUploadDocuments = () => {
   const [currentDocType, setCurrentDocType] = useState("aadhar");
   const [currentPage, setCurrentPage] = useState("front");
   const [isConfirmed, setIsConfirmed] = useState(false); 
-  const [bookingData,setBookingData]=useEffect(null)
+  const [bookingData,setBookingData]=useState(null)
   const { car, startDate, endDate, userData } = location.state || {};
 
 // console.log(car);
 // console.log(startDate);
 // console.log(endDate);
 // console.log(userData);
+
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
   const allImagesUploaded =
     drivingFrontImage &&
     drivingBackImage &&
     aadharFrontImage &&
     aadharBackImage;
+
 
     const resetAllState = () => {
       setAadharFrontImage(null);
@@ -203,7 +205,7 @@ const ExtendedTestDriveUploadDocuments = () => {
       });
       return false;
     }
-  
+    toast.dismiss();
     try {
       const amount = parseInt(car.totalAmount);
       const orderData = await createOrder(amount, "INR");
@@ -280,6 +282,14 @@ const ExtendedTestDriveUploadDocuments = () => {
   //Firebase Upload Logic
   const uploadDataToFirebase = async (images,orderId, paymentId) => {
     try {      
+      toast.loading('Verifying your payment...', {
+        style: {
+          backgroundColor: '#edff8d', 
+          color: '#000', 
+          fontWeight: 'bold',
+        },
+        autoClose: 5000,  
+      });
       // Create a timestamp for the folder name once
       const timestamp = Date.now();
       const folderPath = `documents/${userData.email}_${timestamp}`;
@@ -303,7 +313,7 @@ const ExtendedTestDriveUploadDocuments = () => {
         carType: car.type,
         startDate: startDate,
         endDate: endDate,
-        userName: userData.name,
+        userName: userData.userName,
         email: userData.email,
         phone: userData.phone,
         dob: userData.dob,
@@ -319,14 +329,16 @@ const ExtendedTestDriveUploadDocuments = () => {
         orderId: orderId,
         paymentId: paymentId,
         price: car.totalAmount,
+        bookingType:"Extended Test Drive",
         createdAt: new Date(),
       };
 
       // Add data to Firebase collection
-      const booking_data = await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
-      setBookingData(booking_data)
-      // console.log("Data uploaded to Firebase:", data);
+      await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
+      setBookingData(data)
+      console.log("Data uploaded to Firebase:", data);
 
+      toast.dismiss()
       setIsConfirmed(true);          
       resetAllState();
     } catch (error) {
@@ -367,6 +379,14 @@ const ExtendedTestDriveUploadDocuments = () => {
         });
         return;
       }
+      toast.loading('Redirecting to Payment Dashboard...', {
+        style: {
+          backgroundColor: '#edff8d', 
+          color: '#000',
+          fontWeight: 'bold',
+        },
+        autoClose: 5000, 
+      });
       // Proceed with payment first & After payment is successful, upload the data to Firebase
       const paymentSuccess = await handlePayment();
     

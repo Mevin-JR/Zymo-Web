@@ -27,15 +27,14 @@ const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
   },[functionsUrl]);
 
   useEffect(() => {
-    if (bookingData) {      
-      // if (bookingData) {
-      //   sendWhatsAppMessage(bookingData);  
-      // }
+    const hasUploaded = sessionStorage.getItem('dataUploaded');
+    if ( !hasUploaded && bookingData) {      
+      sendWhatsAppMessage(bookingData);  
+
+      sessionStorage.setItem('dataUploaded', 'true');
     }
   }, [bookingData,sendWhatsAppMessage]);
 
-
-  // If not open, don't render anything
   if (!isOpen) return null;
 
 

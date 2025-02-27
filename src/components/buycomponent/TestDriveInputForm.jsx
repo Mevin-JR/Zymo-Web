@@ -72,8 +72,6 @@ export default function Extended_TestDriveFormPage() {
       
       sessionStorage.setItem('formData', JSON.stringify(dataToStore));
 
-console.log(dataToStore,car);
-
       navigate('/buy/test-drive-confirmpage', { 
         state: { 
           car, 
