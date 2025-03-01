@@ -82,6 +82,7 @@ const Listing = () => {
             }
         }
     
+
         const search = async () => {
             setLoading(true);
             try {
@@ -118,7 +119,17 @@ const Listing = () => {
                     }
                 };
 
-                // Fetch Zoomcar API
+                  let allCarData = [];
+
+            if (activeTab === "subscribe") {
+                // Fetch only subscription cars if activeTab is "subscribe"
+                const subscriptionData = await fetchSubscriptionCars(CityName, formattedPickDate, formattedDropDate);
+                if (subscriptionData) {
+                    allCarData = [...subscriptionData];
+                } else {
+                    console.error("Subscription API failed or returned empty data.");
+                }
+            } else {
                 const zoomPromise = fetch(`${url}/zoomcar/search`, {
                     method: "POST",
                     body: JSON.stringify({
@@ -145,8 +156,6 @@ const Listing = () => {
                     mychoizePromise ? mychoizePromise : Promise.resolve(null),
                     firebasePromise ? firebasePromise : Promise.resolve(null)
                 ]);
-
-                let allCarData = [];
 
                 if (zoomData.status === "fulfilled" && zoomData.value.sections) {
                     const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
@@ -177,6 +186,7 @@ const Listing = () => {
                 }
 
                 if (mychoizeData.status === "fulfilled" && mychoizeData.value) {
+                    console.log("MyChoize Data:", mychoizeData.value);
                     allCarData = [...allCarData, ...mychoizeData.value];
                 } else {
                     console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
@@ -187,6 +197,7 @@ const Listing = () => {
                 } else {
                     console.error("Firebase API failed:", firebaseData.reason);
                 }
+            }
 
                 if (allCarData.length === 0) {
                     toast.error("No cars found, Please try modifying input...", {
@@ -194,6 +205,7 @@ const Listing = () => {
                         autoClose: 5000,
                     });
                 }
+                console.log(allCarData);
     
                 setCarList(allCarData);
                 setCarCount(allCarData.length);
