@@ -90,7 +90,7 @@ function BookingPage() {
         carDetails: {
             registration: vendorDetails?.plateColor || "N/A",
             package: activeTab === "subscribe" ? "Subscription" : car.rateBasis === "DR" ? "Unlimited KMs" :
-             findPackag(car.rateBasis),
+             findPackage(car.rateBasis),
             transmission: car.options[0],
             fuel: car.options[1],
             seats: car.options[2],
