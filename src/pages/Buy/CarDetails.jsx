@@ -167,7 +167,7 @@ const CarDetails = () => {
               {/* Price and Test Drive Button */}
               {/* <p className="text-2xl font-bold text-gray-300 m-4">Starts at &#8377;{price}*</p> */}
               <div className=''>
-                <p className="text-3xl font-semibold mx-2">₹{`${carDetail.price.min_price}-${carDetail.price.max_price}`} Lakh <span className="text-xs text-gray-400">onwards</span> </p>
+                <p className="text-3xl font-semibold mx-2">₹{`${carDetail.price.min_price} - ${carDetail.price.max_price}`} Lakh </p>
               </div>
 
               <p className="text-sm text-gray- m-2 mb-4">Avg. Ex-Showroom price</p>
