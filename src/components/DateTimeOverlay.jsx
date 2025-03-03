@@ -1,15 +1,27 @@
 import { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
-
+import { getCurrentTime } from "../utils/DateFunction";
 const DateTimeOverlay = ({
     selectedDate,
     setSelectedDate,
     onSave,
     onClose,
 }) => {
-    const [hour, setHour] = useState(10);
-    const [minute, setMinute] = useState(0);
-    const [ampm, setAmpm] = useState("AM");
+
+    
+    const now = new Date(getCurrentTime());
+    let currHours = now.getHours();
+    let currMinutes = now.getMinutes() ; // Round minutes to 0 or 30
+   
+    const newnowhrs = new Date().getHours();
+    const getInitialAmpm = () => {
+        let isPM = newnowhrs >= 12;
+        return isPM ? "AM" : "PM"; // Flip AM/PM by 2 cycles
+    };
+
+    const [hour, setHour] = useState(currHours);
+    const [minute, setMinute] = useState(currMinutes);
+    const [ampm, setAmpm] = useState(getInitialAmpm());
 
     const adjustTime = (type, value) => {
         if (type === "hour") {
