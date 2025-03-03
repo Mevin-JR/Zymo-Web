@@ -14,7 +14,7 @@ const ExtendedTestDriveSummary = () => {
   const [faqs, setFaqs] = useState([]); 
   const { car } = location.state || {};
   
-  console.log(car);
+  // console.log("car data:"car);
   
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -69,15 +69,15 @@ const ExtendedTestDriveSummary = () => {
             <div className="mt-8 space-y-4">
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Monthly Test Drive Fee</span>
-                    <span className="text-white font-medium">₹ {car?.monthlyTestDriveFee}</span>
+                    <span className="text-white font-medium">₹ {car?.monthlyTestDriveFee.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-gray-300">Security Deposit</span>
-                    <span className="text-white font-medium">₹ {car?.securityDeposit}</span>
+                    <span className="text-white font-medium">₹ {car?.securityDeposit.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center pt-4 border-t border-white/10">
                     <span className="text-gray-300">Total Amount</span>
-                    <span className="text-white font-medium">₹ {car?.totalAmount}</span>
+                    <span className="text-white font-medium">₹ {car?.totalAmount.toLocaleString()}</span>
                 </div>
             </div>
           </div>
@@ -88,7 +88,7 @@ const ExtendedTestDriveSummary = () => {
                 <div className="grid grid-cols-2">
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Free Kilometers</span>
-                        <span className="text-white font-medium">{car?.freeKilometers} Km</span>
+                        <span className="text-white font-medium">{car?.freeKilometers.toLocaleString()} Km</span>
                     </div>
                     <div className="flex flex-col justify-between items-center">
                         <span className="text-gray-300">Vendor</span>
