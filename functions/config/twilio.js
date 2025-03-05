@@ -10,6 +10,9 @@ const send_whatsapp_message_booking_confirm_template_id = process.env.WHATSAPP_T
 const send_whatsapp_message_booking_confirm_vendor_template_id = process.env.WHATSAPP_TEMPLATE_BOOKING_CONFIRM_VENDOR;
 const send_whatsapp_message_refund_template_id = process.env.WHATSAPP_TEMPLATE_REFUND;
 const send_whatsapp_message_booking_cancel_template_id = process.env.WHATSAPP_TEMPLATE_BOOKING_CANCEL;
+const send_whatsapp_message_test_drive_booking_confirm_template_id = process.env.WHATSAPP_TEMPLATE_TEST_DRIVE_BOOKING_CONFIRM;
+const send_whatsapp_message_extended_test_drive_booking_confirm_template_id = process.env.WHATSAPP_TEMPLATE_EXTENDED_TEST_DRIVE_BOOKING_CONFIRM;
+
 
 const client = twilio(accountSid, authToken);
 
@@ -77,9 +80,9 @@ async function sendWhatsAppMessageIncludeVendor(data) {
 async function sendRefundMessage(data) {
    try {
       const response = await client.messages.create({
-         from: whatsapp_messaging_service_id,            //WhatsApp Messaging Service ID
+         from: whatsapp_messaging_service_id,            //WhatsApp Messaging Service ID 
          to: `whatsapp:${data.phone}`,                   // "whatsapp:+917517442597",
-         contentSid: send_whatsapp_message_refund_template_id, // Template ID
+         contentSid: send_whatsapp_message_refund_template_id, // Template ID 
          contentVariables: JSON.stringify({
             "1": data.customerName,                             // Customer Name
             "2": data.id,                                      // Booking ID
@@ -97,9 +100,9 @@ async function sendRefundMessage(data) {
 async function bookingCancelMessage(data) {
    try {
       const response = await client.messages.create({
-         from: whatsapp_messaging_service_id,      // WhatsApp Messaging Service ID
+         from: whatsapp_messaging_service_id,      // WhatsApp Messaging Service ID 
          to: `whatsapp:${data.phone}`,  // Dynamic recipient
-         contentSid: send_whatsapp_message_booking_cancel_template_id, // Template ID
+         contentSid: send_whatsapp_message_booking_cancel_template_id, // Template ID 
          contentVariables: JSON.stringify({
             "1": data.customerName,    // Customer Name
             "2": data.id,              // Booking ID
@@ -113,13 +116,53 @@ async function bookingCancelMessage(data) {
       console.error(`Failed to send booking cancellation message: ${error.message}`);
    }
 }
+
+//Whatsapp Confirmation message for test drive 
+async function sendTestDriveWhatsappMessage(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id,      // WhatsApp Messaging Service ID 
+         to: `whatsapp:${data.phone}`,  // Dynamic recipient
+         contentSid: send_whatsapp_message_test_drive_booking_confirm_template_id, // Template ID (HX6e55153f6a739a31a3d8b1b5b612620e)
+      });
  
+      console.log(`Booking confirmation message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+      console.error(`Failed to send booking confirmation message: ${error.message}`);
+   }
+}
+
+
+//Whatsapp message for Extended test drive 
+async function sendExtendedTestDriveWhatsappMessage(data) {
+   try {
+      const response = await client.messages.create({
+         from: whatsapp_messaging_service_id,      // WhatsApp Messaging Service ID 
+         to: `whatsapp:${data.phone}`,       // Dynamic recipient
+         contentSid: send_whatsapp_message_extended_test_drive_booking_confirm_template_id, // Template ID 
+         contentVariables: JSON.stringify({
+            "1": data.userName,      // Customer Name
+            "2": data.carModel,      // Car Model 
+            "3": data.carName,       // Car Name  
+            "4": data.startDate,     // Start date 
+            "5": data.endDate,       // End Date
+            "6": data.bookingId,     // Booking Id
+         }),
+      });
+ 
+      console.log(`Booking cancellation message sent to ${data.phone}: ${response.sid}`);
+   } catch (error) {
+      console.error(`Failed to send booking cancellation message: ${error.message}`);
+   }
+}
 
 module.exports = {
   sendWhatsAppMessage,
   sendWhatsAppMessageIncludeVendor,
   sendRefundMessage,
-  bookingCancelMessage
+  bookingCancelMessage,
+  sendTestDriveWhatsappMessage,
+  sendExtendedTestDriveWhatsappMessage
 };
 
 //Dummy JSON for Booking Confirmation Message
