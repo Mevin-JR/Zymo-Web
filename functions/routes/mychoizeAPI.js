@@ -65,18 +65,10 @@ function getCityKey(cityName) {
     return city ? city.CityKey : null;
 }
 
-// Format date to MyChoize format
-async function formatDateToMyChoize(dateString) {
-    const date = new Date(dateString);
-    if (isNaN(date)) throw new Error("Invalid date format");
-    return `\/Date(${date.getTime()}+0530)\/`;
-}
-
 // Search cars endpoint
 router.post("/search-cars", async (req, res) => {
     try {
         let { PickDate, DropDate, CityName } = req.body.data;
-
         if (!PickDate || !DropDate || !CityName) {
             return res.status(400).json({ error: "Missing required fields" });
         }
@@ -113,6 +105,42 @@ router.post("/search-cars", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+router.post("/get-location-list", async (req, res) => {
+    try {
+        const { City, PickupDateTime, DropoffDateTime } = req.body;
+
+        // Debugging log: Check received request body
+        console.log("Received Request Data:", { City, PickupDateTime, DropoffDateTime });
+
+        if (!City || !PickupDateTime || !DropoffDateTime) {
+            console.error("Missing required parameters:", { City, PickupDateTime, DropoffDateTime });
+            return res.status(400).json({ error: "Missing required parameters" });
+        }
+
+        const CityKey = getCityKey(City);
+        if (!CityKey) {
+            console.error("City not found:", City);
+            return res.status(404).json({ error: "City not found in database" });
+        }
+
+        const apiUrl = `${myChoizeUrl}ListingService/GetLocationList`;
+        const requestData = {
+            CityKey,
+            PickupDateTime,
+            DropoffDateTime,
+        };
+        const response = await axios.post(apiUrl, requestData, { headers });
+        res.json({
+            pickupLocations: response.data.BranchesPickupLocationList || [],
+            dropoffLocations: response.data.BranchesDropupLocationList || [],
+        });
+
+    } catch (error) {
+        console.error("Error fetching location list:", {message: error.message});
+        res.status(500).json({ error: "Internal server error", details: error.response?.data || error.message });
+    }
+});
+
 
 // Create Booking API
 router.post("/create-booking", async (req, res) => {

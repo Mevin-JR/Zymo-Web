@@ -29,6 +29,8 @@ import ExtendedTestDriveFormPage from "./pages/Buy/ExtendedTestDriveEnterInforma
 import ExtendedTestDriveUploadDocuments from "./pages/Buy/ExtendedTestDriveUploadDocuments";
 import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker";
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
+import   SubscriptionFormPage from "./components/SubscribeInfo";
+import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
 
 const App = () => {
     return (
@@ -69,6 +71,8 @@ const App = () => {
                         path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
                         element={<BookingPage />}
                     />
+                    <Route path="/subscribe/subscribe-info" element={<SubscriptionFormPage />} />
+                    <Route path="/subscribe/upload-doc" element={<SubscriptionUploadDocuments />} />
 
                     {/* Buy Page Routes*/}
                     <Route path="/buy" element={<NearestCar />} />

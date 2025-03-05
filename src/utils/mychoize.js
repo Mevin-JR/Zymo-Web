@@ -56,7 +56,7 @@ const fetchSubscriptionCars = async (CityName, formattedPickDate, formattedDropD
                 name: toPascalCase(car.BrandName.split(" ")[1]),
                 options: [car.TransMissionType, car.FuelType, `${car.SeatingCapacity} Seats`],
                 address: car.LocationName,
-                location_id: car.LocationKey,
+                locationkey: car.LocationKey,
                 hourly_amount: car.PerUnitCharges,
                 images: [car.VehicleBrandImageName],
                 ratingData: { text: "No ratings available" },
@@ -198,5 +198,28 @@ const createBooking = async (bookingDetails) => {
     }
 };
 
+const fetchLocations = async (City, pickupDateTime, dropoffDateTime) => {
+    try {
+      const response = await fetch(`${apiUrl}/mychoize/get-location-list`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          City,
+          PickupDateTime: pickupDateTime,
+          DropoffDateTime: dropoffDateTime, 
 
-export { findPackage, fetchMyChoizeCars , fetchSubscriptionCars, createBooking};
+        }),
+      });
+  
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+  
+
+export { findPackage, fetchMyChoizeCars , fetchSubscriptionCars, createBooking,fetchLocations};

@@ -78,7 +78,7 @@ const CarDetails = () => {
                     endDate,
                     userData,
                     car,
-                    activeTab
+                    activeTab,
                 },
             }
         );
