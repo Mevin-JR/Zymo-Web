@@ -42,7 +42,7 @@ const CarDetails = () => {
               <img
                 src={image}
                 alt={`${name} ${model}`}
-                className=" rounded-lg shadow-md"
+                className=" rounded-lg shadow-md p-2 border border-[#faffa4] bg-[#faffa4]"
               />
             </div>
             {/* Details Section */}

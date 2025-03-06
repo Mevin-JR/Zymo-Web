@@ -21,7 +21,7 @@ export const carData = [
         weight: "1400 kg",
         cargoVolume: "350",
         about: "The TATA Nexon EV is an affordable electric SUV that combines great range, powerful performance, and eco-friendliness. It’s a perfect option for those looking to make the switch to electric.",
-        image: "/images/Cars/tnex.jpeg",
+        image: "/images/Cars/newtnexcar.png",
         priceRange: "₹ 12.0L - ₹ 14.0L",
         monthlyTestDriveFee: "4000",
         securityDeposit: "15,000",
