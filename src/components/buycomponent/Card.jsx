@@ -1,7 +1,6 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Card = ({ car }) => {
+const Card = ( {car} ) => {
     return (
 
         <div className="flex flex-col md:flex-row bg-[#303030] border border-gray-500 rounded-2xl p-4 py-1 text-white mx-auto w-full max-w-[900px] min-h-[300px] md:items-center">
@@ -36,7 +35,7 @@ const Card = ({ car }) => {
                 <img
                     src={car.image}
                     alt={car.name}
-                    className="relative object-contain rounded-xl w-full p-6"
+                    className="h-auto object-contain rounded-xl w-full md:w-auto max-h-48 hover:scale-110 transition-transform duration-700"
                 />
 
             </div>
@@ -47,15 +46,15 @@ const Card = ({ car }) => {
             <div className="flex md:flex-col items-center md:items-end text-center md:text-right justify-between w-full md:w-1/3 mt-4 md:mt-0 gap-8">
                 <div>
                     <div className='p-0'>
-                        <p className="text-lg font-bold">Rs.{car.price} Lakh* </p>
+                        <p className="text-lg font-bold">₹{`${car.price.min_price}-${car.price.max_price}`} Lakh</p>
                         <p className="text-sm text-gray-400">onwards</p>
                         <p className="text-xs text-right mb-4">Avg. Ex-Showroom price</p>
                     </div>
 
 
                 </div>
-                <Link to={`/buy/car-details/${car.id}`} className="mt-3">
-                    <button className="w-20 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors">
+                <Link to={`/buy/car-details/${car.carId}`} className="mt-3">
+                    <button className="w-10 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors">
                         <i className="fa-solid fa-arrow-right text-darkGrey2"></i>
                     </button>
                 </Link>

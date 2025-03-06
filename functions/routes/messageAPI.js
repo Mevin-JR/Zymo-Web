@@ -1,7 +1,7 @@
 const express = require("express");
 const twilio = require("twilio");
 const dotenv = require("dotenv");
-const {sendWhatsAppMessage} = require("../config/twilio.js");
+const {sendWhatsAppMessage,sendTestDriveWhatsappMessage,sendExtendedTestDriveWhatsappMessage} = require("../config/twilio.js");
 const router = express.Router();
 dotenv.config();
 
@@ -106,5 +106,38 @@ router.post("/send-whatsapp-message", async (req, res) => {
     }
 });
 
-module.exports = router;
 
+// API to send a WhatsApp message for test drive
+router.post("/test-drive-whatsapp-message", async (req, res) => {
+    try {
+        const { bookingData } = req.body;
+
+        if ( !bookingData && !bookingData.phone) {
+            return res.status(400).json({ error: "Booking data are required." });
+        }
+
+        const response = await sendTestDriveWhatsappMessage(bookingData);
+        res.status(200).json({ message: "WhatsApp message sent successfully.",response });
+    } catch (error) {
+        console.error("Error sending WhatsApp message:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// API to send a WhatsApp message for Extended test drive
+router.post("/extended-test-drive-whatsapp-message", async (req, res) => {
+    try {
+        const { bookingData } = req.body;
+
+        if ( !bookingData && !bookingData.phone) {
+            return res.status(400).json({ error: "Booking data are required." });
+        }
+
+        const response = await sendExtendedTestDriveWhatsappMessage(bookingData);
+        res.status(200).json({ message: "WhatsApp message sent successfully.",response });
+    } catch (error) {
+        console.error("Error sending WhatsApp message:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+module.exports = router;
