@@ -727,36 +727,16 @@ function BookingPage() {
                         </span>
                     </div> */}
 
-{/*Pickup Dropup location*/}
-<div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
-                    <h3 className="text-center mb-3 text-white text-3xl font-bold">
-                        Car Pickup & Drop Location
-                    </h3>
-                    <hr className="my-1 mb-5 border-gray-500" />
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
-                            <span className="font-medium text-white">Hub Location</span>
-                            <span className="text-gray-400">Time</span>
-                            <span className=" text-[#eeff87] font-semibold">Cost</span>
-                        </div>
-                        <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
-                            <span className="font-medium text-white">Doorway Delivery</span>
-                            <span className="text-gray-400">10 AM - 6 PM</span>
-                            <span className=" text-[#eeff87] font-semibold">Free</span>
-                        </div>
-                        </div>
-</div>
-
-                        
+                       
   
 
                 {/* Customer Input Fields */}
                 
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
-                    <h3 className="text-center mb-1 text-white text-3xl font-bold">
-                        Customer Details
-                    </h3>
-                    <hr className="my-1 mb-5 border-gray-500" />
+                     <h3 className="text-center mb-1 text-white text-3xl font-bold">
+        {car.source === "zoomcar" ? "Customer Details" : "Car Pickup & Drop Location"}
+    </h3>
+    <hr className="my-1 mb-5 border-gray-500" />
                     {car.source === "zoomcar" ? (
                         <div className="space-y-4">
                             {/* Name Input */}
@@ -809,15 +789,29 @@ function BookingPage() {
                                 />
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex justify-center items-center">
-               <button
-                    className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold transition-colors"
-                    onClick={() => navigate("/subscribe/subscribe-info", { state: { ...location.state, city , totalAmount: calcPayableAmount(car.fare)} })}
-                > Next </button>
-                </div>
-                    
-                    )}
+) : (
+    <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
+ 
+        <div className="space-y-2">
+            <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
+                <span className="font-medium text-white">Hub Location</span>
+                <span className="text-gray-400">Time</span>
+                <span className=" text-[#eeff87] font-semibold">Cost</span>
+            </div>
+            <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
+                <span className="font-medium text-white">Doorway Delivery</span>
+                <span className="text-gray-400">10 AM - 6 PM</span>
+                <span className=" text-[#eeff87] font-semibold">Free</span>
+            </div>
+        </div>
+        <div className="flex justify-center items-center mt-5">
+            <button
+                className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold transition-colors"
+                onClick={() => navigate("/subscribe/subscribe-info", { state: { ...location.state, city , totalAmount: calcPayableAmount(car.fare)} })}
+            > Next </button>
+        </div>
+    </div>
+)}
                 </div>
 
 
