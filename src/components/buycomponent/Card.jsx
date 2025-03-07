@@ -33,9 +33,9 @@ const Card = ( {car} ) => {
             <div className="relative flex items-center justify-center rounded-xl p-1 w-full md:w-auto mt-4 md:mt-0">
 
                 <img
-                    src={car.image}
+                    src="/images/Cars/newtnexcar.png"  //add newtnexcar.png image here
                     alt={car.name}
-                    className="h-auto object-contain rounded-xl w-full md:w-auto max-h-48 hover:scale-110 transition-transform duration-700"
+                    className="h-auto object-contain rounded-xl w-full md:w-auto max-h-50 p-2 hover:scale-100 transition-transform duration-700"
                 />
 
             </div>
@@ -54,7 +54,7 @@ const Card = ( {car} ) => {
 
                 </div>
                 <Link to={`/buy/car-details/${car.carId}`} className="mt-3">
-                    <button className="w-10 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors">
+                    <button className="w-20 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors">
                         <i className="fa-solid fa-arrow-right text-darkGrey2"></i>
                     </button>
                 </Link>
