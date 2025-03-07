@@ -13,13 +13,17 @@ const DateTimeOverlay = ({
     let currHours = now.getHours();
     let currMinutes = now.getMinutes() ; // Round minutes to 0 or 30
    
-    const newnowhrs = new Date().getHours();
-    const getInitialAmpm = () => {
-        let isPM = newnowhrs >= 12;
-        return isPM ? "AM" : "PM"; // Flip AM/PM by 2 cycles
-    };
+  // Convert currHours to 12-hour format
+  const get12HourFormat = (hours) => {
+    return hours % 12 || 12; // Converts 0 to 12
+};
 
-    const [hour, setHour] = useState(currHours);
+const getInitialAmpm = () => {
+    let isPM = currHours >= 12;
+    return isPM ? "PM" : "AM"; // Corrected logic
+};
+
+const [hour, setHour] = useState(get12HourFormat(currHours)); // Initialize with 12-hour format
     const [minute, setMinute] = useState(currMinutes);
     const [ampm, setAmpm] = useState(getInitialAmpm());
 
@@ -82,7 +86,7 @@ const DateTimeOverlay = ({
                                 <ChevronUp />
                             </button>
                             <span className="text-lg font-semibold">
-                                {hour.toString().padStart(2, "0")}
+                                {hour}
                             </span>
                             <button
                                 onClick={() => adjustTime("hour", -1)}

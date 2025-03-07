@@ -74,9 +74,9 @@ const CarDetails = () => {
             {/* Image Section */}
             <div className=" fixed w-1/2 top-6 left-3 h-screen flex justify-center items-center  p-2">
               <img
-                src={carDetail.image}
+                src="/images/Cars/newtnexcar.png"   //add newtnexcar.png image here
                 alt={`${carDetail.name} ${carDetail.model}`}
-                className="w-3/4 rounded-lg shadow-md"
+                className="rounded-lg shadow-md p-2bg-transparent"
               />
             </div>
             {/* Details Section */}

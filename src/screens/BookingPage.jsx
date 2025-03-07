@@ -8,6 +8,7 @@ import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
 import { findPackage } from "../utils/mychoize";
 import { doc, getDoc } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
+import PickupPopup from "../components/PickupPopup";
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
@@ -35,6 +36,15 @@ function BookingPage() {
     const [customerEmail, setCustomerEmail] = useState(userData.email);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
     const [vendorDetails, setVendorDetails] = useState(null);
+//popup 
+    const [showPopup, setShowPopup] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState("");
+  
+    const handleLocationClick = (location) => {
+      setSelectedLocation(location);
+      setShowPopup(true);
+    };
+
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
     // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
@@ -439,7 +449,7 @@ function BookingPage() {
                 {/* Pickup Details */}
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
                     <h3 className="text-center mb-3 text-white text-3xl font-bold">
-                        Pickup
+                        Pickup here!
                     </h3>
                     <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
@@ -449,7 +459,7 @@ function BookingPage() {
                                 <MapPin className="w-5 h-5 text-[#eeff87]" />
                                 <p>Pickup City</p>
                             </div>
-                            <p className="ml-auto text-gray-300">{toPascalCase(bookingData.pickup.city)}</p>
+                            <p className="ml-auto text-white">{toPascalCase(bookingData.pickup.city)}</p>
                         </div>
 
                         {/* Start Date */}
@@ -458,7 +468,7 @@ function BookingPage() {
                                 <Calendar className="w-5 h-5 text-[#eeff87]" />
                                 <p>Start Date</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.pickup.startDate}
                             </p>
                         </div>
@@ -469,11 +479,43 @@ function BookingPage() {
                                 <Calendar className="w-5 h-5 text-[#eeff87]" />
                                 <p>End Date</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.pickup.endDate}
                             </p>
                         </div>
                     </div>
+
+                    <hr className="my-1 mb-5 border-gray-500" />
+                    {/* popup will open here */}
+
+
+                    <h2 className="text-xl text-center font-bold mb-4">Car pickup & Drop location</h2>
+      
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1 text-[#faffa4]">Pickup Location | Time | Charges</label>
+        <div 
+          className="bg-[#404040] text-white p-3 rounded-md cursor-pointer" 
+          onClick={() =>setShowPopup(true) }
+        >
+          Doorstep Delivery (10 Km From Hsr/ Vivekananda)
+        </div>
+        <textarea className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" rows="3"></textarea>
+      </div>
+      
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1 text-[#faffa4]">Drop Location | Time | Charges</label>
+        <div 
+          className="bg-[#404040] text-white p-3 rounded-md cursor-pointer" 
+          onClick={() => setShowPopup(true)}
+        >
+          Doorstep Delivery (10 Km From Hsr/ Vivekananda)
+        </div>
+        <textarea className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" rows="3"></textarea>
+      </div>
+      
+      
+      {showPopup && <PickupPopup setIsOpen={setShowPopup} />}
+
                 </div>
 
                 {/* Car Details */}
@@ -489,7 +531,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Registeration</p>
                             </div>
-                            <p className="ml-auto text-gray-300">{bookingData.carDetails.registration}</p>
+                            <p className="ml-auto text-white">{bookingData.carDetails.registration}</p>
                         </div>
 
                         {/* Package */}
@@ -498,7 +540,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Package</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.carDetails.package}
                             </p>
                         </div>
@@ -509,7 +551,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Transmission</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.carDetails.transmission}
                             </p>
                         </div>
@@ -520,7 +562,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Fuel Type</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.carDetails.fuel}
                             </p>
                         </div>
@@ -531,7 +573,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Seats</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.carDetails.seats}
                             </p>
                         </div>
@@ -549,7 +591,7 @@ function BookingPage() {
                                 <User className="w-5 h-5 text-[#eeff87]" />
                                 <p>Name:</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.customer.name}
                             </p>
                         </div>
@@ -559,7 +601,7 @@ function BookingPage() {
                                 <Phone className="w-5 h-5 text-[#eeff87]" />
                                 <p>Mobile No:</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.customer.mobile}
                             </p>
                         </div>
@@ -569,7 +611,7 @@ function BookingPage() {
                                 <Mail className="w-5 h-5 text-[#eeff87]" />
                                 <p>Email Id:</p>
                             </div>
-                            <p className="ml-auto text-gray-300">
+                            <p className="ml-auto text-white">
                                 {bookingData.customer.email}
                             </p>
                         </div>
@@ -589,7 +631,7 @@ function BookingPage() {
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>Base Fare</span>
                             </div>
-                            <span className="ml-auto text-gray-300">
+                            <span className="ml-auto text-white">
                                 {bookingData.fareDetails.base}
                             </span>
                         </div>
@@ -598,7 +640,7 @@ function BookingPage() {
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>GST {car.source !== "zoomcar" ? `(${(vendorDetails?.TaxSd * 100).toFixed(0)}%)` : ""}</span>
                             </div>
-                            <span className="ml-auto text-gray-300">
+                            <span className="ml-auto text-white">
                                 {bookingData.fareDetails.gst}
                             </span>
                         </div>
@@ -609,7 +651,7 @@ function BookingPage() {
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>Security Deposit</span>
                             </div>
-                            <span className="ml-auto text-gray-300">
+                            <span className="ml-auto text-white">
                                 {bookingData.fareDetails.deposit}
                             </span>
                         </div>
@@ -620,7 +662,7 @@ function BookingPage() {
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
                                 <span>Discount {`(${((1 - vendorDetails?.DiscountSd) * 100).toFixed(0)}%)`}</span>
                             </div>
-                            <span className="ml-auto text-gray-300">
+                            <span className="ml-auto text-white">
                                 {`- ${bookingData.fareDetails.discount}`}
                             </span>
                         </div>
@@ -675,7 +717,7 @@ function BookingPage() {
                             />
                             <span>Select a voucher</span>
                         </div>
-                        <span className="text-red-800 cursor-pointer">
+                        <span className="text-red-400 cursor-pointer">
                             View Voucher
                         </span>
                     </div> */}
@@ -704,7 +746,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerName(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your name"
                                 />
                             </div>
@@ -722,7 +764,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerPhone(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your phone number"
                                 />
                             </div>
@@ -738,7 +780,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerEmail(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-800 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your email"
                                 />
                             </div>
