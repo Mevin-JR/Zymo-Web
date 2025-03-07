@@ -29,4 +29,9 @@ app.use("/payment", paymentRoutes);
 app.use("/message", messageRoutes);
 app.use("/mychoize", mychoizeRoutes);
 
+app.get("/health", (req, res) => {
+    res.status(200).json({ message: "API is running smoothly!" });
+});
+
+
 exports.api = functions.https.onRequest(app);
