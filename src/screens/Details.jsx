@@ -18,7 +18,7 @@ const CarDetails = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
-    const { startDate, endDate, car } = location.state || {};
+    const { startDate, endDate, car ,activeTab} = location.state || {};
 
     const startDateFormatted = formatDate(startDate)
     const endDateFormatted = formatDate(endDate);
@@ -78,6 +78,7 @@ const CarDetails = () => {
                     endDate,
                     userData,
                     car,
+                    activeTab,
                 },
             }
         );
@@ -124,8 +125,10 @@ const CarDetails = () => {
                 { label: "Seats", value: car.options[2] },
                 { label: "Fuel Type", value: car.options[1] },
                 { label: "Transmission", value: car.options[0] },
-                { label: "Package", value: car.source === "zoomcar" ? "Unlimited KMs" : findPackage(car.rateBasis) },
-                { label: "Available KMs", value: car.source === "zoomcar" ? "Unlimited KMs" : car.total_km[car.rateBasis] },
+                { label: "Package", value: activeTab === "subscribe" ? "Subscription" : car.source === "zoomcar" ? "Unlimited KMs" : findPackage(car.rateBasis) },
+                { label: "Available KMs", value: car.source === "zoomcar" ? "Unlimited KMs" : activeTab === "subscribe" && car.source ==="mychoize"? " 3600 KMs" : car.total_km[car.rateBasis] 
+                },
+                
                 { label: "Extra KM Charge", value: car.rateBasis === "DR" ? "No Charge" : car.extrakm_charge }
             ],
             price: car.fare,

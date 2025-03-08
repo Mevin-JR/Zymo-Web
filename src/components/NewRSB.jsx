@@ -208,7 +208,8 @@ const NewRSB = () => {
                 startDate,
                 endDate,
                 tripDuration,
-                tripDurationHours
+                tripDurationHours,
+                activeTab,
             };
 
             sessionStorage.setItem("fromSearch", true);

@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
 import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
-import { findPackage } from "../utils/mychoize";
+import { findPackage ,createBooking  as createMyChoizeBooking } from "../utils/mychoize";
 import { doc, getDoc } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 import PickupPopup from "../components/PickupPopup";
@@ -26,11 +26,10 @@ function BookingPage() {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
-    const { startDate, endDate, userData, car } = location.state || {};
-
-    const startDateFormatted = formatDate(startDate);
-    const endDateFormatted = formatDate(endDate)
-
+    const { car, startDate, endDate, userData, activeTab } = location.state;
+    
+    const startDateFormat = formatDate(startDate);
+    const endDateFormat= formatDate(endDate)
     const [customerName, setCustomerName] = useState(userData.name);
     const [customerPhone, setCustomerPhone] = useState(userData.phone);
     const [customerEmail, setCustomerEmail] = useState(userData.email);
@@ -50,14 +49,15 @@ function BookingPage() {
     // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
     useEffect(() => {
+        console.log(userData);
+        console.log(car);
         const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
         const fetchVendorDetails = async () => {
             const docRef = doc(appDB, "carvendors", vendor);
             const docSnap = await getDoc(docRef);
 
             setVendorDetails(docSnap.data());
-        }
-
+        };
         fetchVendorDetails();
     }, [car.source]);
 
@@ -91,13 +91,14 @@ function BookingPage() {
             image: car.images[0],
         },
         pickup: {
-            startDate: startDateFormatted,
-            endDate: endDateFormatted,
+            startDate: startDateFormat,
+            endDate: endDateFormat,
             city: city,
         },
         carDetails: {
             registration: vendorDetails?.plateColor || "N/A",
-            package: car.rateBasis === "DR" ? "Unlimited KMs" : findPackage(car.rateBasis),
+            package: activeTab === "subscribe" ? "Subscription" : car.rateBasis === "DR" ? "Unlimited KMs" :
+             findPackage(car.rateBasis),
             transmission: car.options[0],
             fuel: car.options[1],
             seats: car.options[2],
@@ -123,10 +124,60 @@ function BookingPage() {
     const createBooking = async (paymentData) => {
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
-
-        const response = await fetch(
-            `${functionsUrl}/zoomcar/bookings/create-booking`,
-            {
+    
+        if (car.source === "mychoize") {
+            try {
+                const bookingDetails = {
+                PickDate: formatDateForMyChoize(startDate),
+                DropDate: formatDateForMyChoize(endDate),
+                PickRegionKey : car.locationKey,
+                RentalType:'D',
+                
+                BrandGroundLength: car.brandGroundLength,
+                BrandKey: car.brandKey,
+                BrandLength: car.brandLength,
+                DropRegionKey: car.locationKey,
+                FuelType: car.fuelType,
+                GroupKey: car.GroupKey,
+                LocationKey: car.locationKey,
+                LuggageCapacity: car.luggageCapacity,
+                RFTEngineCapacity: car.rtfEngineCapacity,
+                SeatingCapacity: car.seatingCapacity,
+                TariffKey: car.tariffKey,
+                TransmissionType: car.transmissionType,
+                VTRHybridFlag: car.vtrHybridFlag,
+                VTRSUVFlag: car.vtrSUVFlag,
+                SecurityToken:"",                    
+                };
+    
+                const data = await createMyChoizeBooking(bookingDetails);
+                
+                if (data.error) {
+                    toast.error("Booking creation failed, Please try again later...", {
+                        position: "top-center",
+                        autoClose: 1000 * 3,
+                    });
+                    return;
+                }
+    
+                toast.info("Booking process started...", {
+                    position: "top-center",
+                    autoClose: 1000 * 3,
+                });
+    
+                // Handle success, if needed
+                console.log("MyChoize Booking Created:", data);
+    
+            } catch (error) {
+                console.error("Error in MyChoize booking:", error);
+                toast.error("An error occurred while booking, please try again...", {
+                    position: "top-center",
+                    autoClose: 1000 * 5,
+                });
+            }
+        } else {
+            // Existing ZoomCar booking process
+            const response = await fetch(`${functionsUrl}/zoomcar/bookings/create-booking`, {
                 method: "POST",
                 body: JSON.stringify({
                     customer: {
@@ -152,42 +203,38 @@ function BookingPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+            });
+    
+            if (!response.ok) {
+                toast.error("Booking creation failed, Please try again later...", {
+                    position: "top-center",
+                    autoClose: 1000 * 3,
+                });
+                throw new Error(`Error: ${response.status} - ${response.statusText}`);
             }
-        );
-
-        console.log(response);
-
-        if (!response.ok) {
-            toast.error("Booking creation failed, Please try again later...", {
+    
+            const data = await response.json();
+            if (data.status !== 1) {
+                const msg = data.msg ? data.msg : "Something went wrong...";
+                toast.error(msg, {
+                    position: "top-center",
+                    autoClose: 1000 * 5,
+                });
+                return;
+            }
+    
+            toast.info("Booking process started...", {
                 position: "top-center",
                 autoClose: 1000 * 3,
             });
-            throw new Error(
-                `Error: ${response.status} - ${response.statusText}`
-            );
+    
+            const bookingId = data.booking.confirmation_key;
+            const amount = data.booking.fare.total_amount;
+    
+            updateBookingPayment(bookingId, amount, paymentData);
         }
-
-        const data = await response.json();
-        console.log(data);
-        if (data.status !== 1) {
-            const msg = data.msg ? data.msg : "Something went wrong...";
-            toast.error(msg, {
-                position: "top-center",
-                autoClose: 1000 * 5,
-            });
-            return;
-        }
-
-        toast.info("Booking process started...", {
-            position: "top-center",
-            autoClose: 1000 * 3,
-        });
-
-        const bookingId = data.booking.confirmation_key;
-        const amount = data.booking.fare.total_amount;
-
-        updateBookingPayment(bookingId, amount, paymentData);
     };
+    
 
     const updateBookingPayment = async (bookingId, amount, paymentData) => {
         let retry = 0;
@@ -722,17 +769,16 @@ function BookingPage() {
                         </span>
                     </div> */}
 
+                       
+  
+
                 {/* Customer Input Fields */}
+                
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
-                    <h3 className="text-center mb-1 text-white text-3xl font-bold">
-                        Customer Details
-                    </h3>
-                    {car.source !== "zoomcar" ? (
-                        <p className="text-center text-gray-400 text-sm mb-4">
-                            (You must add your details and documents to continue)
-                        </p>
-                    ) : ""}
-                    <hr className="my-1 mb-5 border-gray-500" />
+                     <h3 className="text-center mb-1 text-white text-3xl font-bold">
+        {car.source === "zoomcar" ? "Customer Details" : "Car Pickup & Drop Location"}
+    </h3>
+    <hr className="my-1 mb-5 border-gray-500" />
                     {car.source === "zoomcar" ? (
                         <div className="space-y-4">
                             {/* Name Input */}
@@ -785,21 +831,34 @@ function BookingPage() {
                                 />
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex justify-center items-center">
-                            <button
-                                className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
-                                onClick={handlePayment}
-                            >
-                                Upload Documents
-                            </button>
-                        </div>
-                    )}
+) : (
+    <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
+ 
+        <div className="space-y-2">
+            <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
+                <span className="font-medium text-white">Hub Location</span>
+                <span className="text-gray-400">Time</span>
+                <span className=" text-[#eeff87] font-semibold">Cost</span>
+            </div>
+            <div className="flex justify-between items-center bg-zinc-800 p-4 rounded-lg">
+                <span className="font-medium text-white">Doorway Delivery</span>
+                <span className="text-gray-400">10 AM - 6 PM</span>
+                <span className=" text-[#eeff87] font-semibold">Free</span>
+            </div>
+        </div>
+        <div className="flex justify-center items-center mt-5">
+            <button
+                className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold transition-colors"
+                onClick={() => navigate("/subscribe/subscribe-info", { state: { ...location.state, city , totalAmount: calcPayableAmount(car.fare)} })}
+            > Next </button>
+        </div>
+    </div>
+)}
                 </div>
 
 
                 {/* Book Button */}
-                {car.source === "zoomcar" ? (
+                 {car.source === "zoomcar" ? (
                     <div className="flex justify-center items-center">
                         <button
                             className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
@@ -809,6 +868,8 @@ function BookingPage() {
                         </button>
                     </div>
                 ) : ""}
+                
+
             </div>
 
             <ConfirmPage
