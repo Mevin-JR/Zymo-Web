@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { formatTo12 } from "../utils/helperFunctions";
 
-const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) => {
+const DropupPopup = ({ setIsOpen, dropupLocations, setSelectedDropLocation }) => {
 
   const handleSelection = (location) => {
-    setSelectedPickupLocation(location);
+    setSelectedDropLocation(location);
     setIsOpen(false);
   }
 
@@ -15,7 +15,7 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
         <div className="bg-[#303030] text-gray-300 p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex justify-between items-center border-b border-gray-500 pb-2">
-            <h2 className="text-xl font-bold">Pickup Location</h2>
+            <h2 className="text-xl font-bold">Drop Location</h2>
             <button
               onClick={() => setIsOpen(false)}
               className="text-[#faffa4] text-2xl font-bold hover:text-gray-300"
@@ -36,7 +36,7 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
           <div className="mt-2">
             <div className="font-semibold text-[#faffa4]">Hub Locations</div>
             <hr className="border-gray-500" />
-            {pickupLocations.hubs.map((location, index) => (
+            {dropupLocations.hubs.map((location, index) => (
               <>
                 <hr className="border-gray-500" />
                 <div className="flex p-2 cursor-pointer hover:bg-gray-500/20" key={index} onClick={() => handleSelection(location)}>
@@ -49,7 +49,7 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
 
             <div className="font-semibold mt-4 text-[#faffa4]">Airport Locations</div>
             <hr className="border-gray-500" />
-            {pickupLocations.airport_locations.map((location, index) => (
+            {dropupLocations.airport_locations.map((location, index) => (
               <>
                 <hr className="border-gray-500" />
                 <div className="flex p-2 cursor-pointer hover:bg-gray-500/20" key={index} onClick={() => handleSelection(location)} >
@@ -62,7 +62,7 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
 
             <div className="font-semibold mt-4 text-[#faffa4]">Doorstep Delivery</div>
             <hr className="border-gray-500" />
-            {pickupLocations.doorstep_delivery.map((location, index) => (
+            {dropupLocations.doorstep_delivery.map((location, index) => (
               <>
                 <hr className="border-gray-500" />
                 <div className="flex p-2 cursor-pointer hover:bg-gray-500/20" key={index} onClick={() => handleSelection(location)}>
@@ -75,7 +75,7 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
 
             <div className="font-semibold mt-4 text-[#faffa4]">Nearby Locations</div>
             <hr className="border-gray-500" />
-            {pickupLocations.nearby_locations.map((location, index) => (
+            {dropupLocations.nearby_locations.map((location, index) => (
               <>
                 <hr className="border-gray-500" />
                 <div className="flex p-2 cursor-pointer hover:bg-gray-500/20" key={index} onClick={() => handleSelection(location)}>
@@ -92,4 +92,4 @@ const PickupPopup = ({ setIsOpen, pickupLocations, setSelectedPickupLocation }) 
   );
 };
 
-export default PickupPopup;
+export default DropupPopup;

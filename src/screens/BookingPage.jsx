@@ -2,13 +2,14 @@ import { ArrowLeft, MapPin, Calendar, IndianRupee, Car } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
 import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
-import { findPackage } from "../utils/mychoize";
+import { fetchMyChoizeLocationList, findPackage, formatDateForMyChoize } from "../utils/mychoize";
 import { doc, getDoc } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 import PickupPopup from "../components/PickupPopup";
+import DropupPopup from "../components/DropupPopup";
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
@@ -36,15 +37,18 @@ function BookingPage() {
     const [customerEmail, setCustomerEmail] = useState(userData.email);
     const [isConfirmPopupOpen, setIsConfirmPopupOpen] = useState(false);
     const [vendorDetails, setVendorDetails] = useState(null);
-//popup 
-    const [showPopup, setShowPopup] = useState(false);
-    const [selectedLocation, setSelectedLocation] = useState("");
-  
-    const handleLocationClick = (location) => {
-      setSelectedLocation(location);
-      setShowPopup(true);
-    };
 
+    const [gst, setGst] = useState(0);
+    const [discount, setDiscount] = useState(0);
+    const [payableAmount, setPayableAmount] = useState(0);
+    const [deliveryCharges, setDeliveryCharges] = useState(0);
+
+    const [showPickupPopup, setShowPickupPopup] = useState(false);
+    const [showDropupPopup, setShowDropupPopup] = useState(false);
+    const [selectedPickupLocation, setSelectedPickupLocation] = useState(null);
+    const [selectedDropLocation, setSelectedDropLocation] = useState(null);
+    const [mychoizePickupLocations, setMychoizePickupLocations] = useState({});
+    const [mychoizeDropupLocations, setMychoizeDropupLocations] = useState({});
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
     // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
@@ -61,25 +65,33 @@ function BookingPage() {
         fetchVendorDetails();
     }, [car.source]);
 
-    const calcGST = (fare) => {
-        const rawFare = parseInt(fare.slice(1));
-        const gstPercent = parseFloat(vendorDetails?.TaxSd);
-        return parseFloat(rawFare * gstPercent);
-    }
+    useEffect(() => {
+        if (!car.fare || !vendorDetails) return;
 
-    const calcDiscount = (fare) => {
-        const rawFare = parseInt(fare.slice(1));
-        const discountPrecent = 1 - parseFloat(vendorDetails?.DiscountSd);
-        return parseFloat(rawFare * discountPrecent);
-    }
+        const rawFare = parseInt(car.fare.slice(1));
+        const gstPercent = parseFloat(vendorDetails?.TaxSd) || 0;
+        const discountPercent = parseFloat(vendorDetails?.DiscountSd) || 0;
+        const deposit = parseInt(vendorDetails?.Securitydeposit) || 0;
 
-    const calcPayableAmount = (fare) => {
-        const rawFare = parseInt(fare.slice(1));
-        const gst = calcGST(fare) === rawFare ? 0 : calcGST(fare);
-        const deposit = parseInt(vendorDetails?.Securitydeposit);
-        const discount = calcDiscount(fare);
-        return (rawFare + gst + deposit) - discount;
-    }
+        const gstValue = rawFare * gstPercent;
+        const discountValue = rawFare * (1 - discountPercent);
+
+        setGst(gstValue);
+        setDiscount(discountValue);
+
+        const amount = (rawFare + gstValue + deposit) - discountValue;
+        setPayableAmount(amount);
+    }, [car.fare, vendorDetails]);
+
+    useEffect(() => {
+        if (selectedPickupLocation && selectedDropLocation) {
+            const newDeliveryCharges = parseInt(selectedPickupLocation.DeliveryCharge) + parseInt(selectedDropLocation.DeliveryCharge);
+            setPayableAmount(prevAmount => {
+                return prevAmount - deliveryCharges + newDeliveryCharges;
+            })
+            setDeliveryCharges(newDeliveryCharges);
+        }
+    }, [selectedPickupLocation, selectedDropLocation])
 
     const formattedFare = formatFare(car.fare);
 
@@ -105,20 +117,61 @@ function BookingPage() {
         fareDetails: {
             base: car.actual_fare ? car.actual_fare : formattedFare,
             fare: formattedFare,
-            gst: car.source === "zoomcar" ? "Included in Base Fare" : formatFare(calcGST(car.fare)),
+            gst: car.source === "zoomcar" ? "Incl. in Base Fare" : formatFare(gst),
             deposit: car.source === "zoomcar" ? "₹0" : formatFare(vendorDetails?.Securitydeposit),
-            discount: formatFare(calcDiscount(car.fare)),
-            payable_amount: formatFare(calcPayableAmount(car.fare)),
+            discount: formatFare(discount),
+            payable_amount: formatFare(payableAmount),
         },
         customer: {
             name: userData.name === null ? "N/A" : userData.name,
             mobile: userData.phone === null ? "N/A" : userData.phone,
             email: userData.email === null ? "N/A" : userData.email,
         },
-        voucher: {
-            amount: 75,
-        },
     };
+
+    useEffect(() => {
+        const mychoizeFormattedPickDate = formatDateForMyChoize(startDate);
+        const mychoizeFormattedDropDate = formatDateForMyChoize(endDate);
+
+        const filterLocationLists = (locationList) => {
+            const filteredLocationList = locationList
+                .filter(location => !location.LocationName.includes("Monthly"));
+
+            const hubLocations = filteredLocationList
+                .filter(location => !location.IsPickDropChargesApplicable)
+            const doorstepDeliveryLocations = filteredLocationList
+                .filter(location => location.LocationName.includes("Doorstep"))
+                .filter(location => location.IsPickDropChargesApplicable);
+            const airportLocations = filteredLocationList
+                .filter(location => location.LocationName.includes("Airport"))
+
+            const filteredLocations = new Set([
+                ...hubLocations,
+                ...doorstepDeliveryLocations,
+                ...airportLocations
+            ])
+            const nearbyLocations = filteredLocationList
+                .filter(location => !filteredLocations.has(location))
+
+            return {
+                hubs: hubLocations,
+                doorstep_delivery: doorstepDeliveryLocations,
+                airport_locations: airportLocations,
+                nearby_locations: nearbyLocations,
+            }
+        }
+
+        const fetchLocationList = () => fetchMyChoizeLocationList(city, mychoizeFormattedDropDate, mychoizeFormattedPickDate)
+            .then((data) => {
+                console.log(data);
+                const pickupLocations = filterLocationLists(data.BranchesPickupLocationList);
+                const dropupLocations = filterLocationLists(data.BranchesDropupLocationList);
+
+                setMychoizePickupLocations(pickupLocations);
+                setMychoizeDropupLocations(dropupLocations);
+            });
+        fetchLocationList();
+    }, [])
 
     const createBooking = async (paymentData) => {
         const startDateEpoc = Date.parse(startDate);
@@ -449,18 +502,10 @@ function BookingPage() {
                 {/* Pickup Details */}
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
                     <h3 className="text-center mb-3 text-white text-3xl font-bold">
-                        Pickup here!
+                        Pickup Details
                     </h3>
                     <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
-                        {/* Pickup Location */}
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <MapPin className="w-5 h-5 text-[#eeff87]" />
-                                <p>Pickup City</p>
-                            </div>
-                            <p className="ml-auto text-white">{toPascalCase(bookingData.pickup.city)}</p>
-                        </div>
 
                         {/* Start Date */}
                         <div className="flex items-center justify-between">
@@ -485,36 +530,35 @@ function BookingPage() {
                         </div>
                     </div>
 
-                    <hr className="my-1 mb-5 border-gray-500" />
-                    {/* popup will open here */}
+                    {car.source === "mychoize" ? (
+                        <>
 
+                            <div className="mt-5 mb-4">
+                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">Pickup Location | Time | Charges</label>
+                                <div
+                                    className="bg-[#404040] text-white p-3 rounded-md cursor-pointer"
+                                    onClick={() => setShowPickupPopup(true)}
+                                >
+                                    {selectedPickupLocation ? `${selectedPickupLocation.LocationName} | ${selectedPickupLocation.IsPickDropChargesApplicable ? `₹${selectedPickupLocation.DeliveryCharge}` : "FREE"}` : "Select pickup location"}
+                                </div>
+                                <textarea disabled className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" placeholder={selectedPickupLocation ? selectedPickupLocation.HubAddress : ""} rows="3"></textarea>
+                            </div>
 
-                    <h2 className="text-xl text-center font-bold mb-4">Car pickup & Drop location</h2>
-      
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1 text-[#faffa4]">Pickup Location | Time | Charges</label>
-        <div 
-          className="bg-[#404040] text-white p-3 rounded-md cursor-pointer" 
-          onClick={() =>setShowPopup(true) }
-        >
-          Doorstep Delivery (10 Km From Hsr/ Vivekananda)
-        </div>
-        <textarea className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" rows="3"></textarea>
-      </div>
-      
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1 text-[#faffa4]">Drop Location | Time | Charges</label>
-        <div 
-          className="bg-[#404040] text-white p-3 rounded-md cursor-pointer" 
-          onClick={() => setShowPopup(true)}
-        >
-          Doorstep Delivery (10 Km From Hsr/ Vivekananda)
-        </div>
-        <textarea className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" rows="3"></textarea>
-      </div>
-      
-      
-      {showPopup && <PickupPopup setIsOpen={setShowPopup} />}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">Drop Location | Time | Charges</label>
+                                <div
+                                    className="bg-[#404040] text-white p-3 rounded-md cursor-pointer"
+                                    onClick={() => setShowDropupPopup(true)}
+                                >
+                                    {selectedDropLocation ? `${selectedDropLocation.LocationName} | ${selectedDropLocation.IsPickDropChargesApplicable ? `₹${selectedDropLocation.DeliveryCharge}` : "FREE"}` : "Select drop location"}
+                                </div>
+                                <textarea disabled className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" placeholder={selectedDropLocation ? selectedDropLocation.HubAddress : ""} rows="3"></textarea>
+                            </div>
+
+                            {showPickupPopup && <PickupPopup setIsOpen={setShowPickupPopup} pickupLocations={mychoizePickupLocations} setSelectedPickupLocation={setSelectedPickupLocation} />}
+                            {showDropupPopup && <DropupPopup setIsOpen={setShowDropupPopup} dropupLocations={mychoizeDropupLocations} setSelectedDropLocation={setSelectedDropLocation} />}
+                        </>
+                    ) : ""}
 
                 </div>
 
@@ -666,6 +710,18 @@ function BookingPage() {
                                 {`- ${bookingData.fareDetails.discount}`}
                             </span>
                         </div>
+
+                        {deliveryCharges > 0 ? (
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <IndianRupee className="w-5 h-5 text-[#eeff87]" />
+                                    <span>Delivery Charges</span>
+                                </div>
+                                <span className="ml-auto text-white">
+                                    {formatFare(deliveryCharges)}
+                                </span>
+                            </div>
+                        ) : ""}
 
                         <hr className="my-0 border-gray-600" />
 

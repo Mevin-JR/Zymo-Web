@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { fetchMyChoizeCars } from "../utils/mychoize";
+import { fetchMyChoizeCars, formatDateForMyChoize } from "../utils/mychoize";
 import { formatDate } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
@@ -17,15 +17,7 @@ const Listing = () => {
     const startDateFormatted = formatDate(startDate);
     const endDateFormatted = formatDate(endDate);
 
-    const formatDateForMyChoize = (dateString) => {
-        const date = new Date(dateString);
-        if (isNaN(date)) return null; // Handle invalid date input
-        return `\/Date(${date.getTime()}+0530)\/`;
-    };
-
-
     const hasRun = useRef(false);
-    let searchCount = 0;
 
     const [loading, setLoading] = useState(true);
     const [carList, setCarList] = useState([]);
@@ -110,6 +102,8 @@ const Listing = () => {
                                 trips: Math.floor(Math.random() * 50),
                                 type: "firebase",
                                 location_est: "Local Owner",
+                                source: "firebase",
+                                sourceImg: null
                             }));
 
                         return filterdData;
@@ -120,24 +114,27 @@ const Listing = () => {
                 };
 
                 // Fetch Zoomcar API
-                const zoomPromise = fetch(`${url}/zoomcar/search`, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        data: {
-                            city,
-                            lat,
-                            lng,
-                            fromDate: startDateEpoc,
-                            toDate: endDateEpoc,
-                        },
-                    }),
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
+                // const zoomPromise = fetch(`${url}/zoomcar/search`, {
+                //     method: "POST",
+                //     body: JSON.stringify({
+                //         data: {
+                //             city,
+                //             lat,
+                //             lng,
+                //             fromDate: startDateEpoc,
+                //             toDate: endDateEpoc,
+                //         },
+                //     }),
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //     },
+                // }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
-                const mychoizePromise = tripDurationHours >= 24 ? fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours) : null;
+                const zoomPromise = null; // Temporarily Disabled
+
+                const mychoizePromise = tripDurationHours < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
+
                 const firebasePromise = fetchFirebaseCars();
 
                 // Execute both API calls in parallel
@@ -149,7 +146,7 @@ const Listing = () => {
 
                 let allCarData = [];
 
-                if (zoomData.status === "fulfilled" && zoomData.value.sections) {
+                if (zoomData.status === "fulfilled" && zoomData.value) {
                     const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
                         id: car.car_data.car_id,
                         brand: car.car_data.brand,
@@ -431,9 +428,9 @@ const Listing = () => {
                                         </p>
                                         <div className="img-container">
                                             <img
-                                                src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
-                                                alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
-                                                className="h-6 rounded-sm mt-2 bg-white p-1"
+                                                src={car.sourceImg}
+                                                alt={car.source}
+                                                className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
                                             />
                                         </div>
                                     </div>
@@ -476,9 +473,9 @@ const Listing = () => {
                                         </div>
                                         <div className="img-container">
                                             <img
-                                                src={car.source === "zoomcar" ? "/images/ServiceProvider/zoomcarlogo.png" : "/images/ServiceProvider/mychoize.png"}
-                                                alt={car.source === "zoomcar" ? "Zoomcar" : "MyChoize"}
-                                                className="h-5 rounded-sm mt-2 bg-white p-1"
+                                                src={car.sourceImg}
+                                                alt={car.source}
+                                                className="h-5 rounded-sm mt-2 bg-white p-1 text-black"
                                             />
                                         </div>
                                         <div className="self-auto ">
