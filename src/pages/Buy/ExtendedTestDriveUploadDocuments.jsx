@@ -56,10 +56,10 @@ const ExtendedTestDriveUploadDocuments = () => {
   const [bookingData,setBookingData]=useState(null)
   const { car, startDate, endDate, userData } = location.state || {};
 
-// console.log(car);
-// console.log(startDate);
-// console.log(endDate);
-// console.log(userData);
+// console.log("car:",car);
+// console.log("StartDate:",startDate);
+// console.log("EndDate:",endDate);
+// console.log("UserData:",userData);
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
   const allImagesUploaded =
