@@ -43,9 +43,9 @@ const Footer = () => {
             <div className="flex flex-col gap-2 min-w-[100px]">
                 <div className="font-bold text-lg mb-2">Features</div>
                 <Link to="/blogs" className="hover:text-[#faffa4]">Blogs</Link>
-                <Link to="/privacypolicy" className="hover:text-[#faffa4]">Privacy Policy</Link>
-                <Link to="/termsofservice" className="hover:text-[#faffa4]">Terms of Service</Link>
-                <Link to="/cancellationpolicy" className="hover:text-[#faffa4]">Cancellation Policy</Link>
+                <Link to="/privacy-policy" className="hover:text-[#faffa4]">Privacy Policy</Link>
+                <Link to="/terms-of-service" className="hover:text-[#faffa4]">Terms of Service</Link>
+                <Link to="/cancellation-policy" className="hover:text-[#faffa4]">Cancellation Policy</Link>
             </div>
 
             {/* Install App Section */}
@@ -134,7 +134,7 @@ const Footer = () => {
                         <Youtube size={30} />
                     </a>
                 </div>
-            </div>  
+            </div>
         </div>
     );
 };

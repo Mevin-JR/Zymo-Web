@@ -1,11 +1,13 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 
 const BlogDetailPage = () => {
-    const { title } = useParams();
+    const location = useLocation();
+    const { title } = location.state || {}
+
     const blogs = JSON.parse(sessionStorage.getItem("blogs"));
     const blog = blogs.find((blog) => blog.title === title);
 

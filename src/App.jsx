@@ -99,19 +99,19 @@ const App = () => {
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:title" element={<BlogDetailPage />} />
-                    <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/details" element={<YourDetails />} />
 
                     <Route
-                        path="/termsofservice"
+                        path="/terms-of-service"
                         element={<TermsofService />}
                     />
                     <Route
-                        path="/cancellationpolicy"
+                        path="/cancellation-policy"
                         element={<CancellationPolicy />}
                     />
                     <Route
-                        path="/mybookings"
+                        path="/my-bookings"
                         element={<MyBookings />}
                     />
                     <Route path="*" element={<ErrorPage />} />
