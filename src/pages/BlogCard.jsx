@@ -4,14 +4,9 @@ import { useNavigate } from "react-router-dom";
 const BlogCard = ({ blog }) => {
     let urlTitle = blog.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "-");
 
-    const navigate = useNavigate();
     const goToBlog = () => {
-        navigate(`/blogs/${urlTitle}`, {
-            state: {
-                title: blog.title
-            }
-        }
-        )
+        localStorage.setItem("selectedBlogTitle", blog.title);
+        window.open(`/blogs/${urlTitle}`, "_blank");
     }
 
     return (
