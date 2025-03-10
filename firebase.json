@@ -1,15 +1,28 @@
 {
-    "hosting": {
-        "site": "zymocar-test",
-        "public": "dist",
-        "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-        "rewrites": [
-            {
-                "source": "**",
-                "destination": "/index.html"
-            }
-        ]
-    },
+    "hosting": [
+        {
+            "site": "zymocar-test",
+            "public": "dist",
+            "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        },
+        {
+            "site": "zymo-prod",
+            "public": "dist",
+            "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+            "rewrites": [
+                {
+                    "source": "**",
+                    "destination": "/index.html"
+                }
+            ]
+        }
+    ],
     "functions": [
         {
             "source": "functions",

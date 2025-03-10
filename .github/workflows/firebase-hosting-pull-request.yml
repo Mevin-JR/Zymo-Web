@@ -45,3 +45,4 @@ jobs:
                   firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ZYMO_PROD }}
                   channelId: live
                   projectId: zymo-prod
+                  target: zymo-prod
