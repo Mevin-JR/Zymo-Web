@@ -55,7 +55,6 @@ const App = () => {
                     />
 
                     {/* Page3 */}
-                    {/* Temporarily disabled */}
                     <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
 
                     {/* Page4 */}
@@ -79,7 +78,7 @@ const App = () => {
                     <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
                     <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
                     <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
-                    <Route path="/buy/upload-doc"element={<ExtendedTestDriveUploadDocuments />}/>
+                    <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments />} />
 
                     {/* Test Drive input form and confirm page */}
                     <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />

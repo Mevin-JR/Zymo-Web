@@ -11,7 +11,7 @@ const getTotalKms = (tripDurationHours) => {
 const findPackage = (rateBasis) => {
     if (rateBasis === "FF") return "120km/day";
     if (rateBasis === "MP") return "300km/day";
-    if (rateBasis === "DR") return "Unlimited Kms";
+    if (rateBasis === "DR") return "Unlimited KMs";
     return "Undefined";
 };
 

@@ -6,10 +6,13 @@ import { useCallback, useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
 import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
 import { fetchMyChoizeLocationList, findPackage, formatDateForMyChoize } from "../utils/mychoize";
-import { doc, getDoc } from "firebase/firestore";
-import { appDB } from "../utils/firebase";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
+import { appDB, appStorage } from "../utils/firebase";
 import PickupPopup from "../components/PickupPopup";
 import DropupPopup from "../components/DropupPopup";
+import BookingPageFormPopup from "../components/BookingPageFormPopup";
+import BookingPageUploadPopup from "../components/BookingPageUploadPopup";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
@@ -50,11 +53,19 @@ function BookingPage() {
     const [mychoizePickupLocations, setMychoizePickupLocations] = useState({});
     const [mychoizeDropupLocations, setMychoizeDropupLocations] = useState({});
 
-    const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-    // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+    const [showFormPopup, setShowFormPopup] = useState(false);
+    const [showUploadPopup, setShowUploadPopup] = useState(false);
+    const [formData, setFormData] = useState(null);
+    const [uploadDocData, setUploadDocData] = useState(null);
+    const [bookingData, setBookingData] = useState(null);
 
+    const customerUploadDetails = formData && uploadDocData;
+
+    // const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+
+    const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
     useEffect(() => {
-        const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
         const fetchVendorDetails = async () => {
             const docRef = doc(appDB, "carvendors", vendor);
             const docSnap = await getDoc(docRef);
@@ -95,7 +106,7 @@ function BookingPage() {
 
     const formattedFare = formatFare(car.fare);
 
-    const bookingData = {
+    const preBookingData = {
         headerDetails: {
             name: `${car.brand} ${car.name}`,
             type: car.options.slice(0, 3).join(" | "),
@@ -129,41 +140,40 @@ function BookingPage() {
         },
     };
 
+    const filterLocationLists = (locationList) => {
+        const filteredLocationList = locationList
+            .filter(location => !location.LocationName.includes("Monthly"));
+
+        const hubLocations = filteredLocationList
+            .filter(location => !location.IsPickDropChargesApplicable)
+        const doorstepDeliveryLocations = filteredLocationList
+            .filter(location => location.LocationName.includes("Doorstep"))
+            .filter(location => location.IsPickDropChargesApplicable);
+        const airportLocations = filteredLocationList
+            .filter(location => location.LocationName.includes("Airport"))
+
+        const filteredLocations = new Set([
+            ...hubLocations,
+            ...doorstepDeliveryLocations,
+            ...airportLocations
+        ])
+        const nearbyLocations = filteredLocationList
+            .filter(location => !filteredLocations.has(location))
+
+        return {
+            hubs: hubLocations,
+            doorstep_delivery: doorstepDeliveryLocations,
+            airport_locations: airportLocations,
+            nearby_locations: nearbyLocations,
+        }
+    }
+
     useEffect(() => {
         const mychoizeFormattedPickDate = formatDateForMyChoize(startDate);
         const mychoizeFormattedDropDate = formatDateForMyChoize(endDate);
 
-        const filterLocationLists = (locationList) => {
-            const filteredLocationList = locationList
-                .filter(location => !location.LocationName.includes("Monthly"));
-
-            const hubLocations = filteredLocationList
-                .filter(location => !location.IsPickDropChargesApplicable)
-            const doorstepDeliveryLocations = filteredLocationList
-                .filter(location => location.LocationName.includes("Doorstep"))
-                .filter(location => location.IsPickDropChargesApplicable);
-            const airportLocations = filteredLocationList
-                .filter(location => location.LocationName.includes("Airport"))
-
-            const filteredLocations = new Set([
-                ...hubLocations,
-                ...doorstepDeliveryLocations,
-                ...airportLocations
-            ])
-            const nearbyLocations = filteredLocationList
-                .filter(location => !filteredLocations.has(location))
-
-            return {
-                hubs: hubLocations,
-                doorstep_delivery: doorstepDeliveryLocations,
-                airport_locations: airportLocations,
-                nearby_locations: nearbyLocations,
-            }
-        }
-
         const fetchLocationList = () => fetchMyChoizeLocationList(city, mychoizeFormattedDropDate, mychoizeFormattedPickDate)
             .then((data) => {
-                console.log(data);
                 const pickupLocations = filterLocationLists(data.BranchesPickupLocationList);
                 const dropupLocations = filterLocationLists(data.BranchesDropupLocationList);
 
@@ -171,7 +181,118 @@ function BookingPage() {
                 setMychoizeDropupLocations(dropupLocations);
             });
         fetchLocationList();
-    }, [])
+    }, [selectedPickupLocation, selectedDropLocation])
+
+    const uploadDocs = async (images) => {
+        try {
+            const timestamp = Date.now();
+            const folderPath = `userImages/${formData.email}_${timestamp}`;
+
+            const imageUrls = await Promise.all(
+                images.map(async (image) => {
+                    const fileRef = ref(appStorage, `${folderPath}/${image.name}`);
+                    await uploadBytes(fileRef, image.file_object);
+                    return await getDownloadURL(fileRef);
+                })
+            );
+
+            // URLs of uploaded images
+            const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
+
+            const documents = {
+                LicenseBack: licenseBackUrl,
+                LicenseFront: licenseFrontUrl,
+                aadhaarBack: aadharBackUrl,
+                aadhaarFront: aadharFrontUrl,
+            };
+
+            return documents;
+
+        } catch (error) {
+            console.error("Error uploading documents to Firebase:", error);
+        }
+    }
+
+    // Sends whatsapp notif to both user and zymo
+    const sendWhatsappNotif = async (data) => {
+        setIsConfirmPopupOpen(true);
+        await fetch(`${functionsUrl}/message/booking-confirmation`, {
+            method: "POST",
+            body: JSON.stringify({
+                data
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+    }
+
+    const handleMychoizeBooking = async (data) => {
+        const bookingId = 'Z' + new Date().getTime().toString();
+        const documents = await uploadDocs(uploadDocData);
+
+        const bookingDataStructure = {
+            Balance: 0,
+            CarImage: car.images[0],
+            CarName: car.name,
+            City: city,
+            DateOfBirth: formData.dob,
+            DateOfBooking: Date.now(),
+            Documents: documents,
+            Drive: "",
+            Email: formData.email,
+            EndDate: endDateFormatted,
+            EndTime: "",
+            FirstName: formData.userName,
+            MapLocation: car.address,
+            "Package Selected": findPackage(car.rateBasis),
+            PhoneNumber: formData.phone,
+            "Pickup Location": selectedPickupLocation.LocationName,
+            "Promo Code Used": "",
+            SecurityDeposit: vendorDetails?.Securitydeposit,
+            StartDate: startDateFormatted,
+            StartTime: "",
+            Street1: "",
+            Street2: "",
+            TimeStamp: formatDate(Date.now()),
+            Transmission: car.options[0],
+            UserId: userData.uid,
+            Vendor: vendor,
+            Zipcode: "",
+            actualPrice: parseInt(car.fare.slice(1)),
+            bookingId: bookingId,
+            deliveryType: selectedPickupLocation.LocationName.includes("Doorstep") ? "Doorstep Delivery" : "Self Pickup",
+            paymentId: data.razorpay_payment_id,
+            price: payableAmount
+        }
+
+        await addDoc(collection(appDB, "CarsPaymentSuccessDetails"), bookingDataStructure);
+        setBookingData(bookingDataStructure);
+
+        const whatsappMsgStucture = {
+            id: bookingId,
+            customerName: formData.userName,
+            dateOfBirth: formData.dob,
+            phone: formData.phone,
+            email: formData.email,
+            startDate: startDateFormatted,
+            endDate: endDateFormatted,
+            city: city,
+            pickupLocation: selectedPickupLocation.HubAddress,
+            amount: formatFare(payableAmount),
+            vendorName: vendor,
+            vendorPhone: "+919987933348", // TODO: Change this later
+            vendorLocation: car.address,
+            model: `${car.brand} ${car.name}`,
+            transmission: car.options[0],
+            package: findPackage(car.rateBasis),
+            freeKMs: "",
+            paymentMode: "Online (Razorpay)",
+            serviceType: "",
+        }
+
+        sendWhatsappNotif(whatsappMsgStucture);
+    }
 
     const createBooking = async (paymentData) => {
         const startDateEpoc = Date.parse(startDate);
@@ -346,9 +467,6 @@ function BookingPage() {
     };
 
     const handlePayment = async () => {
-        if (!handleCustomerDetails()) {
-            return;
-        }
         await delay(1000);
         const res = await loadScript(
             "https://checkout.razorpay.com/v1/checkout.js"
@@ -364,14 +482,14 @@ function BookingPage() {
         }
 
         try {
-            const amount = parseInt(car.fare.slice(1));
-            const orderData = await createOrder(amount, "INR");
+            // const amount = parseInt(car.fare.slice(1));
+            const orderData = await createOrder(payableAmount, "INR");
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
                 amount: orderData.amount,
                 currency: "INR",
                 name: "Zymo",
-                description: "title",
+                description: "Zymo Car Rental",
                 image: "/images/AppLogo/zymo2.jpg",
                 order_id: orderData.id,
                 handler: async function (response) {
@@ -383,30 +501,32 @@ function BookingPage() {
                         data
                     );
 
+
                     // Payment successful
                     if (res.data.success) {
+                        handleMychoizeBooking(data);
                         // setIsConfirmPopupOpen(true);
                         // Create booking
-                        createBooking(data).catch((error) => {
-                            console.error("Booking error:", error);
-                            console.log(
-                                "Initiating refund due to booking failure"
-                            );
-                            initiateRefund(data.razorpay_payment_id).then(
-                                (refundResponse) => {
-                                    if (refundResponse.status === "processed") {
-                                        navigate("/");
-                                        toast.success(
-                                            "A refund has been processed, please check your mail for more details",
-                                            {
-                                                position: "top-center",
-                                                autoClose: 1000 * 10,
-                                            }
-                                        );
-                                    }
-                                }
-                            );
-                        });
+                        // createBooking(data).catch((error) => {
+                        //     console.error("Booking error:", error);
+                        //     console.log(
+                        //         "Initiating refund due to booking failure"
+                        //     );
+                        //     initiateRefund(data.razorpay_payment_id).then(
+                        //         (refundResponse) => {
+                        //             if (refundResponse.status === "processed") {
+                        //                 navigate("/");
+                        //                 toast.success(
+                        //                     "A refund has been processed, please check your mail for more details",
+                        //                     {
+                        //                         position: "top-center",
+                        //                         autoClose: 1000 * 10,
+                        //                     }
+                        //                 );
+                        //             }
+                        //         }
+                        //     );
+                        // });
                     } else {
                         toast.error("Payment error, Please try again...", {
                             position: "top-center",
@@ -442,6 +562,18 @@ function BookingPage() {
         }
     };
 
+    const handleUploadDocuments = () => {
+        if (!selectedPickupLocation || !selectedDropLocation) {
+            toast.warn("Please choose the pickup and drop locations", {
+                position: "top-center",
+                autoClose: 1000 * 3,
+            });
+            return;
+        }
+
+        setShowFormPopup(true);
+    }
+
     return (
         <div className="min-h-screen bg-[#212121]">
             {/* Header */}
@@ -463,23 +595,17 @@ function BookingPage() {
                 <div className="flex flex-wrap justify-between items-center gap-5 rounded-lg p-6 shadow-sm w-full">
                     <div className="flex-1 min-w-[200px] text-xl">
                         <h2 className="font-semibold mb-2">
-                            {bookingData.headerDetails.name}
+                            {preBookingData.headerDetails.name}
                         </h2>
-                        {/* <p className="text-[18px] text-gray-400 mb-1">
-                            {bookingData.headerDetails.type}
-                        </p>
-                        <p className="text-[18px] text-gray-400">
-                            {bookingData.headerDetails.range}
-                        </p> */}
                     </div>
 
                     <div className="flex-1 flex justify-center -mt-10">
                         <img
                             src={
-                                bookingData.headerDetails.image ||
+                                preBookingData.headerDetails.image ||
                                 "/placeholder.svg"
                             }
-                            alt={`${bookingData.headerDetails.name}`}
+                            alt={`${preBookingData.headerDetails.name}`}
                             className="w-full sm:w-96 lg:w-80 h-[200px] sm:h-[280px] lg:h-[200px] object-cover rounded-lg"
                         />
                     </div>
@@ -498,7 +624,6 @@ function BookingPage() {
                     </div>
                 </div>
 
-
                 {/* Pickup Details */}
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
                     <h3 className="text-center mb-3 text-white text-3xl font-bold">
@@ -514,7 +639,7 @@ function BookingPage() {
                                 <p>Start Date</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.pickup.startDate}
+                                {preBookingData.pickup.startDate}
                             </p>
                         </div>
 
@@ -525,14 +650,13 @@ function BookingPage() {
                                 <p>End Date</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.pickup.endDate}
+                                {preBookingData.pickup.endDate}
                             </p>
                         </div>
                     </div>
 
                     {car.source === "mychoize" ? (
                         <>
-
                             <div className="mt-5 mb-4">
                                 <label className="block text-sm font-medium mb-1 text-[#faffa4]">Pickup Location | Time | Charges</label>
                                 <div
@@ -575,7 +699,7 @@ function BookingPage() {
                                 <Car className="w-5 h-5 text-[#eeff87]" />
                                 <p>Registeration</p>
                             </div>
-                            <p className="ml-auto text-white">{bookingData.carDetails.registration}</p>
+                            <p className="ml-auto text-white">{preBookingData.carDetails.registration}</p>
                         </div>
 
                         {/* Package */}
@@ -585,7 +709,7 @@ function BookingPage() {
                                 <p>Package</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.carDetails.package}
+                                {preBookingData.carDetails.package}
                             </p>
                         </div>
 
@@ -596,7 +720,7 @@ function BookingPage() {
                                 <p>Transmission</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.carDetails.transmission}
+                                {preBookingData.carDetails.transmission}
                             </p>
                         </div>
 
@@ -607,7 +731,7 @@ function BookingPage() {
                                 <p>Fuel Type</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.carDetails.fuel}
+                                {preBookingData.carDetails.fuel}
                             </p>
                         </div>
 
@@ -618,45 +742,7 @@ function BookingPage() {
                                 <p>Seats</p>
                             </div>
                             <p className="ml-auto text-white">
-                                {bookingData.carDetails.seats}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Customer Details */}
-                {/* <div className="max-w-3xl mx-auto rounded-lg">
-                    <h3 className="text-center mb-6 text-white text-3xl font-bold">
-                        Customer Details
-                    </h3>
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <User className="w-5 h-5 text-[#eeff87]" />
-                                <p>Name:</p>
-                            </div>
-                            <p className="ml-auto text-white">
-                                {bookingData.customer.name}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Phone className="w-5 h-5 text-[#eeff87]" />
-                                <p>Mobile No:</p>
-                            </div>
-                            <p className="ml-auto text-white">
-                                {bookingData.customer.mobile}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Mail className="w-5 h-5 text-[#eeff87]" />
-                                <p>Email Id:</p>
-                            </div>
-                            <p className="ml-auto text-white">
-                                {bookingData.customer.email}
+                                {preBookingData.carDetails.seats}
                             </p>
                         </div>
                     </div>
@@ -676,7 +762,7 @@ function BookingPage() {
                                 <span>Base Fare</span>
                             </div>
                             <span className="ml-auto text-white">
-                                {bookingData.fareDetails.base}
+                                {preBookingData.fareDetails.base}
                             </span>
                         </div>
                         <div className="flex items-center justify-between">
@@ -685,7 +771,7 @@ function BookingPage() {
                                 <span>GST {car.source !== "zoomcar" ? `(${(vendorDetails?.TaxSd * 100).toFixed(0)}%)` : ""}</span>
                             </div>
                             <span className="ml-auto text-white">
-                                {bookingData.fareDetails.gst}
+                                {preBookingData.fareDetails.gst}
                             </span>
                         </div>
 
@@ -696,7 +782,7 @@ function BookingPage() {
                                 <span>Security Deposit</span>
                             </div>
                             <span className="ml-auto text-white">
-                                {bookingData.fareDetails.deposit}
+                                {preBookingData.fareDetails.deposit}
                             </span>
                         </div>
 
@@ -707,7 +793,7 @@ function BookingPage() {
                                 <span>Discount {`(${((1 - vendorDetails?.DiscountSd) * 100).toFixed(0)}%)`}</span>
                             </div>
                             <span className="ml-auto text-white">
-                                {`- ${bookingData.fareDetails.discount}`}
+                                {`- ${preBookingData.fareDetails.discount}`}
                             </span>
                         </div>
 
@@ -732,51 +818,11 @@ function BookingPage() {
                                 <span>Payable Amount</span>
                             </div>
                             <span className="ml-auto text-[#eeff87]">
-                                {bookingData.fareDetails.payable_amount}
+                                {preBookingData.fareDetails.payable_amount}
                             </span>
                         </div>
                     </div>
                 </div>
-
-                {/* Voucher Notice */}
-                {/* <div className="text-center">
-                    <p className="bg-zinc-900 text-white p-4 rounded-lg inline-block">
-                        On Completion of this order, you will receive a voucher
-                        of ₹{bookingData.voucher.amount}
-                    </p>
-                </div> */}
-
-                {/* Promo Code */}
-                {/* <div className="space-y-3 w-fit">
-                    <h3 className="text-white text-3xl font-bold text-center ">
-                        Apply Promo Code
-                    </h3>
-                    <div className="flex gap-2 flex-wrap">
-                        <input
-                            type="text"
-                            placeholder="Enter Promo Code"
-                            className="flex-1 border rounded-lg px-4 py-2 bg-zinc-900"
-                        />
-                        <button className=" text-black px-6 py-2 rounded-lg font-medium bg-[#eeff87] hover:bg-[#e2ff5d] transition-colors">
-                            Apply
-                        </button>
-                    </div>
-                </div> */}
-
-                {/* Voucher Selection */}
-                {/* <div className="bg-zinc-900 text-white p-4 rounded-lg flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                            <img
-                                src="path-to-your-image.jpg"
-                                alt="Voucher"
-                                className="w-8 h-8 rounded-full"
-                            />
-                            <span>Select a voucher</span>
-                        </div>
-                        <span className="text-red-400 cursor-pointer">
-                            View Voucher
-                        </span>
-                    </div> */}
 
                 {/* Customer Input Fields */}
                 <div className="max-w-3xl mx-auto rounded-lg bg-[#303030] p-5">
@@ -842,13 +888,24 @@ function BookingPage() {
                             </div>
                         </div>
                     ) : (
-                        <div className="flex justify-center items-center">
+                        <div className="flex flex-col justify-center items-center">
                             <button
-                                className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
-                                onClick={handlePayment}
+                                className={`px-6 py-2 rounded-lg font-semibold  transition-colors
+                                ${!customerUploadDetails
+                                        ? "text-black bg-[#eeff87] hover:bg-[#e2ff5d] cursor-pointer"
+                                        : "text-[#eeff87] bg-transparent border-2 border-[#eeff87] cursor-not-allowed"
+                                    }`}
+                                onClick={handleUploadDocuments}
+                                disabled={customerUploadDetails}
                             >
                                 Upload Documents
                             </button>
+                            {customerUploadDetails ? (
+                                <p className="mt-4 text-green-400 text-sm">Details and Documents uploaded successfully</p>
+                            ) : ""}
+
+                            {showFormPopup && <BookingPageFormPopup isOpen={showFormPopup} setIsOpen={setShowFormPopup} setUserFormData={setFormData} showUploadPopup={setShowUploadPopup} />}
+                            {showUploadPopup && <BookingPageUploadPopup isOpen={showUploadPopup} setIsOpen={setShowUploadPopup} setUserUploadData={setUploadDocData} />}
                         </div>
                     )}
                 </div>
@@ -864,7 +921,17 @@ function BookingPage() {
                             Book & Pay
                         </button>
                     </div>
-                ) : ""}
+                ) : (
+                    <div className="flex justify-center items-center">
+                        <button
+                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                            onClick={handlePayment}
+                            disabled={!customerUploadDetails}
+                        >
+                            Book & Pay
+                        </button>
+                    </div>
+                )}
             </div>
 
             <ConfirmPage

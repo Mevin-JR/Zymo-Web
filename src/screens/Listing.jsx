@@ -135,7 +135,8 @@ const Listing = () => {
 
                 const mychoizePromise = tripDurationHours < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
 
-                const firebasePromise = fetchFirebaseCars();
+                // const firebasePromise = fetchFirebaseCars();
+                const firebasePromise = null; // Temporarily Disabled
 
                 // Execute both API calls in parallel
                 const [zoomData, mychoizeData, firebaseData] = await Promise.allSettled([
@@ -180,7 +181,7 @@ const Listing = () => {
                     console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
                 }
 
-                if (firebaseData.status === "fulfilled") {
+                if (firebaseData.status === "fulfilled" && firebaseData.value) {
                     allCarData = [...allCarData, ...firebaseData.value];
                 } else {
                     console.error("Firebase API failed:", firebaseData.reason);
