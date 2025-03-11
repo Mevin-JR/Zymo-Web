@@ -20,6 +20,7 @@ const NewRSB = () => {
     const [fade, setFade] = useState(false);
     const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
     const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
+    const [disableBtn, setDisableBtn] = useState(false);
 
     const navigate = useNavigate();
 
@@ -69,7 +70,72 @@ const NewRSB = () => {
                     (component) => component.types.includes("locality")
                 );
                 setCity(cityComponent ? cityComponent.long_name : "");
+
+                // Update placeInput with the selected place's formatted address
+                setPlaceInput(placeDetails.formatted_address);
             }
+        }
+    };
+
+    const getCurrentLocation = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+
+                    // Use Google Maps Geocoding API to get the address
+                    fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${placesAPIKey}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "OK") {
+                                const placeDetails = data.results[0];
+                                const lat = latitude;
+                                const lng = longitude;
+                                setPlace({ name: placeDetails.formatted_address, lat, lng });
+
+                                const address = placeDetails.formatted_address.split(",");
+                                setAddress(
+                                    address.length > 2
+                                        ? `${address[0]}, ${address[1]}, ${address.at(-2)}`
+                                        : address
+                                );
+
+                                const cityComponent = placeDetails.address_components.find(
+                                    (component) => component.types.includes("locality")
+                                );
+                                setCity(cityComponent ? cityComponent.long_name : "");
+
+                                // Update the input field with the current location
+                                setPlaceInput(placeDetails.formatted_address);
+                                console.log("city", cityComponent);
+                                console.log("placeInput", placeInput);
+                                console.log("placeDetails.formatted_address", placeDetails.formatted_address);
+                            } else {
+                                toast.error("Unable to fetch location details", {
+                                    position: "top-center",
+                                    autoClose: 1000 * 5,
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            toast.error("Error fetching location details", {
+                                position: "top-center",
+                                autoClose: 1000 * 5,
+                            });
+                        });
+                },
+                (error) => {
+                    toast.error("Unable to retrieve your location", {
+                        position: "top-center",
+                        autoClose: 1000 * 5,
+                    });
+                }
+            );
+        } else {
+            toast.error("Geolocation is not supported by this browser", {
+                position: "top-center",
+                autoClose: 1000 * 5,
+            });
         }
     };
 
@@ -100,9 +166,23 @@ const NewRSB = () => {
         }
 
         const timeDifference = end - start;
-        if (timeDifference < 0) {
-            setTripDuration("0 Day(s) 0 Hour(s)");
+        // if (timeDifference < 0) {
+        //     setTripDuration("0 Day(s) 0 Hour(s)");
+        //     toast.error("Should greater than  0 Hour(s) !")
+        //     return;
+        // }
+
+        if (timeDifference < 8 * 60 * 60 * 1000) { // 8 hours in milliseconds
+            console.log("Time difference is less than 8 hours", timeDifference); // Debugging log
+            setTripDuration("Time should greater than 8+ hrs !");
+            setDisableBtn(true);
+            toast.error("End time should be greater than start time by at least 8 hours!", {
+                position: "top-center",
+                autoClose: 5000, // 5 seconds
+            });
             return;
+        } else {
+            setDisableBtn(false); // Enable the button if the condition is met
         }
 
         const totalHours = Math.floor(timeDifference / (1000 * 60 * 60));
@@ -204,9 +284,9 @@ const NewRSB = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-4 mx-auto w-full max-w-[90%] md:max-w-[80%]">
                     {/* Location Input */}
                     <LoadScriptNext googleMapsApiKey={placesAPIKey} libraries={placesAPILibraries}>
-                        <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full">
+                        <div className="flex items-center border border-gray-500 bg-[#212121] rounded-md px-4 py-2 w-full overflow-hidden">
                             {/* Icon */}
-                            <MapPinIcon className="w-5 h-5 text-gray-400 mr-2" />
+                            <MapPinIcon className="w-5 h-5 text-gray-400 mr-2 flex-shrink-0" />
 
                             {/* Input Field */}
                             <Autocomplete
@@ -217,18 +297,23 @@ const NewRSB = () => {
                                 <input
                                     type="text"
                                     placeholder="Enter a location"
-                                    className="bg-transparent text-white outline-none w-full placeholder-gray-400"
+                                    className="bg-transparent text-white outline-none w-full placeholder-gray-400 flex-grow truncate"
+                                    value={placeInput}
+                                    onChange={(e) => setPlaceInput(e.target.value)}
                                 />
                             </Autocomplete>
 
                             {/* Current Location Button */}
-                            <button className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2">
+                            <button
+                                className="flex items-center text-gray-300 hover:text-[#faffa4] ml-2 flex-shrink-0"
+                                onClick={() => getCurrentLocation()}
+                            >
                                 <img
                                     src="/images/Benefits/Group_1-removebg-preview.png"
                                     alt="Current Location"
                                     className="w-5 h-5 mr-1"
                                 />
-                                <span className="text-xs">Current Location</span>
+                                <span className="text-xs hidden sm:inline">Get Location</span>
                             </button>
                         </div>
                     </LoadScriptNext>
@@ -322,12 +407,25 @@ const NewRSB = () => {
 
                 {/* Search Button */}
                 <div className="mx-auto max-w-[90%] md:max-w-[50%] mb-7">
-                    <button
-                        onClick={handleSearch}
-                        className="w-full bg-[#faffa4] hover:bg-[#faffa8] text-black font-medium py-3 rounded-lg transition-colors"
-                    >
-                        Search
-                    </button>
+                    {disableBtn
+                        ? <button
+                            disabled
+                            onClick={handleSearch}
+                            className="w-full bg-[#faffa4] opacity-50 cursor-not-allowed
+ text-black font-medium py-3 rounded-lg transition-colors"
+                        >
+                            Search
+                        </button>
+                        :
+                        <button
+
+                            onClick={handleSearch}
+                            className="w-full bg-[#faffa4] hover:bg-[#faffa8] text-black font-medium py-3 rounded-lg transition-colors"
+                        >
+                            Search
+                        </button>
+                    }
+
                 </div>
             </div>
         </>

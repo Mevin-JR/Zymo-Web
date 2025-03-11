@@ -9,15 +9,31 @@ const getTotalKms = (tripDurationHours) => {
 };
 
 const findPackage = (rateBasis) => {
-    if (rateBasis === "FF") {
-        return "120km/day";
-    } else if (rateBasis === "MP") {
-        return "300km/day";
-    } else if (rateBasis === "DR") {
-        return "Unlimited Kms";
-    } else {
-        return "Undefined";
+    if (rateBasis === "FF") return "120km/day";
+    if (rateBasis === "MP") return "300km/day";
+    if (rateBasis === "DR") return "Unlimited KMs";
+    return "Undefined";
+};
+
+const formatDateForMyChoize = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date)) return null; // Handle invalid date input
+    return `\/Date(${date.getTime()}+0530)\/`;
+};
+
+const fetchWithRetry = async (url, options, retries = 5, delay = 500) => {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error("MyChoize API error");
+            return await response.json();
+        } catch (error) {
+            console.error(`Attempt ${i + 1} failed:`, error);
+            if (i < retries - 1)
+                await new Promise((res) => setTimeout(res, delay * (i + 1)));
+        }
     }
+    throw new Error("MyChoize API failed after multiple retries.");
 };
 
 const fetchSubscriptionCars = async (CityName, formattedPickDate, formattedDropDate) => {
@@ -85,23 +101,20 @@ const fetchMyChoizeCars = async (
     
 
     try {
-        const response = await fetch(`${apiUrl}/mychoize/search-cars`, {
-            method: "POST",
-            body: JSON.stringify({
-                data: {
-                    CityName,
-                    PickDate: formattedPickDate,
-                    DropDate: formattedDropDate,
-                },
-            }),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (!response.ok) throw new Error("MyChoize API error");
-
-        const mychoizeData = await response.json();
+        const mychoizeData = await fetchWithRetry(
+            `${apiUrl}/mychoize/search-cars`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    data: {
+                        CityName,
+                        PickDate: formattedPickDate,
+                        DropDate: formattedDropDate,
+                    },
+                }),
+                headers: { "Content-Type": "application/json" },
+            }
+        );
 
         if (!mychoizeData.SearchBookingModel) {
             console.error("MyChoize API response missing expected data.");
@@ -153,9 +166,7 @@ const fetchMyChoizeCars = async (
                 };
             }
 
-            // Assign fares to corresponding rate basis
             groupedCars[key].rateBasisFare[car.RateBasis] = car.TotalExpCharge;
-
             Object.values(groupedCars[key].rateBasisFare).forEach((fare) => {
                 if (!groupedCars[key].all_fares.includes(fare)) {
                     groupedCars[key].all_fares.push(fare);
@@ -168,58 +179,40 @@ const fetchMyChoizeCars = async (
             fare: `₹${Math.min(...car.all_fares)}`,
         }));
     } catch (error) {
-        console.error("MyChoize API failed:", error);
+        console.error(error.message);
         return [];
     }
 };
 
- let apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
-const createBooking = async (bookingDetails) => {
+const fetchMyChoizeLocationList = async (
+    city,
+    formattedDropDate,
+    formattedPickDate
+) => {
+    const apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    // const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+
     try {
-        const response = await fetch(`${apiUrl}/mychoize/create-booking`, {
+        const response = await fetch(`${apiUrl}/mychoize/location-list`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(bookingDetails),
+            body: JSON.stringify({
+                data: {
+                    CityName: city,
+                    PickDate: formattedPickDate,
+                    DropDate: formattedDropDate,
+                },
+            }),
+            headers: { "Content-Type": "application/json" },
         });
-
-        if (!response.ok) {
-            throw new Error("Failed to create booking");
-        }
-
-        const data = await response.json();
-        console.log(data);
-        return data;
+        return response.json();
     } catch (error) {
-        console.log(error);
-        console.error("Error creating booking:", error);
-        return { error: error.message };
+        console.error(error.message);
     }
 };
 
-const fetchLocations = async (City, pickupDateTime, dropoffDateTime) => {
-    try {
-      const response = await fetch(`${apiUrl}/mychoize/get-location-list`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          City,
-          PickupDateTime: pickupDateTime,
-          DropoffDateTime: dropoffDateTime, 
-
-        }),
-      });
-  
-      const data = await response.json();
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching locations:", error);
-    }
-  };
-  
-
-export { findPackage, fetchMyChoizeCars , fetchSubscriptionCars, createBooking,fetchLocations};
+export {
+    findPackage,
+    fetchMyChoizeCars,
+    fetchMyChoizeLocationList,
+    formatDateForMyChoize,
+};
