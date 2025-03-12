@@ -87,23 +87,21 @@ const Listing = () => {
                         const snapshot = await getDocs(collectionGroup(appDB, "uploadedCars"));
                         console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
 
-                        const filterdData = snapshot.docs
+                       // Inside fetchFirebaseCars function, modify the fare field:
+                            const filterdData = snapshot.docs
                             .map(doc => ({ id: doc.id, ...doc.data() }))
-                            // .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
                             .map(car => ({
-                                id: car.id,
-                                name: car.name,
-                                options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
-                                address: car.pickupLocation,
-                                fare: `₹${car.hourlyRate}/km`,
-                                actual_fare: car.kmRate,
-                                images: car.images,
-                                ratingData: { rating: 4.5 },
-                                trips: Math.floor(Math.random() * 50),
-                                type: "firebase",
-                                location_est: "Local Owner",
-                                source: "firebase",
-                                sourceImg: null
+                            id: car.id,
+                            name: car.name,
+                            options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
+                            address: car.pickupLocation,
+                            fare: `₹${car.hourlyRate * tripDurationHours}`, // Multiply by hours
+                            actual_fare: car.hourlyRate, // Store hourly rate if needed
+                            images: car.images,
+                            ratingData: { rating: 4.5 },
+                            trips: Math.floor(Math.random() * 50),
+                            type: "firebase",
+                            location_est: "Local Owner",
                             }));
 
                         return filterdData;
