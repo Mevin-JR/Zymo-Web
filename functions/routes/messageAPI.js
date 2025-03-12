@@ -1,14 +1,21 @@
 const express = require("express");
 const twilio = require("twilio");
 const dotenv = require("dotenv");
-const {sendWhatsAppMessage,sendTestDriveWhatsappMessage,sendExtendedTestDriveWhatsappMessage} = require("../config/twilio.js");
+const {
+    sendWhatsAppMessage,
+    sendTestDriveWhatsappMessage,
+    sendExtendedTestDriveWhatsappMessage,
+    sendWhatsAppMessageIncludeVendor,
+} = require("../config/twilio.js");
 const router = express.Router();
 dotenv.config();
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const client = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+);
 
-const verify_service_id_thr_whatsapp=process.env.TWILIO_VERIFY_SERVICE_SID;
-
+const verify_service_id_thr_whatsapp = process.env.TWILIO_VERIFY_SERVICE_SID;
 
 // API to send OTP via WhatsApp (fallback to SMS)
 router.post("/otp/send", async (req, res) => {
@@ -24,31 +31,38 @@ router.post("/otp/send", async (req, res) => {
             verification = await client.verify.v2
                 .services(verify_service_id_thr_whatsapp)
                 .verificationChecks.create({
-                    channel: 'whatsapp',
+                    channel: "whatsapp",
                     to: phone,
                 });
 
             // console.log("OTP Sent via WhatsApp:", verification.status);
-            return res.json({ message: "OTP sent via WhatsApp", verification: verification });
-
+            return res.json({
+                message: "OTP sent via WhatsApp",
+                verification: verification,
+            });
         } catch (whatsappError) {
-            console.error("WhatsApp OTP failed, falling back to SMS:", whatsappError.message);
-            
+            console.error(
+                "WhatsApp OTP failed, falling back to SMS:",
+                whatsappError.message
+            );
+
             verification = await client.verify.v2
                 .services(verify_service_id_thr_whatsapp)
                 .verifications.create({
-                    channel: 'sms',
+                    channel: "sms",
                     to: phone,
                 });
             // console.log("OTP Sent via SMS:", verification.status);
-            return res.json({ message: "OTP sent via SMS", verification: verification });
+            return res.json({
+                message: "OTP sent via SMS",
+                verification: verification,
+            });
         }
     } catch (error) {
         console.error("OTP sending failed:", error.message);
         return res.status(500).json({ error: error.message });
     }
 });
-
 
 // API to verify OTP
 router.post("/otp/verify", async (req, res) => {
@@ -68,19 +82,19 @@ router.post("/otp/verify", async (req, res) => {
                 to: `whatsapp:${phone}`,
                 code,
             });
-        
+
         // console.log("Verification Status:", verificationCheck.status);
 
         if (verificationCheck.status === "approved") {
-            return res.json({ 
+            return res.json({
                 message: "OTP Verified Successfully",
-                verificationCheck
+                verificationCheck,
             });
         } else {
-            return res.status(400).json({ 
-                message: "Invalid OTP", 
-                error: true ,
-                verificationCheck
+            return res.status(400).json({
+                message: "Invalid OTP",
+                error: true,
+                verificationCheck,
             });
         }
     } catch (error) {
@@ -94,30 +108,61 @@ router.post("/send-whatsapp-message", async (req, res) => {
     try {
         const { bookingData } = req.body;
 
-        if ( !bookingData) {
-            return res.status(400).json({ error: "Booking data are required." });
+        if (!bookingData) {
+            return res
+                .status(400)
+                .json({ error: "Booking data are required." });
         }
 
         const response = await sendWhatsAppMessage(bookingData);
-        res.status(200).json({ message: "WhatsApp message sent successfully.",response });
+        res.status(200).json({
+            message: "WhatsApp message sent successfully.",
+            response,
+        });
     } catch (error) {
         console.error("Error sending WhatsApp message:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
+router.post("/booking-confirmation", async (req, res) => {
+    try {
+        const { data } = req.body;
+        if (!data) {
+            return res.status(400).json({ error: "Booking data is required." });
+        }
+
+        const response = await Promise.allSettled([
+            sendWhatsAppMessage(data),
+            sendWhatsAppMessageIncludeVendor(data),
+        ]);
+
+        res.status(200).json({
+            message: "WhatsApp message sent successfully.",
+            response,
+        });
+    } catch (error) {
+        console.error("Error sending booking confirmation message:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 // API to send a WhatsApp message for test drive
 router.post("/test-drive-whatsapp-message", async (req, res) => {
     try {
         const { bookingData } = req.body;
 
-        if ( !bookingData && !bookingData.phone) {
-            return res.status(400).json({ error: "Booking data are required." });
+        if (!bookingData && !bookingData.phone) {
+            return res
+                .status(400)
+                .json({ error: "Booking data are required." });
         }
 
         const response = await sendTestDriveWhatsappMessage(bookingData);
-        res.status(200).json({ message: "WhatsApp message sent successfully.",response });
+        res.status(200).json({
+            message: "WhatsApp message sent successfully.",
+            response,
+        });
     } catch (error) {
         console.error("Error sending WhatsApp message:", error);
         res.status(500).json({ error: error.message });
@@ -129,12 +174,19 @@ router.post("/extended-test-drive-whatsapp-message", async (req, res) => {
     try {
         const { bookingData } = req.body;
 
-        if ( !bookingData && !bookingData.phone) {
-            return res.status(400).json({ error: "Booking data are required." });
+        if (!bookingData && !bookingData.phone) {
+            return res
+                .status(400)
+                .json({ error: "Booking data are required." });
         }
 
-        const response = await sendExtendedTestDriveWhatsappMessage(bookingData);
-        res.status(200).json({ message: "WhatsApp message sent successfully.",response });
+        const response = await sendExtendedTestDriveWhatsappMessage(
+            bookingData
+        );
+        res.status(200).json({
+            message: "WhatsApp message sent successfully.",
+            response,
+        });
     } catch (error) {
         console.error("Error sending WhatsApp message:", error);
         res.status(500).json({ error: error.message });

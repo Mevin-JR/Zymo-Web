@@ -31,6 +31,36 @@ router.get("/cities", async (req, res) => {
     res.json(data);
 });
 
+router.post("/location-list", async (req, res) => {
+    try {
+        const locationEndpoint = `${myChoizeUrl}ListingService/GetLocationList`;
+
+        let { PickDate, DropDate, CityName } = req.body.data;
+        if (!PickDate || !DropDate || !CityName) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const CityKey = await getCityKeyFromName(CityName);
+        if (!CityKey) {
+            return res.status(404).json({ error: "City not found" });
+        }
+
+        const requestBody = {
+            CityKey: parseInt(CityKey, 10),
+            DropDate,
+            PickDate,
+        };
+
+        const response = await axios.post(locationEndpoint, requestBody, {
+            headers,
+        });
+        res.json(response.data);
+    } catch (error) {
+        console.error("Error getting location list:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 async function getCityKeyFromName(cityName) {
     try {
         const cityData = await fetchData("ListingService/GetCityList");

@@ -12,6 +12,14 @@ const formatDate = (date) => {
         .replace(" at", "");
 };
 
+// 24hr to 12hr format
+const formatTo12 = (time) => {
+    let [hour, minutes] = time.split(":").map(Number);
+    let period = hour >= 12 ? "pm" : "am";
+    hour = hour % 12 || 12;
+    return `${hour}${period}`;
+};
+
 // String Formatting
 const toPascalCase = (str) => {
     return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
@@ -36,4 +44,4 @@ const formatFare = (fare) => {
     return `₹${formatter.format(fare)}`;
 };
 
-export { formatDate, toPascalCase, formatFare };
+export { formatDate, toPascalCase, formatFare, formatTo12 };

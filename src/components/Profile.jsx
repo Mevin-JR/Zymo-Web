@@ -29,7 +29,7 @@ const Profile = () => {
           </Link>
 
           {/* Your Bookings Section */}
-          <Link to="/mybookings">
+          <Link to="/my-bookings">
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <FaCar className="text-gray-700 text-lg" />

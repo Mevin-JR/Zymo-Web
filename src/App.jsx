@@ -29,6 +29,8 @@ import ExtendedTestDriveFormPage from "./pages/Buy/ExtendedTestDriveEnterInforma
 import ExtendedTestDriveUploadDocuments from "./pages/Buy/ExtendedTestDriveUploadDocuments";
 import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker";
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
+import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
+import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 
 const App = () => {
     return (
@@ -55,7 +57,6 @@ const App = () => {
                     />
 
                     {/* Page3 */}
-                    {/* Temporarily disabled */}
                     <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
 
                     {/* Page4 */}
@@ -79,7 +80,7 @@ const App = () => {
                     <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
                     <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
                     <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
-                    <Route path="/buy/upload-doc"element={<ExtendedTestDriveUploadDocuments />}/>
+                    <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments />} />
 
                     {/* Test Drive input form and confirm page */}
                     <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
@@ -100,19 +101,21 @@ const App = () => {
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:title" element={<BlogDetailPage />} />
-                    <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-                    <Route path="/details" element={<YourDetails />} />
+                    <Route path="/createblog/:id" element={<CreateBlogPage />} />
+                    <Route path="/createblog" element={<CreateEditBlogPage />} />
 
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/details" element={<YourDetails />} />
                     <Route
-                        path="/termsofservice"
+                        path="/terms-of-service"
                         element={<TermsofService />}
                     />
                     <Route
-                        path="/cancellationpolicy"
+                        path="/cancellation-policy"
                         element={<CancellationPolicy />}
                     />
                     <Route
-                        path="/mybookings"
+                        path="/my-bookings"
                         element={<MyBookings />}
                     />
                     <Route path="*" element={<ErrorPage />} />

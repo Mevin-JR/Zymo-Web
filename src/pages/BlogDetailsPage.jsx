@@ -1,23 +1,32 @@
-import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 
 const BlogDetailPage = () => {
-    const { title } = useParams();
-    const blogs = JSON.parse(sessionStorage.getItem("blogs"));
-    const blog = blogs.find((blog) => blog.title === title);
-
+    const [blog, setBlog] = useState(null);
     const navigate = useNavigate();
-    if (!blog) {
-        toast.error("Blog not found", {
-            position: "top-center",
-            autoClose: 1000 * 5,
-        });
-        navigate("/blogs");
-        return;
-    }
+
+    useEffect(() => {
+        const title = localStorage.getItem("selectedBlogTitle");
+        const blogs = JSON.parse(sessionStorage.getItem("blogs")) || [];
+
+        const foundBlog = blogs.find((b) => b.title === title);
+
+        if (!foundBlog) {
+            toast.error("Blog not found", {
+                position: "top-center",
+                autoClose: 5000,
+            });
+
+            navigate("/blogs", { replace: true });
+        } else {
+            setBlog(foundBlog);
+        }
+    }, [navigate]);
+
+    if (!blog) return null;
 
     const htmlParser = (htmlContent) => {
         const parser = new DOMParser();

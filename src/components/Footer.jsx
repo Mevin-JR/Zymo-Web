@@ -12,19 +12,14 @@ import React from "react";
 
 const Footer = () => {
     return (
-        <div className="text-white p-8 flex flex-wrap justify-around text-left">
+        <div className="text-white p-8 flex flex-row justify-between text-left gap-4 flex-wrap">
             {/* Contact Section */}
-            <div className="flex flex-col gap-2">
-                <div className="font-bold text-lg mb-2 text-[#faffa4]">
-                    Zymo
-                </div>
+            <div className="flex flex-col gap-2 min-w-[100px]">
+                <div className="font-bold text-lg mb-2 text-[#faffa4]">Zymo</div>
                 <p>Contact:</p>
                 <p>
                     Email:{" "}
-                    <a
-                        href="mailto:hello@zymo.app"
-                        className="hover:text-[#faffa4]"
-                    >
+                    <a href="mailto:hello@zymo.app" className="hover:text-[#faffa4]">
                         hello@zymo.app
                     </a>
                 </p>
@@ -37,34 +32,20 @@ const Footer = () => {
             </div>
 
             {/* About Section */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 min-w-[100px]">
                 <div className="font-bold text-lg mb-2">About</div>
-                <Link to="/about-us" className="hover:text-[#faffa4]">
-                    About Us
-                </Link>
-                <Link to="/contact-us" className="hover:text-[#faffa4]">
-                    Contact Us
-                </Link>
-                <Link to="/career" className="hover:text-[#faffa4]">
-                    Career
-                </Link>
+                <Link to="/about-us" className="hover:text-[#faffa4]">About Us</Link>
+                <Link to="/contact-us" className="hover:text-[#faffa4]">Contact Us</Link>
+                <Link to="/career" className="hover:text-[#faffa4]">Career</Link>
             </div>
 
             {/* Features Section */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 min-w-[100px]">
                 <div className="font-bold text-lg mb-2">Features</div>
-                <Link to="/blogs" className="hover:text-[#faffa4]">
-                    Blogs
-                </Link>
-                <Link to="/privacypolicy" className="hover:text-[#faffa4]">
-                    Privacy Policy
-                </Link>
-                <Link to="/termsofservice" className="hover:text-[#faffa4]">
-                    Terms of Service
-                </Link>
-                <Link to="/cancellationpolicy" className="hover:text-[#faffa4]">
-                    Cancellation Policy
-                </Link>
+                <Link to="/blogs" className="hover:text-[#faffa4]">Blogs</Link>
+                <Link to="/privacy-policy" className="hover:text-[#faffa4]">Privacy Policy</Link>
+                <Link to="/terms-of-service" className="hover:text-[#faffa4]">Terms of Service</Link>
+                <Link to="/cancellation-policy" className="hover:text-[#faffa4]">Cancellation Policy</Link>
             </div>
 
             {/* Install App Section */}

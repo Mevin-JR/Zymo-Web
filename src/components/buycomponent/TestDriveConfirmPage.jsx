@@ -23,7 +23,7 @@ const TestDriveConfirmPage = () => {
       });
 
       const data = await response.json();
-      console.log("WhatsApp Message Response:", data);
+      // console.log("WhatsApp Message Response:", data);
       localStorage.clear();
       sessionStorage.clear();
     } catch (error) {
@@ -55,7 +55,7 @@ const TestDriveConfirmPage = () => {
   
         // Add data to Firebase collection
         await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
-        console.log("Data uploaded to Firebase:", data);
+        // console.log("Data uploaded to Firebase:", data);
         } catch (error) {
         console.error("Error uploading documents to Firebase:", error);
       }
@@ -65,7 +65,7 @@ const TestDriveConfirmPage = () => {
   useEffect(() => {
     if (car && userData) {
       const bookingData = { ...car, ...userData }; 
-      console.log(bookingData);
+      // console.log("Booking Data:",bookingData);
       
       const hasUploaded = sessionStorage.getItem('dataUploaded');
       if (!hasUploaded && bookingData) {
@@ -78,6 +78,11 @@ const TestDriveConfirmPage = () => {
   }, [car, userData,sendWhatsAppMessage,uploadDataToFirebase]);
   
 
+  const handlesubmit = ()=>{
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/')
+  }
   return (
     <div className="flex items-center justify-center min-h-screen bg-[#212121]">
       <div className="w-full max-w-md p-6 bg-[#2c2c2c] border rounded-lg shadow-lg border-appColor text-center transform transition duration-300 hover:scale-105">
@@ -96,7 +101,7 @@ const TestDriveConfirmPage = () => {
         </p>
 
         <button
-          onClick={()=>navigate('/')}
+          onClick={handlesubmit}
           className="mt-6 bg-appColor text-[#212121] hover:bg-appColor py-2 px-4 rounded-lg text-lg font-semibold transition duration-300"
         >
           Go to Home
