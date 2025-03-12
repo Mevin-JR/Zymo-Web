@@ -31,6 +31,12 @@ const BlogsMainPage = () => {
         }
         getBlogs();
     }, []);
+
+    const refreshBlogs = () => {
+        setLoading(true);
+        getBlogs().then(() => setLoading(false));
+    }
+
     return (
         <>
             <NavBar />
@@ -39,9 +45,15 @@ const BlogsMainPage = () => {
                     <span className="text-blue-600">“</span> Blog{" "}
                     <span className="text-blue-600">”</span>
                 </h1>
-                <p className="text-center text-gray-300">
-                    India's Largest Aggregator For Self Drive Car Rental
-                </p>
+                <div className="relative w-full flex flex-row">
+                    <p className="text-gray-300 absolute left-1/2 -translate-x-1/2">
+                        India's Largest Aggregator For Self Drive Car Rental
+                    </p>
+
+                    <div className="text-white ml-auto">
+                        <button className="rounded-lg bg-[#faffa4] text-black py-1 px-3" onClick={refreshBlogs}>Refresh</button>
+                    </div>
+                </div>
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 w-full max-w-7xl mt-6">
                         {[...Array(9)].map((_, index) => (

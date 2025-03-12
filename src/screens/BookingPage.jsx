@@ -504,29 +504,32 @@ function BookingPage() {
 
                     // Payment successful
                     if (res.data.success) {
-                        handleMychoizeBooking(data);
-                        // setIsConfirmPopupOpen(true);
-                        // Create booking
-                        // createBooking(data).catch((error) => {
-                        //     console.error("Booking error:", error);
-                        //     console.log(
-                        //         "Initiating refund due to booking failure"
-                        //     );
-                        //     initiateRefund(data.razorpay_payment_id).then(
-                        //         (refundResponse) => {
-                        //             if (refundResponse.status === "processed") {
-                        //                 navigate("/");
-                        //                 toast.success(
-                        //                     "A refund has been processed, please check your mail for more details",
-                        //                     {
-                        //                         position: "top-center",
-                        //                         autoClose: 1000 * 10,
-                        //                     }
-                        //                 );
-                        //             }
-                        //         }
-                        //     );
-                        // });
+                        if (vendor === "Mychoize") {
+                            handleMychoizeBooking(data);
+                        } else if (vendor === "ZoomCar") {
+                            createBooking(data).catch((error) => {
+                                console.error("Booking error:", error);
+                                console.log(
+                                    "Initiating refund due to booking failure"
+                                );
+                                initiateRefund(data.razorpay_payment_id).then(
+                                    (refundResponse) => {
+                                        if (refundResponse.status === "processed") {
+                                            navigate("/");
+                                            toast.success(
+                                                "A refund has been processed, please check your mail for more details",
+                                                {
+                                                    position: "top-center",
+                                                    autoClose: 1000 * 10,
+                                                }
+                                            );
+                                        }
+                                    }
+                                );
+                            });
+                            // setIsConfirmPopupOpen(true);
+                        }
+
                     } else {
                         toast.error("Payment error, Please try again...", {
                             position: "top-center",

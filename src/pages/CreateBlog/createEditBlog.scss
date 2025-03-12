@@ -1,0 +1,64 @@
+.create-button {
+  display: blocks;
+  justify-content: space-between;
+  align-items: center;
+  text-align:center;
+
+  color: white;
+  > h1 {
+    padding-top:2rem;
+    margin: auto;
+    font-size: 4rem;
+    color: #673ab7;
+  }
+  .create-new-button {
+    background-image: linear-gradient(
+      to right,
+
+      #9b08fe,
+      #673ab7,
+      #9c27b0
+    );
+    border: none;
+    color: #fdf9f9;
+
+    font-weight: 600;
+    font-size: large;
+    padding: 1rem 2rem 1rem 2rem;
+    margin-top:3rem;
+    margin-bottom:3rem;
+    border-radius:20px;
+    width:auto; 
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+.edit-blogs-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 5rem;
+
+  color: white;
+
+  > p {
+    color: lightgray;
+    font-weight: 500;
+    margin-bottom: 3rem;
+  }
+  > .edit-blogs-cards-container {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    padding: 1rem 1rem;
+    @media screen and (max-width: 650px) {
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+  }
+}
