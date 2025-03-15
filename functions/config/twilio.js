@@ -79,7 +79,7 @@ async function sendWhatsAppMessageIncludeVendor(data) {
         });
 
         console.log(
-            `Vendor Booking Message sent to ${data.phone}: ${response.sid}`
+            `Vendor Booking Message sent to ${data.vendorPhone}: ${response.sid}`
         );
     } catch (error) {
         console.error(

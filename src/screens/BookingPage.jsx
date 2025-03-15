@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useCallback, useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
-import { formatDate, formatFare, toPascalCase } from "../utils/helperFunctions";
+import { formatDate, formatFare, retryFunction, toPascalCase } from "../utils/helperFunctions";
 import { fetchMyChoizeLocationList, findPackage, formatDateForMyChoize } from "../utils/mychoize";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { appDB, appStorage } from "../utils/firebase";
@@ -84,7 +84,7 @@ function BookingPage() {
         const discountPercent = parseFloat(vendorDetails?.DiscountSd) || 0;
         const deposit = parseInt(vendorDetails?.Securitydeposit) || 0;
 
-        const gstValue = rawFare * gstPercent;
+        const gstValue = gstPercent != 1 ? rawFare * gstPercent : 0;
         const discountValue = rawFare * (1 - discountPercent);
 
         setGst(gstValue);
@@ -120,13 +120,13 @@ function BookingPage() {
         },
         carDetails: {
             registration: vendorDetails?.plateColor || "N/A",
-            package: car.rateBasis === "DR" ? "Unlimited KMs" : findPackage(car.rateBasis),
+            package: findPackage(car.rateBasis),
             transmission: car.options[0],
             fuel: car.options[1],
             seats: car.options[2],
         },
         fareDetails: {
-            base: car.actual_fare ? car.actual_fare : formattedFare,
+            base: formattedFare,
             fare: formattedFare,
             gst: car.source === "zoomcar" ? "Incl. in Base Fare" : formatFare(gst),
             deposit: car.source === "zoomcar" ? "₹0" : formatFare(vendorDetails?.Securitydeposit),
@@ -134,9 +134,9 @@ function BookingPage() {
             payable_amount: formatFare(payableAmount),
         },
         customer: {
-            name: userData.name === null ? "N/A" : userData.name,
-            mobile: userData.phone === null ? "N/A" : userData.phone,
-            email: userData.email === null ? "N/A" : userData.email,
+            name: customerName || "N/A",
+            mobile: customerPhone || "N/A",
+            email: customerEmail || "N/A",
         },
     };
 
@@ -185,6 +185,15 @@ function BookingPage() {
 
     const uploadDocs = async (images) => {
         try {
+            if (!images) {
+                return {
+                    LicenseBack: null,
+                    LicenseFront: null,
+                    aadhaarBack: null,
+                    aadhaarFront: null,
+                }
+            }
+
             const timestamp = Date.now();
             const folderPath = `userImages/${formData.email}_${timestamp}`;
 
@@ -213,22 +222,9 @@ function BookingPage() {
         }
     }
 
-    // Sends whatsapp notif to both user and zymo
-    const sendWhatsappNotif = async (data) => {
-        setIsConfirmPopupOpen(true);
-        await fetch(`${functionsUrl}/message/booking-confirmation`, {
-            method: "POST",
-            body: JSON.stringify({
-                data
-            }),
-            headers: {
-                "Content-Type": "application/json",
-            }
-        });
-    }
-
-    const handleMychoizeBooking = async (data) => {
-        const bookingId = 'Z' + new Date().getTime().toString();
+    const saveSuccessfulBooking = async (paymentId, booking_id = null) => {
+        const formattedPhoneNumber = customerPhone.startsWith("+91") ? customerPhone : `+91${customerPhone}`;
+        const bookingId = booking_id || 'Z' + new Date().getTime().toString();
         const documents = await uploadDocs(uploadDocData);
 
         const bookingDataStructure = {
@@ -236,18 +232,18 @@ function BookingPage() {
             CarImage: car.images[0],
             CarName: car.name,
             City: city,
-            DateOfBirth: formData.dob,
+            DateOfBirth: formData?.dob || "",
             DateOfBooking: Date.now(),
             Documents: documents,
             Drive: "",
-            Email: formData.email,
+            Email: formData?.email || customerEmail,
             EndDate: endDateFormatted,
             EndTime: "",
-            FirstName: formData.userName,
+            FirstName: formData?.userName || customerName,
             MapLocation: car.address,
             "Package Selected": findPackage(car.rateBasis),
-            PhoneNumber: formData.phone,
-            "Pickup Location": selectedPickupLocation.LocationName,
+            PhoneNumber: formData?.phone || formattedPhoneNumber,
+            "Pickup Location": selectedPickupLocation?.LocationName || car.address,
             "Promo Code Used": "",
             SecurityDeposit: vendorDetails?.Securitydeposit,
             StartDate: startDateFormatted,
@@ -260,25 +256,31 @@ function BookingPage() {
             Vendor: vendor,
             Zipcode: "",
             actualPrice: parseInt(car.fare.slice(1)),
-            bookingId: bookingId,
-            deliveryType: selectedPickupLocation.LocationName.includes("Doorstep") ? "Doorstep Delivery" : "Self Pickup",
-            paymentId: data.razorpay_payment_id,
+            bookingId,
+            deliveryType: selectedPickupLocation?.LocationName?.includes("Doorstep") ? "Doorstep Delivery" : "Self Pickup",
+            paymentId,
             price: payableAmount
         }
 
         await addDoc(collection(appDB, "CarsPaymentSuccessDetails"), bookingDataStructure);
         setBookingData(bookingDataStructure);
 
-        const whatsappMsgStucture = {
+        return bookingId;
+    }
+
+    // Sends whatsapp notif to both user and zymo
+    const sendWhatsappNotif = async (bookingId) => {
+        const formattedPhoneNumber = customerPhone.startsWith("+91") ? customerPhone : `+91${customerPhone}`;
+        const data = {
             id: bookingId,
-            customerName: formData.userName,
-            dateOfBirth: formData.dob,
-            phone: formData.phone,
-            email: formData.email,
+            customerName: formData?.userName || customerName,
+            dateOfBirth: formData?.dob || "",
+            phone: formData?.phone || formattedPhoneNumber,
+            email: formData?.email || customerEmail,
             startDate: startDateFormatted,
             endDate: endDateFormatted,
             city: city,
-            pickupLocation: selectedPickupLocation.HubAddress,
+            pickupLocation: selectedPickupLocation?.HubAddress || car.address,
             amount: formatFare(payableAmount),
             vendorName: vendor,
             vendorPhone: "+919987933348", // TODO: Change this later
@@ -291,10 +293,55 @@ function BookingPage() {
             serviceType: "",
         }
 
-        sendWhatsappNotif(whatsappMsgStucture);
+        await fetch(`${functionsUrl}/message/booking-confirmation`, {
+            method: "POST",
+            body: JSON.stringify({
+                data
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
     }
 
-    const createBooking = async (paymentData) => {
+    // Booking handling
+    const handleMychoizeBooking = async (paymentData) => {
+        const bookingId = saveSuccessfulBooking(paymentData.razorpay_payment_id);
+        sendWhatsappNotif(bookingId);
+        setIsConfirmPopupOpen(true);
+    }
+
+    const handleZoomcarBooking = async (paymentData) => {
+
+        try {
+            const bookingId = await retryFunction(createBooking);
+            saveSuccessfulBooking(paymentData.razorpay_payment_id, bookingId);
+            sendWhatsappNotif(bookingId);
+            setIsConfirmPopupOpen(true);
+        } catch (error) {
+            console.error(error.message);
+            toast.error("Booking Creation Failed...", {
+                position: "top-center",
+                autoClose: 5000,
+            });
+        }
+        // initiateRefund(data.razorpay_payment_id).then(
+        //     (refundResponse) => {
+        //         if (refundResponse.status === "processed") {
+        //             navigate("/");
+        //             toast.success(
+        //                 "A refund has been processed, please check your mail for more details",
+        //                 {
+        //                     position: "top-center",
+        //                     autoClose: 1000 * 10,
+        //                 }
+        //             );
+        //         }
+        //     }
+        // );
+    }
+
+    const createBooking = async () => {
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
 
@@ -321,7 +368,7 @@ function BookingPage() {
                         lng: car.lng,
                         pricing_id: car.pricing_id,
                         starts: startDateEpoc,
-                    },
+                    }
                 }),
                 headers: {
                     "Content-Type": "application/json",
@@ -329,22 +376,16 @@ function BookingPage() {
             }
         );
 
-        console.log(response);
-
         if (!response.ok) {
-            toast.error("Booking creation failed, Please try again later...", {
-                position: "top-center",
-                autoClose: 1000 * 3,
-            });
             throw new Error(
                 `Error: ${response.status} - ${response.statusText}`
             );
         }
 
         const data = await response.json();
-        console.log(data);
+
         if (data.status !== 1) {
-            const msg = data.msg ? data.msg : "Something went wrong...";
+            const msg = data.msg || "Something went wrong...";
             toast.error(msg, {
                 position: "top-center",
                 autoClose: 1000 * 5,
@@ -354,18 +395,24 @@ function BookingPage() {
 
         toast.info("Booking process started...", {
             position: "top-center",
-            autoClose: 1000 * 3,
+            autoClose: 1000 * 5,
         });
 
         const bookingId = data.booking.confirmation_key;
         const amount = data.booking.fare.total_amount;
 
-        updateBookingPayment(bookingId, amount, paymentData);
+        const paymentUpdateData = await retryFunction(updateBookingPayment, [bookingId, amount]);
+        if (paymentUpdateData.status != 1) {
+            toast.error(paymentUpdateData.msg || "Error while payment update", {
+                position: "top-center",
+                autoClose: 1000 * 5,
+            });
+        }
+        return bookingId;
+
     };
 
-    const updateBookingPayment = async (bookingId, amount, paymentData) => {
-        let retry = 0;
-
+    const updateBookingPayment = async (bookingId, amount) => {
         const response = await fetch(`${functionsUrl}/zoomcar/payments`, {
             method: "POST",
             body: JSON.stringify({
@@ -375,12 +422,11 @@ function BookingPage() {
                     phone: customerPhone,
                     email: customerEmail,
                 },
-                city: city,
+                city,
                 bookingData: {
                     booking_id: bookingId,
                     amount: amount,
                 },
-                payment_data: paymentData,
             }),
             headers: {
                 "Content-Type": "application/json",
@@ -388,23 +434,13 @@ function BookingPage() {
         });
 
         if (!response.ok) {
-            if (retry <= 2) {
-                retry += 1;
-                updateBookingPayment(bookingId, amount, paymentData);
-                return;
-            }
-
-            toast.error("Payment confirmation failed...", {
-                position: "top-center",
-                autoClose: 1000 * 5,
-            });
             throw new Error(
-                `Error: ${response.status} - ${response.statusText}`
+                `${response.status} (${response.statusText})`
             );
         }
 
         const data = await response.json();
-        // TODO: Handle this
+        return data;
     };
 
     //Create order
@@ -462,11 +498,14 @@ function BookingPage() {
             });
             return false;
         }
-        setCustomerPhone(`+91${customerPhone}`);
         return true;
     };
 
     const handlePayment = async () => {
+        if (car.source != "mychoize" && !handleCustomerDetails()) {
+            return;
+        }
+
         await delay(1000);
         const res = await loadScript(
             "https://checkout.razorpay.com/v1/checkout.js"
@@ -482,8 +521,8 @@ function BookingPage() {
         }
 
         try {
-            // const amount = parseInt(car.fare.slice(1));
-            const orderData = await createOrder(payableAmount, "INR");
+            const amount = parseInt(payableAmount);
+            const orderData = await createOrder(amount, "INR");
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
                 amount: orderData.amount,
@@ -507,27 +546,7 @@ function BookingPage() {
                         if (vendor === "Mychoize") {
                             handleMychoizeBooking(data);
                         } else if (vendor === "ZoomCar") {
-                            createBooking(data).catch((error) => {
-                                console.error("Booking error:", error);
-                                console.log(
-                                    "Initiating refund due to booking failure"
-                                );
-                                initiateRefund(data.razorpay_payment_id).then(
-                                    (refundResponse) => {
-                                        if (refundResponse.status === "processed") {
-                                            navigate("/");
-                                            toast.success(
-                                                "A refund has been processed, please check your mail for more details",
-                                                {
-                                                    position: "top-center",
-                                                    autoClose: 1000 * 10,
-                                                }
-                                            );
-                                        }
-                                    }
-                                );
-                            });
-                            // setIsConfirmPopupOpen(true);
+                            handleZoomcarBooking(data);
                         }
 
                     } else {
@@ -851,7 +870,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerName(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your name"
                                 />
                             </div>
@@ -869,7 +888,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerPhone(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your phone number"
                                 />
                             </div>
@@ -885,7 +904,7 @@ function BookingPage() {
                                     onChange={(e) =>
                                         setCustomerEmail(e.target.value)
                                     }
-                                    className="p-2 rounded-lg bg-zinc-400 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
+                                    className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your email"
                                 />
                             </div>

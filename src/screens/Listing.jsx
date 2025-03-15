@@ -4,7 +4,7 @@ import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchMyChoizeCars, formatDateForMyChoize } from "../utils/mychoize";
-import { formatDate } from "../utils/helperFunctions";
+import { formatDate, retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 
@@ -87,23 +87,29 @@ const Listing = () => {
                         const snapshot = await getDocs(collectionGroup(appDB, "uploadedCars"));
                         console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
 
-                       // Inside fetchFirebaseCars function, modify the fare field:
-                            const filterdData = snapshot.docs
+                        const filterdData = snapshot.docs
                             .map(doc => ({ id: doc.id, ...doc.data() }))
+                            // .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
                             .map(car => ({
-                            id: car.id,
-                            name: car.name,
-                            options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
-                            address: car.pickupLocation,
-                            fare: `₹${car.hourlyRate * tripDurationHours}`, // Multiply by hours
-                            actual_fare: car.hourlyRate, // Store hourly rate if needed
-                            images: car.images,
-                            ratingData: { rating: 4.5 },
-                            trips: Math.floor(Math.random() * 50),
-                            type: "firebase",
-                            location_est: "Local Owner",
+                                id: car.id,
+                                name: car.name,
+                                brand: "",
+                                options: [car.transmissionType, car.fuelType, `${car.noOfSeats} Seats`],
+                                address: car.pickupLocation,
+                                images: car.images,
+                                fare: `₹${car.hourlyRate * tripDurationHours}`,
+                                actual_fare: car.hourlyRate * tripDurationHours,
+                                hourly_amount: car.id, hourlyRate,
+                                securityDeposit: car.securityDeposit,
+                                ratingData: { rating: 4.5 },
+                                trips: 0,
+                                location_est: "",
+                                source: "firebase",
+                                sourceImg: null,
                             }));
 
+
+                        console.log(filterdData);
                         return filterdData;
                     } catch (error) {
                         console.error("Error fetching Firebase cars:", error);
@@ -112,26 +118,35 @@ const Listing = () => {
                 };
 
                 // Fetch Zoomcar API
+                const fetchZoomcarData = async () => {
+                    const response = await fetch(`${url}/zoomcar/search`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            data: {
+                                city,
+                                lat,
+                                lng,
+                                fromDate: startDateEpoc,
+                                toDate: endDateEpoc,
+                            },
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
 
-                // const zoomPromise = fetch(`${url}/zoomcar/search`, {
-                //     method: "POST",
-                //     body: JSON.stringify({
-                //         data: {
-                //             city,
-                //             lat,
-                //             lng,
-                //             fromDate: startDateEpoc,
-                //             toDate: endDateEpoc,
-                //         },
-                //     }),
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                // }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
+                    if (!response.ok) {
+                        throw new Error("Zoomcar API Error");
+                    }
 
-                const zoomPromise = null; // Temporarily Disabled
+                    return response.json();
+                }
 
-                const mychoizePromise = tripDurationHours < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
+                const zoomPromise = retryFunction(fetchZoomcarData);
+
+                // const zoomPromise = null; // Temporarily Disabled
+
+                const mychoizePromise = parseInt(tripDurationHours) < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
 
                 // const firebasePromise = fetchFirebaseCars();
                 const firebasePromise = null; // Temporarily Disabled
@@ -148,10 +163,11 @@ const Listing = () => {
                 if (zoomData.status === "fulfilled" && zoomData.value) {
                     const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
                         id: car.car_data.car_id,
+                        cargroup_id: car.car_data.cargroup_id,
                         brand: car.car_data.brand,
                         name: car.car_data.name,
                         options: car.car_data.accessories,
-                        address: car.car_data.location.address,
+                        address: car.car_data.location.address || "",
                         location_id: car.car_data.location.location_id,
                         location_est: car.car_data.location.text,
                         lat: car.car_data.location.lat,
@@ -160,6 +176,7 @@ const Listing = () => {
                         actual_fare: car.car_data.pricing.fare_breakup
                             ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
                             : "000",
+                        pricing_id: car.car_data.pricing.id,
                         hourly_amount: car.car_data.pricing.payable_amount,
                         images: car.car_data.image_urls,
                         ratingData: car.car_data.rating_v3,

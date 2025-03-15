@@ -9,7 +9,7 @@ router.post("/create-order", async (req, res) => {
         if (!amount || !currency) {
             return res.status(400).json({
                 success: false,
-                message: "Amount and currency is  required.",
+                message: "Amount and currency is required.",
             });
         }
         const options = {

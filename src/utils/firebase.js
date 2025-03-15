@@ -38,7 +38,6 @@ const webFirebase =
     getApps().find((app) => app.name === "webFirebase") ||
     initializeApp(webFirebaseConfig, "webFirebase");
 const webDB = getFirestore(webFirebase);
-const webAuth = getAuth(webFirebase);
 const webStorage = getStorage(webFirebase);
 
-export { appDB, appAuth, appStorage, webDB, webAuth, webStorage };
+export { appDB, appAuth, appStorage, webDB, webStorage };
