@@ -93,25 +93,7 @@ const TestDriveConfirmPage = () => {
 
     processBooking();
   }, [car, userData, sendWhatsAppMessage, uploadDataToFirebase]);
-
-  useEffect(() => {
-    if (car && userData) {
-      const bookingData = { ...car, ...userData }; 
-      // console.log("Booking Data:",bookingData);
-      
-      const hasUploaded = sessionStorage.getItem('dataUploaded');
-      if (!hasUploaded && bookingData) {
-        console.log("Booking Data:",bookingData);
-        
-        sendWhatsAppMessage(bookingData); 
-        uploadDataToFirebase(bookingData); 
-        
-        sessionStorage.setItem('dataUploaded', 'true');
-      }
-    }
-  }, [car, userData,sendWhatsAppMessage,uploadDataToFirebase]);
   
-
   const handlesubmit = ()=>{
     localStorage.clear();
     sessionStorage.clear();
