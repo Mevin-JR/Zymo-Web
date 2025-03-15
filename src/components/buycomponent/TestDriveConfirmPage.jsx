@@ -1,5 +1,5 @@
 import { useLocation ,useNavigate  } from 'react-router-dom';
-import { useEffect,useCallback } from 'react';
+import { useEffect,useCallback,useRef } from 'react';
 
 import { collection, addDoc } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
@@ -7,6 +7,8 @@ import { webDB } from "../../utils/firebase";
 const TestDriveConfirmPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isProcessing = useRef(false);
+  const processingComplete = useRef(false);
 
   const { car, userData } = location.state || {};  
   
@@ -14,7 +16,7 @@ const TestDriveConfirmPage = () => {
 
   const sendWhatsAppMessage = useCallback(async (bookingData) => {
     try {
-      const response = await fetch(`${functionsUrl}/test-drive-whatsapp-message`, {
+      const response = await fetch(`${functionsUrl}/message/test-drive-whatsapp-message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +34,7 @@ const TestDriveConfirmPage = () => {
   },[functionsUrl]);
 
     // Upload data to Firebase
-    const uploadDataToFirebase = useCallback(async(bookingData) => {
+  const uploadDataToFirebase = useCallback(async(bookingData) => {
       try {
           
         const data = {
@@ -59,9 +61,39 @@ const TestDriveConfirmPage = () => {
         } catch (error) {
         console.error("Error uploading documents to Firebase:", error);
       }
-    },[]);
+  },[]);
 
     
+  useEffect(() => {
+    const processBooking = async () => {
+      if (!car || !userData || isProcessing.current || processingComplete.current) {
+        return;
+      }
+
+      try {
+        isProcessing.current = true;
+        const bookingData = { 
+          ...car, 
+          ...userData,
+        };
+
+        await Promise.all([
+          sendWhatsAppMessage(bookingData),
+          uploadDataToFirebase(bookingData)
+        ]);
+
+        processingComplete.current = true;
+
+      } catch (error) {
+        console.error('Error processing booking:', error);
+      } finally {
+        isProcessing.current = false;
+      }
+    };
+
+    processBooking();
+  }, [car, userData, sendWhatsAppMessage, uploadDataToFirebase]);
+
   useEffect(() => {
     if (car && userData) {
       const bookingData = { ...car, ...userData }; 
@@ -69,6 +101,8 @@ const TestDriveConfirmPage = () => {
       
       const hasUploaded = sessionStorage.getItem('dataUploaded');
       if (!hasUploaded && bookingData) {
+        console.log("Booking Data:",bookingData);
+        
         sendWhatsAppMessage(bookingData); 
         uploadDataToFirebase(bookingData); 
         
