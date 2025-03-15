@@ -2,9 +2,36 @@ import { FaUser, FaSignOutAlt } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCar } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
+import { appAuth } from "../utils/firebase";
+import { toast } from "react-toastify";
 
 const Profile = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    const user = appAuth.currentUser;
+    if (user) {
+      appAuth.signOut().then(() => {
+        toast.success("Logged Out...", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+        navigate("/");
+      }).catch((error) => {
+        console.error(error);
+        toast.error(error.message || "Something went wrong...", {
+          position: "top-center",
+          autoClose: 5000
+        })
+      })
+    } else {
+      toast.error("Not signed in..", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    }
+  }
+
   return (
     <>
       <button
@@ -42,7 +69,7 @@ const Profile = () => {
           <hr className="border-gray-600 my-3" />
 
           {/* Logout Section */}
-          <div className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer">
+          <div className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer" onClick={handleLogout}>
             <FaSignOutAlt className="text-lg mr-3" />
             <span className="font-medium">Log Out</span>
           </div>

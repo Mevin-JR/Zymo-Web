@@ -128,6 +128,7 @@ router.post("/send-whatsapp-message", async (req, res) => {
 router.post("/booking-confirmation", async (req, res) => {
     try {
         const { data } = req.body;
+
         if (!data) {
             return res.status(400).json({ error: "Booking data is required." });
         }
