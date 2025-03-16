@@ -336,7 +336,7 @@ const ExtendedTestDriveUploadDocuments = () => {
       // Add data to Firebase collection
       await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
       setBookingData(data)
-      console.log("Data uploaded to Firebase:", data);
+      // console.log("Data uploaded to Firebase:", data);
 
       toast.dismiss()
       setIsConfirmed(true);          
