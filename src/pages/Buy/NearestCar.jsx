@@ -14,10 +14,8 @@ const NearestCar = () => {
 
   const [filteredCars, setFilteredCars] = useState("Electric");
   const [allCars, setAllCars] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchResults,setSearchResults]=useState(allCars)
-
-  // Fetch all cars initially and store them in state
+  const [searchResults, setSearchResults] = useState([]);
+  
   useEffect(() => {
     const fetchCarsData = async () => {
       try {
@@ -26,8 +24,7 @@ const NearestCar = () => {
 
         const cars = querySnapshot.docs.map((doc) => doc.data());
         setAllCars(cars); 
-      
-        setFilteredData(cars.filter((car) => car.type === "Electric"));
+        setSearchResults(cars);  // Store all cars in searchResults
       } catch (err) {
         console.error("Error fetching cars data:", err);
       }
@@ -36,12 +33,11 @@ const NearestCar = () => {
     fetchCarsData();
   }, []);
 
+  // Update filtered cars and search results whenever the filter or search changes
   useEffect(() => {
-    if (filteredCars) {
-      const filtered = allCars.filter((car) => car.type === filteredCars);
-      setSearchResults(filtered); 
-    }
-  }, [filteredCars, allCars]); 
+    const filtered = allCars.filter((car) => car.type === filteredCars);
+    setSearchResults(filtered);
+  }, [filteredCars, allCars]);
 
   return (
     <>
@@ -60,8 +56,16 @@ const NearestCar = () => {
           <SearchBar setSearchResults={setSearchResults} />
         </div>
       </div>
-      <Filter setFilterCar={setFilteredCars} /> {/* Pass setter function */}
-      <Cards cars={filteredData} />
+      <Filter setFilterCar={setFilteredCars} />
+
+      {searchResults.length > 0 ? (
+        <Cards cars={searchResults} /> 
+      ) : (
+        <div className="flex justify-center items-center h-[60vh] p-4 bg-darkGrey">
+          <p className="text-white text-xl font-semibold">No cars at the moment. Please try another filter</p>
+        </div>  
+      )}
+      
       <Footer />
     </>
   );

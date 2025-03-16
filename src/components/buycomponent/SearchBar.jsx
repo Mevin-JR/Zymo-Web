@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import {carData} from "../../api/NewCarData"
 const SearchBar = ({ setSearchResults }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -7,9 +7,6 @@ const SearchBar = ({ setSearchResults }) => {
   const setSearchResultsChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    // setSearchResults(query);
-
-    // Update the search results
     if (query) {
       const filteredCars = carData.filter(car =>
         car.name.toLowerCase().includes(query.toLowerCase()) ||

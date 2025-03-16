@@ -31,6 +31,8 @@ import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
 import   SubscriptionFormPage from "./components/SubscribeInfo";
 import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
+import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
+import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 
 const App = () => {
     return (
@@ -103,10 +105,11 @@ const App = () => {
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:title" element={<BlogDetailPage />} />
-                  
+                    <Route path="/createblog/:id" element={<CreateBlogPage />} />
+                    <Route path="/createblog" element={<CreateEditBlogPage />} />
+
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/details" element={<YourDetails />} />
-
                     <Route
                         path="/terms-of-service"
                         element={<TermsofService />}

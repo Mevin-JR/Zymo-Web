@@ -93,19 +93,23 @@ const Listing = () => {
                             .map(car => ({
                                 id: car.id,
                                 name: car.name,
-                                options: [car.fuelType, car.transmissionType, `${car.minBookingDuration} ${car.unit}`],
+                                brand: "",
+                                options: [car.transmissionType, car.fuelType, `${car.noOfSeats} Seats`],
                                 address: car.pickupLocation,
-                                fare: `₹${car.hourlyRate}/km`,
-                                actual_fare: car.kmRate,
                                 images: car.images,
+                                fare: `₹${car.hourlyRate * tripDurationHours}`,
+                                actual_fare: car.hourlyRate * tripDurationHours,
+                                hourly_amount: car.id, hourlyRate,
+                                securityDeposit: car.securityDeposit,
                                 ratingData: { rating: 4.5 },
-                                trips: Math.floor(Math.random() * 50),
-                                type: "firebase",
-                                location_est: "Local Owner",
+                                trips: 0,
+                                location_est: "",
                                 source: "firebase",
-                                sourceImg: null
+                                sourceImg: null,
                             }));
 
+
+                        console.log(filterdData);
                         return filterdData;
                     } catch (error) {
                         console.error("Error fetching Firebase cars:", error);
@@ -141,7 +145,11 @@ const Listing = () => {
                    },
                 }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
-                const mychoizePromise = tripDurationHours < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
+                 zoomPromise = retryFunction(fetchZoomcarData);
+
+                // const zoomPromise = null; // Temporarily Disabled
+
+                const mychoizePromise = parseInt(tripDurationHours) < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
 
                 // const firebasePromise = fetchFirebaseCars();
                 const firebasePromise = null; // Temporarily Disabled
@@ -156,10 +164,11 @@ const Listing = () => {
                 if (zoomData.status === "fulfilled" && zoomData.value) {
                     const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
                         id: car.car_data.car_id,
+                        cargroup_id: car.car_data.cargroup_id,
                         brand: car.car_data.brand,
                         name: car.car_data.name,
                         options: car.car_data.accessories,
-                        address: car.car_data.location.address,
+                        address: car.car_data.location.address || "",
                         location_id: car.car_data.location.location_id,
                         location_est: car.car_data.location.text,
                         lat: car.car_data.location.lat,
@@ -168,6 +177,7 @@ const Listing = () => {
                         actual_fare: car.car_data.pricing.fare_breakup
                             ? car.car_data.pricing.fare_breakup[0].fare_item[0].value
                             : "000",
+                        pricing_id: car.car_data.pricing.id,
                         hourly_amount: car.car_data.pricing.payable_amount,
                         images: car.car_data.image_urls,
                         ratingData: car.car_data.rating_v3,

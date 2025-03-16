@@ -1,0 +1,47 @@
+.edit-blog-card-container {
+  width: 25vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  img {
+    height: 17rem;
+    width: 100%;
+    border-radius: 15px;
+    object-fit: cover;
+  }
+
+  span {
+    background-image: linear-gradient(to right, #9b08fe, #673ab7, #9c27b0);
+    color: #fdf9f9;
+    padding: 0.3rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bolder;
+  }
+
+  .no-category {
+    padding: 0.7rem 0.5rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+  }
+
+  p {
+    word-break: break-all;
+    font-size: small;
+    color: rgb(154, 153, 153);
+  }
+
+  @media screen and (max-width: 960px) {
+    width: 29vw;
+  }
+
+  @media screen and (max-width: 800px) {
+    width: 45vw;
+  }
+
+  @media screen and (max-width: 650px) {
+    width: 75vw;
+  }
+}

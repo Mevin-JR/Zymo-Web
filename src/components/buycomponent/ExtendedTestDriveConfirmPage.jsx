@@ -1,15 +1,17 @@
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect,useCallback } from 'react';
+import { useEffect,useCallback ,useRef} from 'react';
 
 const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
   const navigate = useNavigate();
+  const isProcessing = useRef(false);
+  const processingComplete = useRef(false);
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
 
   const sendWhatsAppMessage = useCallback(async (bookingData) => {
     try {
-      const response = await fetch(`${functionsUrl}/extended-test-drive-whatsapp-message`, {
+      const response = await fetch(`${functionsUrl}/message/extended-test-drive-whatsapp-message`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -27,22 +29,35 @@ const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
   },[functionsUrl]);
 
   useEffect(() => {
-    const hasUploaded = sessionStorage.getItem('dataUploaded');
-    if ( !hasUploaded && bookingData) {      
-      sendWhatsAppMessage(bookingData);  
+    const processBooking = async () => {
+      if (!isOpen || !bookingData || isProcessing.current || processingComplete.current) {
+        return;
+      }
 
-      sessionStorage.setItem('dataUploaded', 'true');
-    }
-  }, [bookingData,sendWhatsAppMessage]);
+      try {
+        isProcessing.current = true;
+        await sendWhatsAppMessage(bookingData);
+        processingComplete.current = true;
+        console.log('Extended test drive booking processed successfully');
+      } catch (error) {
+        console.error('Error processing extended test drive booking:', error);
+      } finally {
+        isProcessing.current = false;
+      }
+    };
 
-  if (!isOpen) return null;
-
+    processBooking();
+  }, [isOpen, bookingData, sendWhatsAppMessage]);
 
   // Handle button click
   const handleConfirm = () => {
-    close(); 
-    navigate("/"); 
+    localStorage.clear();
+    sessionStorage.clear();
+    close();
+    navigate("/");
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
