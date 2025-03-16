@@ -31,6 +31,8 @@ import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
+import Agent from "./components/Agent.jsx";
+import AgentPage from "./components/AgentPage.jsx";
 
 const App = () => {
     return (
@@ -117,6 +119,14 @@ const App = () => {
                     <Route
                         path="/my-bookings"
                         element={<MyBookings />}
+                    />
+                    <Route
+                        path="/agent-login"
+                        element={<Agent />}
+                    />
+                    <Route
+                        path="/agent-info"
+                        element={<AgentPage/>}
                     />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
