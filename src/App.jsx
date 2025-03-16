@@ -103,6 +103,7 @@ const App = () => {
                     {/* Blogs  */}
                     <Route path="/blogs" element={<BlogsMainPage />} />
                     <Route path="/blogs/:title" element={<BlogDetailPage />} />
+                  
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/details" element={<YourDetails />} />
 

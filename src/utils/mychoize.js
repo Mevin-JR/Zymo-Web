@@ -215,4 +215,5 @@ export {
     fetchMyChoizeCars,
     fetchMyChoizeLocationList,
     formatDateForMyChoize,
+    fetchSubscriptionCars
 };

@@ -12,11 +12,6 @@ const formatDate = (date) => {
         .replace(" at", "");
 };
 
-const formatDateForMyChoize = (dateString) => {
-    const date = new Date(dateString);
-    if (isNaN(date)) return null; // Handle invalid date input
-    return `\/Date(${date.getTime()}+0530)\/`;
-};
 
 // 24hr to 12hr format
 const formatTo12 = (time) => {
@@ -49,5 +44,30 @@ const formatFare = (fare) => {
 
     return `₹${formatter.format(fare)}`;
 };
+// Retry functions
+const retryFunction = async (fn, args = [], maxRetries = 3, delay = 100) => {
+    let retry = 0;
 
-export { formatDate, toPascalCase, formatFare, formatTo12 ,formatDateForMyChoize};
+    while (retry <= maxRetries) {
+        try {
+            return await fn(...args);
+        } catch (error) {
+            console.error(`Attempt ${retry + 1} failed: ${error.message}`);
+            retry++;
+
+            if (retry > maxRetries) {
+                throw new Error(
+                    `Max retry attempts reached. Last error: ${error.message}`
+                );
+            }
+
+            // exponential backoff (100ms, 200ms, 400ms, ...)
+            await new Promise((resolve) =>
+                setTimeout(resolve, delay * 2 ** retry)
+            );
+        }
+    }
+};
+
+export { formatDate, toPascalCase, formatFare, formatTo12, retryFunction };
+

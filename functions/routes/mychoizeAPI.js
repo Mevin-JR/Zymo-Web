@@ -105,12 +105,9 @@ router.post("/search-cars", async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-router.post("/get-location-list", async (req, res) => {
+router.post("/location-list", async (req, res) => {
     try {
         const { City, PickupDateTime, DropoffDateTime } = req.body;
-
-        // Debugging log: Check received request body
-        console.log("Received Request Data:", { City, PickupDateTime, DropoffDateTime });
 
         if (!City || !PickupDateTime || !DropoffDateTime) {
             console.error("Missing required parameters:", { City, PickupDateTime, DropoffDateTime });
@@ -130,10 +127,7 @@ router.post("/get-location-list", async (req, res) => {
             DropoffDateTime,
         };
         const response = await axios.post(apiUrl, requestData, { headers });
-        res.json({
-            pickupLocations: response.data.BranchesPickupLocationList || [],
-            dropoffLocations: response.data.BranchesDropupLocationList || [],
-        });
+        res.json(response.data);
 
     } catch (error) {
         console.error("Error fetching location list:", {message: error.message});
@@ -156,7 +150,6 @@ router.post("/create-booking", async (req, res) => {
             PickRegionKey,
             ...rest,
         };
-        console.log("Booking Data:", bookingData);
         const response = await axios.post(`${myChoizeUrl}BookingService/CreateBooking`, bookingData, { headers });
         return res.status(200).json(response.data);
     } catch (error) {

@@ -4,7 +4,7 @@ import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchMyChoizeCars, formatDateForMyChoize ,fetchSubscriptionCars} from "../utils/mychoize";
-import { formatDate } from "../utils/helperFunctions";
+import { formatDate,retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 
@@ -113,7 +113,7 @@ const Listing = () => {
                     }
                 };
 
-                  let allCarData = [];
+            let allCarData = [];
 
             if (activeTab === "subscribe") {
                 // Fetch only subscription cars if activeTab is "subscribe"
@@ -125,23 +125,21 @@ const Listing = () => {
                 }
             } else {
 
-                // const zoomPromise = fetch(`${url}/zoomcar/search`, {
-                //     method: "POST",
-                //     body: JSON.stringify({
-                //         data: {
-                //             city,
-                //             lat,
-                //             lng,
-                //             fromDate: startDateEpoc,
-                //             toDate: endDateEpoc,
-                //         },
-                //     }),
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //     },
-                // }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
-
-                const zoomPromise = null; // Temporarily Disabled
+                const zoomPromise = fetch(`${url}/zoomcar/search`, {
+                    method: "POST",
+                     body: JSON.stringify({
+                         data: {
+                             city,
+                             lat,
+                             lng,
+                             fromDate: startDateEpoc,
+                             toDate: endDateEpoc,
+                         },
+                     }),
+                     headers: {
+                 "Content-Type": "application/json",
+                   },
+                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
 
                 const mychoizePromise = tripDurationHours < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
 
@@ -178,6 +176,7 @@ const Listing = () => {
                         sourceImg: "/images/ServiceProvider/zoomcarlogo.png",
                         rateBasis: "DR"
                     }));
+                    console.log("Zoomcar Data:", zoomCarData);
                     allCarData = [...allCarData, ...zoomCarData];
                 } else {
                     console.error("Zoomcar API failed:", zoomData.reason);
