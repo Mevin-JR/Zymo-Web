@@ -29,14 +29,18 @@ const Footer = () => {
                         +91 9987933348
                     </a>
                 </p>
+               
             </div>
 
             {/* About Section */}
             <div className="flex flex-col gap-2 min-w-[100px]">
+            
                 <div className="font-bold text-lg mb-2">About</div>
                 <Link to="/about-us" className="hover:text-[#faffa4]">About Us</Link>
                 <Link to="/contact-us" className="hover:text-[#faffa4]">Contact Us</Link>
                 <Link to="/career" className="hover:text-[#faffa4]">Career</Link>
+                <Link to="/agent-login" className="hover:text-[#faffa4]">Agent-Login</Link>
+                
             </div>
 
             {/* Features Section */}
