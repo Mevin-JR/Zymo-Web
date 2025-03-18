@@ -9,6 +9,16 @@ import { webDB, webStorage, appAuth } from "../utils/firebase"; // Import Fireba
 import { collection, addDoc, query, where, getDocs} from "firebase/firestore"; // Firestore functions
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
 
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'Button Clicked',
+    label: label, 
+  });
+}
+
+
 export default function YourDetails() {
   const [formData, setFormData] = useState({
     name: "",
@@ -115,6 +125,7 @@ export default function YourDetails() {
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
+    UserNavigation("Account Deleted");
   };
 
   // Function to upload a file to Firebase Storage and return its download URL
@@ -157,6 +168,8 @@ export default function YourDetails() {
       const docRef = await addDoc(collection(webDB, "webUserProfiles"), userProfile);
       console.log("Document written with ID: ", docRef.id);
       setIsSaved(true); // Set saved state instead of alert
+
+      UserNavigation("Profile Saved");
     } catch (error) {
       console.error("Error saving profile: ", error);
       alert("Failed to save profile. Please try again.");
