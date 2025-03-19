@@ -23,30 +23,33 @@ const TermsofService = () => {
                     <p className=" mb-4">
                         This Terms of Service Agreement (the "Agreement")
                         governs your use of this Website/Mobile Application,
-                        www.zymo.app (the "Website/Mobile Application "), Rent
-                        Aggregators Pvt Ltd ("Business Name") offer of products
+                        www.zymo.app (the "Website/Mobile Application "), 
+                        Zep Tepi Technologies Pvt Ltd
+                         ("Business Name") offer of products
                         for rent on this Website/Mobile Application. This
                         Agreement includes, and incorporates by this reference,
-                        the policies and guidelines referenced below. Rent
-                        Aggregators Pvt Ltd reserves the right to change or
+                        the policies and guidelines referenced below. 
+                        Zep Tepi Technologies Pvt Ltd
+                         reserves the right to change or
                         revise the terms and conditions of this Agreement at any
                         time by posting any changes or a revised Agreement on
-                        this Website/Mobile Application. Rent Aggregators Pvt
-                        Ltd will alert you that changes or revisions have been
+                        this Website/Mobile Application. Zep Tepi Technologies Pvt Ltd
+                         will alert you that changes or revisions have been
                         made by indicating on the top of this Agreement the date
                         it was last revised. The changed or revised Agreement
                         will be effective immediately after it is posted on this
                         Website/Mobile Application. Your use of the
                         Website/Mobile Application following the posting any
                         such changes or of a revised Agreement will constitute
-                        your acceptance of any such changes or revisions. Rent
-                        Aggregators Pvt Ltd encourages you to review this
+                        your acceptance of any such changes or revisions.
+                        Zep Tepi Technologies Pvt Ltd
+                        encourages you to review this
                         Agreement whenever you visit the Website/Mobile
                         Application to make sure that you understand the terms
                         and conditions governing use of the Website/Mobile
                         Application. This Agreement does not alter in any way
                         the terms or conditions of any other written agreement
-                        you may have with Rent Aggregators Pvt Ltd for other
+                        you may have with Zep Tepi Technologies Pvt Ltd for other
                         products or services. If you do not agree to this
                         Agreement (including any referenced policies or
                         guidelines), please immediately terminate your use of
@@ -62,8 +65,9 @@ const TermsofService = () => {
                     </p>
                     <p className=" mb-4">
                         Customer Solicitation: Unless you notify our or Alliance
-                        Partners or third-party call center reps or direct Rent
-                        Aggregators Pvt Ltd , while they are calling you, of
+                        Partners or third-party call center reps or 
+                        direct Zep Tepi Technologies Pvt Ltd
+                         , while they are calling you, of
                         your desire to opt out from further direct company
                         communications and solicitations, you are agreeing to
                         continue to receive further emails and call
@@ -86,11 +90,10 @@ const TermsofService = () => {
                         marketing materials of Alliance Partners. This
                         Website/Mobile Application also offers information, both
                         directly and through indirect links to third-party
-                        Website/Mobile Application s, about its products. Rent
-                        Aggregators Pvt Ltd does not always create the
+                        Website/Mobile Applications, about its products. Zep Tepi Technologies Pvt Ltd does not always create the
                         information offered on this Website/Mobile Application;
                         instead the information is often gathered from other
-                        sources. To the extent that Rent Aggregators Pvt Ltd
+                        sources. To the extent that Zep Tepi Technologies Pvt Ltd
                         does create the content on this Website/Mobile
                         Application, such content is protected by intellectual
                         property laws of the India, foreign nations, and
@@ -101,9 +104,9 @@ const TermsofService = () => {
                         noncommercial use. Any links to third-party
                         Website/Mobile Application s or persons associated with
                         us in the name of Alliance Partners are provided solely
-                        as a convenience to you Rent Aggregators Pvt Ltd does
+                        as a convenience to you Zep Tepi Technologies Pvt Ltd does
                         not endorse the contents on any such third-party
-                        Website/Mobile Application s. Rent Aggregators Pvt Ltd
+                        Website/Mobile Application s. Zep Tepi Technologies Pvt Ltd
                         is not responsible for the content of or any damage that
                         may result from your access to or reliance on these
                         third-party Website/Mobile Application s. If you link to
@@ -111,8 +114,8 @@ const TermsofService = () => {
                         your own risk.
                     </p>
                     <p className=" mb-4">
-                        Use of Website/Mobile Application: Rent Aggregators Pvt
-                        Ltd is not responsible for any damages resulting from
+                        Use of Website/Mobile Application: Zep Tepi Technologies Pvt Ltd
+                        is not responsible for any damages resulting from
                         use of this Website/Mobile Application by anyone. You
                         will not use the Website/Mobile Application for illegal
                         purposes. You will (1) abide by all applicable local,
@@ -137,116 +140,96 @@ const TermsofService = () => {
                         Application. You may not copy, reproduce, transmit,
                         distribute, or create derivative works of such content
                         or information without express written authorization
-                        from Rent Aggregators Pvt Ltd or the applicable third
+                        from Zep Tepi Technologies Pvt Ltd or the applicable third
                         party (if third party content is at issue).
                     </p>
                     <p className=" mb-4">
                         Posting: By posting, storing, or transmitting any
                         content on the Website/Mobile Application, you hereby
-                        grant Rent Aggregators Pvt Ltd a perpetual, worldwide,
+                        grant Zep Tepi Technologies Pvt Ltd a perpetual, worldwide,
                         non-exclusive, royalty-free, assignable, right and
                         license to use, copy, display, perform, create
                         derivative works from, distribute, have distributed,
                         transmit and assign such content in any form, in all
                         media now known or hereinafter created, anywhere in the
-                        world. Rent Aggregators Pvt Ltd does not have the
+                        world. Zep Tepi Technologies Pvt Ltd does not have the
                         ability to control the nature of the user-generated
                         content offered through the Website/Mobile Application
                         and nor of its products. You are solely responsible for
                         your interactions with other users of the Website/Mobile
-                        Application and any content you post. Rent Aggregators
-                        Pvt Ltd is not liable for any damage or harm resulting
-                        from any posts by or interactions between users. Rent
-                        Aggregators Pvt Ltd reserves the right, but has no
+                        Application and any content you post. Zep Tepi Technologies Pvt Ltd
+                         is not liable for any damage or harm resulting
+                        from any posts by or interactions between users. 
+                        Zep Tepi Technologies Pvt Ltd 
+                        reserves the right, but has no
                         obligation, to monitor interactions between and among
                         users of the Website/Mobile Application and to remove
-                        any content Rent Aggregators Pvt Ltd deems
+                        any content Zep Tepi Technologies Pvt Ltd deems
                         objectionable, in its sole discretion.
                     </p>
                     <p className=" mb-4">Ⅲ. DISCLAIMER OF WARRANTIES</p>
                     <p className=" mb-4">
-                        YOUR USE OF THIS WEBSITE/MOBILE APPLICATION AND/OR
-                        PRODUCTS FOR RENT ARE AT YOUR RISK AND ASSOCIATED WITH
-                        THE ALLIANCE PARTNER WITH WHOM WE WILL BE ASSOCIATED
-                        WITH. THE WEBSITE/MOBILE APPLICATION AND PRODUCTS ARE
-                        OFFERED ON RENT AN "AS IS" AND "AS AVAILABLE" BASIS.
-                        Rent Aggregators Pvt Ltd IS MERE A EXPRESSLY DISCLAIMS
-                        ALL WARRANTIES OF ANY KIND, WHETHER EXPRESS OR IMPLIED,
-                        INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
-                        MERCHANTABILITY, PRODUCT WARRANTY FOR A PARTICULAR
-                        PURPOSE AND NON-INFRINGEMENT WITH RESPECT TO THE
-                        PRODUCTS OR WEBSITE/MOBILE APPLICATION CONTENT, OR ANY
-                        RELIANCE UPON OR USE OF THE WEBSITE/MOBILE APPLICATION
-                        CONTENT OR PRODUCTS. ("PRODUCTS" INCLUDE TRIAL
-                        PRODUCTS.)
+                    Your use of this website/mobile application and/or products for rent are at your risk and associated with the alliance partner with whom we will be associated with. The website/mobile application and products are offered on rent an "as is" and "as available" basis. Zep Tepi Technologies Pvt Ltd is mere a expressly disclaims all warranties of any kind, whether express or implied, including, but not limited to, implied warranties of merchantability, product warranty for a particular purpose and non-infringement with respect to the products or website/mobile application content, or any reliance upon or use of the website/mobile application content or products. ("products" include trial products.)
                     </p>
                     <p className=" mb-4">
-                        WITHOUT LIMITING THE GENERALITY OF THE FOREGOING, Rent
-                        Aggregators Pvt Ltd MAKES NO WARRANTY.
+                    Without limiting the generality of the foregoing, Zep tepi technologies pvt ltd  makes no warranty.
                     </p>
                     <p className=" mb-4">
-                        THAT THE INFORMATION PROVIDED ON THIS WEBSITE/MOBILE
-                        APPLICATION IS ACCURATE, RELIABLE, COMPLETE, OR TIMELY.
+                    That the information provided on this website/mobile application is accurate, reliable, complete, or timely.
                     </p>
                     <p className=" mb-4">
-                        THAT THE LINKS TO THIRD-PARTY WEBSITE/MOBILE APPLICATION
-                        S ARE TO INFORMATION THAT IS ACCURATE, RELIABLE,
-                        COMPLETE, OR TIMELY.
+                    That the links to third-party website/mobile application s are to information that is accurate, reliable, complete, or timely.
                     </p>
                     <p className=" mb-4">
-                        NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN,
-                        OBTAINED BY YOU FROM THIS WEBSITE/MOBILE APPLICATION
-                        WILL CREATE ANY WARRANTY NOT EXPRESSLY STATED HEREIN.
+                    No advice or information, whether oral or written, obtained by you from this website/mobile application will create any warranty not expressly stated herein.
                     </p>
                     <p className=" mb-4">
-                        AS TO THE RESULTS THAT MAY BE OBTAINED FROM THE USE OF
-                        THE PRODUCTS OR THAT DEFECTS IN PRODUCTS WILL BE
-                        CORRECTED BY ALLIANCE PARTNERS ONLY.
+                    As to the results that may be obtained from the use of the products or that defects in products will be corrected by alliance partners only.
                     </p>
                     <p className=" mb-4">
-                        REGARDING ANY PRODUCTS OBTAINED ON RENT THROUGH THE
-                        WEBSITE/MOBILE APPLICATION Rent Aggregators Pvt Ltd WILL
-                        NOT BE RESPONSIBLE ON THE FULLFILLMENT AND YOU WILL HAVE
-                        TO ADHERE TO THE TERMS AND CONDITIONS OF THE ALLIANCE
-                        PARTNER WHOES PRODUCT YOU WILL OBATAIN ON RENT.
+                    Regarding any products obtained on rent through the website/mobile application Zep Tepi Technologies Pvt Ltd will not be responsible on the fullfillment and you will have to adhere to the terms and conditions of the alliance partner whoes product you will obtain on rent.
                     </p>
                     <p className=" mb-4">
-                        SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CERTAIN
-                        WARRANTIES, SO SOME OF THE ABOVE EXCLUSIONS MAY NOT
-                        APPLY TO YOU.
+                    Some jurisdictions do not allow the exclusion of certain warranties, so some of the above exclusions may not apply to you.
                     </p>{" "}
                     <p className=" mb-4">Ⅳ. LIMITATION OF LIABILITY</p>{" "}
                     <p className=" mb-4">
-                        Rent Aggregators Pvt Ltd ENTIRE LIABILITY, AND YOUR
-                        EXCLUSIVE REMEDY, IN LAW, IN EQUITY, OR OTHWERWISE, WITH
-                        RESPECT TO THE WEBSITE/MOBILE APPLICATION CONTENT AND
-                        PRODUCTS AND/OR FOR ANY BREACH OF THIS AGREEMENT IS
-                        SOLELY LIMITED TO THE AMOUNT YOU PAID, LESS SHIPPING AND
-                        HANDLING, FOR PRODUCTS HIRED ON RENT VIA THE
-                        WEBSITE/MOBILE APPLICATION.
+                    Zep tepi technologies pvt ltd entire liability, and your
+                        exclusive remedy, in law, in equity, or othwerwise, with
+                        respect to the website/mobile application content and
+                        products and/or for any breach of this agreement is
+                        solely limited to the amount you paid, less shipping and
+                        handling, for products hired on rent via the
+                        website/mobile application.
+
                     </p>{" "}
                     <p className=" mb-4">
-                        Rent Aggregators Pvt Ltd WILL NOT BE LIABLE FOR ANY
-                        DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL
-                        DAMAGES IN CONNECTION WITH THIS AGREEMENT OR THE
-                        PRODUCTS IN ANY MANNER, INCLUDING LIABILITIES RESULTING
-                        FROM (1) THE USE OR THE INABILITY TO USE THE
-                        WEBSITE/MOBILE APPLICATION CONTENT OR PRODUCTS; (2) THE
-                        COST OF PROCURING SUBSTITUTE PRODUCTS OR CONTENT; (3)
-                        ANY PRODUCTS HIRED ON RENT OR OBTAINED OR TRANSACTIONS
-                        ENTERED INTO THROUGH THE WEBSITE/MOBILE APPLICATION ; OR
-                        (4) ANY LOST PROFITS YOU ALLEGE.
+                    Zep tepi technologies pvt ltd will not be liable for any
+                        direct, indirect, incidental, special or consequential
+                        damages in connection with this agreement or the
+                        products in any manner, including liabilities resulting
+                        from (1) the use or the inability to use the
+                        website/mobile application content or products; (2) the
+                        cost of procuring substitute products or content; (3)
+                        any products hired on rent or obtained or transactions
+                        entered into through the website/mobile application ; or
+                        (4) any lost profits you allege.
+
+
+
                     </p>{" "}
                     <p className=" mb-4">
-                        SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OR
-                        EXCLUSION OF LIABILITY FOR INCIDENTAL OR CONSEQUENTIAL
-                        DAMAGES SO SOME OF THE ABOVE LIMITATIONS MAY NOT APPLY
-                        TO YOU.
+                    Some jurisdictions do not allow the limitation or
+                        exclusion of liability for incidental or consequential
+                        damages so some of the above limitations may not apply
+                        to you.
+
+
                     </p>{" "}
                     <p className=" mb-4">Ⅴ. INDEMNIFICATION</p>{" "}
                     <p className=" mb-4">
                         You will release, indemnify, defend and hold harmless
-                        Rent Aggregators Pvt Ltd , and any of its contractors,
+                        Zep Tepi Technologies Pvt Ltd , and any of its contractors,
                         agents, employees, officers, directors, shareholders,
                         affiliates and assigns from all liabilities, claims,
                         damages, costs and expenses, including reasonable
@@ -259,23 +242,20 @@ const TermsofService = () => {
                         intellectual property or other proprietary right of any
                         person or entity; (5) your violation of any provision of
                         this Agreement; or (6) any information or data you
-                        supplied to Rent Aggregators Pvt Ltd . When Rent
-                        Aggregators Pvt Ltd is threatened with suit or sued by a
-                        third party, Rent Aggregators Pvt Ltd may seek written
+                        supplied to Zep Tepi Technologies Pvt Ltd . When Zep Tepi Technologies Pvt Ltd is threatened with suit or sued by a
+                        third party, Zep Tepi Technologies Pvt Ltd may seek written
                         assurances from you concerning your promise to indemnify
-                        Rent Aggregators Pvt Ltd ; your failure to provide such
-                        assurances may be considered by Rent Aggregators Pvt Ltd
-                        to be a material breach of this Agreement. Rent
-                        Aggregators Pvt Ltd will have the right to participate
+                        Zep Tepi Technologies Pvt Ltd ; your failure to provide such
+                        assurances may be considered by Zep Tepi Technologies Pvt Ltd
+                        to be a material breach of this Agreement. Zep Tepi Technologies Pvt Ltd will have the right to participate
                         in any defense by you of a third-party claim related to
                         your use of any of the Website/Mobile Application
-                        content or Products, with counsel of Rent Aggregators
-                        Pvt Ltd choice at its expense. Rent Aggregators Pvt Ltd
+                        content or Products, with counsel of Zep Tepi Technologies Pvt Ltd
+                        choice at its expense. Zep Tepi Technologies Pvt Ltd
                         will reasonably cooperate in any defense by you of a
                         third-party claim at your request and expense. You will
-                        have sole responsibility to defend Rent Aggregators Pvt
-                        Ltd against any claim, but you must receive Rent
-                        Aggregators Pvt Ltd prior written consent regarding any
+                        have sole responsibility to defend Zep Tepi Technologies Pvt Ltd
+                         against any claim, but you must receive Zep Tepi Technologies Pvt Ltd prior written consent regarding any
                         related settlement. The terms of this provision will
                         survive any termination or cancellation of this
                         Agreement or your use of the Website/Mobile Application
@@ -291,7 +271,7 @@ const TermsofService = () => {
                     </p>
                     <p className=" mb-4">Ⅶ. GENERAL</p>
                     <p className=" mb-4">
-                        Force Majeure. Rent Aggregators Pvt Ltd will not be
+                        Force Majeure. Zep Tepi Technologies Pvt Ltd will not be
                         deemed in default hereunder or held responsible for any
                         cessation, interruption or delay in the performance of
                         its obligations hereunder due to earthquake, flood,
@@ -300,20 +280,20 @@ const TermsofService = () => {
                         boycott.
                     </p>{" "}
                     <p className=" mb-4">
-                        Cessation of Operation. Rent Aggregators Pvt Ltd may at
+                        Cessation of Operation. Zep Tepi Technologies Pvt Ltd may at
                         any time, in its sole discretion and without advance
                         notice to you, cease operation of the Website/Mobile
                         Application and distribution of the Products.
                     </p>{" "}
                     <p className=" mb-4">
                         Entire Agreement. This Agreement comprises the entire
-                        agreement between you and Rent Aggregators Pvt Ltd and
+                        agreement between you and Zep Tepi Technologies Pvt Ltd and
                         supersedes any prior agreements pertaining to the
                         subject matter contained herein.
                     </p>{" "}
                     <p className=" mb-4">
-                        Effect of Waiver. The failure of Rent Aggregators Pvt
-                        Ltd to exercise or enforce any right or provision of
+                        Effect of Waiver. The failure of Zep Tepi Technologies Pvt Ltd
+                        to exercise or enforce any right or provision of
                         this Agreement will not constitute a waiver of such
                         right or provision. If any provision of this Agreement
                         is found by a court of competent jurisdiction to be
@@ -328,8 +308,7 @@ const TermsofService = () => {
                         Application originates from the Mumbai, Maharashtra.
                         This Agreement will be governed by the laws of the State
                         of Maharashtra without regard to its conflict of law
-                        principles to the contrary. Neither you nor Rent
-                        Aggregators Pvt Ltd will commence or prosecute any suit,
+                        principles to the contrary. Neither you nor Zep Tepi Technologies Pvt Ltd will commence or prosecute any suit,
                         proceeding or claim to enforce the provisions of this
                         Agreement, to recover damages for breach of or default
                         of this Agreement, or otherwise arising under or by
@@ -359,25 +338,25 @@ const TermsofService = () => {
                         THIS AGREEMENT MUST BE ASSERTED INDIVIDUALLY.
                     </p>{" "}
                     <p className=" mb-4">
-                        Termination. Rent Aggregators Pvt Ltd reserves the right
+                        Termination. Zep Tepi Technologies Pvt Ltd reserves the right
                         to terminate your access to the Website/Mobile
                         Application if it reasonably believes, in its sole
                         discretion, that you have breached any of the terms and
                         conditions of this Agreement. Following termination, you
                         will not be permitted to use the Website/Mobile
-                        Application and Rent Aggregators Pvt Ltd may, in its
+                        Application and Zep Tepi Technologies Pvt Ltd may, in its
                         sole discretion and without advance notice to you,
                         cancel any outstanding orders for Products. If your
                         access to the Website/Mobile Application is terminated,
-                        Rent Aggregators Pvt Ltd reserves the right to exercise
+                        Zep Tepi Technologies Pvt Ltd reserves the right to exercise
                         whatever means it deems necessary to prevent
                         unauthorized access of the Website/Mobile Application.
                         This Agreement will survive indefinitely unless and
-                        until Rent Aggregators Pvt Ltd chooses, in its sole
+                        until Zep Tepi Technologies Pvt Ltd chooses, in its sole
                         discretion and without advance to you, to terminate it.
                     </p>{" "}
                     <p className=" mb-4">
-                        Domestic Use. Rent Aggregators Pvt Ltd makes no
+                        Domestic Use. Zep Tepi Technologies Pvt Ltd makes no
                         representation that the Website/Mobile Application or
                         Products are appropriate or available for use in
                         locations outside India. Users who access the
@@ -385,8 +364,7 @@ const TermsofService = () => {
                         their own risk and initiative and must bear all
                         responsibility for compliance with any applicable local
                         laws. Assignment. You may not assign your rights and
-                        obligations under this Agreement to anyone. Rent
-                        Aggregators Pvt Ltd may assign its rights and
+                        obligations under this Agreement to anyone. Zep Tepi Technologies Pvt Ltd may assign its rights and
                         obligations under this Agreement in its sole discretion
                         and without advance notice to you.
                     </p>{" "}
