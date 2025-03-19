@@ -129,23 +129,32 @@ const Listing = () => {
                 }
             } else {
 
-                const zoomPromise = fetch(`${url}/zoomcar/search`, {
-                    method: "POST",
-                     body: JSON.stringify({
-                         data: {
-                             city,
-                             lat,
-                             lng,
-                             fromDate: startDateEpoc,
-                             toDate: endDateEpoc,
-                         },
-                     }),
-                     headers: {
-                 "Content-Type": "application/json",
-                   },
-                }).then((res) => (res.ok ? res.json() : Promise.reject("Zoomcar API error")));
+                // Fetch Zoomcar API
+                const fetchZoomcarData = async () => {
+                    const response = await fetch(`${url}/zoomcar/search`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            data: {
+                                city,
+                                lat,
+                                lng,
+                                fromDate: startDateEpoc,
+                                toDate: endDateEpoc,
+                            },
+                        }),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
 
-                 zoomPromise = retryFunction(fetchZoomcarData);
+                    if (!response.ok) {
+                        throw new Error("Zoomcar API Error");
+                    }
+
+                    return response.json();
+                }
+
+                const zoomPromise = retryFunction(fetchZoomcarData);
 
                 // const zoomPromise = null; // Temporarily Disabled
 

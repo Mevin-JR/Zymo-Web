@@ -107,33 +107,34 @@ router.post("/search-cars", async (req, res) => {
 });
 router.post("/location-list", async (req, res) => {
     try {
-        const { City, PickupDateTime, DropoffDateTime } = req.body;
+        const locationEndpoint = `${myChoizeUrl}ListingService/GetLocationList`;
 
-        if (!City || !PickupDateTime || !DropoffDateTime) {
-            console.error("Missing required parameters:", { City, PickupDateTime, DropoffDateTime });
-            return res.status(400).json({ error: "Missing required parameters" });
+        let { PickDate, DropDate, CityName } = req.body.data;
+        if (!PickDate || !DropDate || !CityName) {
+            return res.status(400).json({ error: "Missing required fields" });
         }
 
-        const CityKey = getCityKey(City);
+        const CityKey = await getCityKeyFromName(CityName);
         if (!CityKey) {
-            console.error("City not found:", City);
-            return res.status(404).json({ error: "City not found in database" });
+            return res.status(404).json({ error: "City not found" });
         }
 
-        const apiUrl = `${myChoizeUrl}ListingService/GetLocationList`;
-        const requestData = {
-            CityKey,
-            PickupDateTime,
-            DropoffDateTime,
+        const requestBody = {
+            CityKey: parseInt(CityKey, 10),
+            DropDate,
+            PickDate,
         };
-        const response = await axios.post(apiUrl, requestData, { headers });
-        res.json(response.data);
 
+        const response = await axios.post(locationEndpoint, requestBody, {
+            headers,
+        });
+        res.json(response.data);
     } catch (error) {
-        console.error("Error fetching location list:", {message: error.message});
-        res.status(500).json({ error: "Internal server error", details: error.response?.data || error.message });
+        console.error("Error getting location list:", error);
+        res.status(500).json({ error: error.message });
     }
 });
+
 
 
 // Create Booking API
