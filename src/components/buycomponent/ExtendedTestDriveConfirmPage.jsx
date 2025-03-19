@@ -20,7 +20,7 @@ const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
       });
 
       const data = await response.json();
-      console.log("WhatsApp Message Response:", data);
+      // console.log("WhatsApp Message Response:", data);
       localStorage.clear();
       sessionStorage.clear();
     } catch (error) {
