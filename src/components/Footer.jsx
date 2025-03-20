@@ -4,8 +4,6 @@ import {
     Instagram,
     Linkedin,
     Youtube,
-    Mail,
-    Phone,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactGA from 'react-ga4';
