@@ -14,12 +14,12 @@ const PrivacyPolicy = () => {
                     <hr />
                     <br />
                     <p className=" mb-4">
-                        RENT AGGREGATORS PVT LTD (hereinafter mentioned as RAPL)
+                        Zep Tepi Technologies Pvt Ltd (hereinafter mentioned as ZTTPL)
                         respect your privacy. This Privacy Policy outlines the
-                        manner your data is collected and used by RAPL. You are
+                        manner your data is collected and used by ZTTPL. You are
                         advised to please read the Privacy Policy carefully. By
-                        accessing the services provided by RAPL you agree to the
-                        collection and use of your data by RAPL in the manner
+                        accessing the services provided by ZTTPL you agree to the
+                        collection and use of your data by ZTTPL in the manner
                         provided in this Privacy Policy.
                     </p>
                     <p className=" mb-4">
@@ -28,8 +28,8 @@ const PrivacyPolicy = () => {
                         send us an email at hello@zymo.app The Policy does not
                         apply to the procedures and practices followed by
                         entities that are not managed, owned or controlled by
-                        RAPL or to the people that are not engaged, employed or
-                        managed by RAPL.
+                        ZTTPL or to the people that are not engaged, employed or
+                        managed by ZTTPL.
                     </p>
                     <p className=" mb-4">
                         Through this Document, We Wish to Make you: Feel at ease
@@ -41,7 +41,7 @@ const PrivacyPolicy = () => {
                         <b>Information that may be collected from You:</b>
                     </p>
                     <p className=" mb-4">
-                        RAPL collects the details provided by you on
+                        ZTTPL collects the details provided by you on
                         registration together with information we learn about
                         you from your use of our service and your visits to our
                         website.

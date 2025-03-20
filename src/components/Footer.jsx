@@ -38,17 +38,15 @@ const Footer = () => {
                         +91 9987933348
                     </a>
                 </p>
-               
             </div>
 
             {/* About Section */}
             <div className="flex flex-col gap-2 min-w-[100px]">
-            
                 <div className="font-bold text-lg mb-2">About</div>
                 <Link to="/about-us" className="hover:text-[#faffa4]" onClick={()=>trackFooterLinkClick("About Us")}>About Us</Link>
                 <Link to="/contact-us" className="hover:text-[#faffa4]" onClick={()=>trackFooterLinkClick("Contact Us")}>Contact Us</Link>
                 <Link to="/career" className="hover:text-[#faffa4]" onClick={()=>trackFooterLinkClick("Career")}>Career</Link>
-                <Link to="/agent-login" className="hover:text-[#faffa4]" onClick={()=>trackFooterLinkClick("Agent-Login")}>Agent-Login</Link>
+                <Link to="/agent-login" className="hover:text-[#faffa4]" onClick={()=>trackFooterLinkClick("Agent-Panel")}>Agent-Panel</Link>
                 
             </div>
 
@@ -151,7 +149,12 @@ const Footer = () => {
                     >
                         <Youtube size={30} />
                     </a>
+                    {/* Copyright Section */}
+            
                 </div>
+            </div>
+            <div className="w-full text-center mt-4 text-gray-400 text-sm">
+                &copy; ZEP TEPI TECHNOLOGIES PVT LTD
             </div>
         </div>
     );
