@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route , useLocation } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
 import HomeScreen from "./screens/HomeScreen";
@@ -33,11 +34,14 @@ import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
 import AgentPage from "./components/AgentPage.jsx";
+import PageTracker from "./components/PageTracker.jsx";
 
-const App = () => {
+const App = () => {   
+    
     return (
         <>
             <BrowserRouter>
+                <PageTracker />
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
                 <Routes>
                     {/* HomePage urls */}

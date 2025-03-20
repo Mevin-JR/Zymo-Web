@@ -3,6 +3,16 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import UpcomingBookingCard from "./UpcomingBookingCard";
 import PastBookings from "./PastBookings";
+import ReactGA from 'react-ga4';
+
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'Button Clicked',
+    label: label, 
+  });
+}
 
 export default function MyBookings() {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -19,7 +29,10 @@ export default function MyBookings() {
             className={`${
               activeTab === "upcoming" ? "text-[#faffa4]" : "text-gray-400"
             } cursor-pointer hover:text-white`}
-            onClick={() => setActiveTab("upcoming")}
+            onClick={() => {
+              setActiveTab("upcoming")
+              UserNavigation("Upcoming Bookings"); 
+            }}
           >
             Upcoming
           </button>
@@ -27,7 +40,11 @@ export default function MyBookings() {
             className={`${
               activeTab === "past" ? "text-[#faffa4]" : "text-gray-400"
             } cursor-pointer hover:text-white`}
-            onClick={() => setActiveTab("past")}
+            onClick={() => {
+              setActiveTab("past"); 
+              UserNavigation("Past Bookings"); 
+            }}
+          
           >
             Past
           </button>
@@ -35,7 +52,10 @@ export default function MyBookings() {
             className={`${
               activeTab === "cancelled" ? "text-[#faffa4]" : "text-gray-400"
             } cursor-pointer hover:text-white`}
-            onClick={() => setActiveTab("cancelled")}
+            onClick={() => {
+              setActiveTab("cancelled")
+              UserNavigation("Cancelled Bookings"); 
+            }}
           >
             Cancelled
           </button>
