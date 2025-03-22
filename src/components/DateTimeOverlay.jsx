@@ -62,7 +62,7 @@ const [hour, setHour] = useState(get12HourFormat(currHours)); // Initialize with
                     </label>
                     <input
                         type="date"
-                        className="border p-2 rounded bg-[#212121]  text-white w-full sm:w-auto"
+                        className=" p-2 rounded bg-[#404040]  text-white w-full sm:w-auto"
                         value={selectedDate.toLocaleDateString("en-CA")}
                         onChange={(e) =>
                             setSelectedDate(new Date(e.target.value))

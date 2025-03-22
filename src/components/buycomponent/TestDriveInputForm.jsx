@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import {countryCodes} from "../../api/CountryCode"
 
-export default function Extended_TestDriveFormPage() {
+export default function TestDriveFormPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -96,7 +96,7 @@ export default function Extended_TestDriveFormPage() {
 
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl p-2 md:text-4xl font-bold text-appColor">
-            Extended Test Drive Booking
+             Test Drive Booking
           </h1>
         </div>
 
