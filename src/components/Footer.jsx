@@ -1,3 +1,4 @@
+import React from "react";
 import {
     Facebook,
     Twitter,
@@ -8,9 +9,16 @@ import {
     Phone,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import React from "react";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 const Footer = () => {
+    const trackEvent = useTrackEvent();
+
+    const handleFooterClicks =(label)=>{
+        trackEvent("Foooter new Section","Footer Link Clicked!",label);
+
+    }
+
     return (
         <div className="text-white p-8 flex flex-row justify-between text-left gap-4 flex-wrap">
             {/* Contact Section */}
@@ -19,13 +27,13 @@ const Footer = () => {
                 <p>Contact:</p>
                 <p>
                     Email:{" "}
-                    <a href="mailto:hello@zymo.app" className="hover:text-[#faffa4]">
+                    <a href="mailto:hello@zymo.app" className="hover:text-[#faffa4]" onClick={()=> handleFooterClicks("Email")}>
                         hello@zymo.app
                     </a>
                 </p>
                 <p>
                     Phone:{" "}
-                    <a href="tel:9987933348" className="hover:text-[#faffa4]">
+                    <a href="tel:9987933348" className="hover:text-[#faffa4]" onClick={()=> handleFooterClicks("Phone")}>
                         +91 9987933348
                     </a>
                 </p>
@@ -34,18 +42,18 @@ const Footer = () => {
             {/* About Section */}
             <div className="flex flex-col gap-2 min-w-[100px]">
                 <div className="font-bold text-lg mb-2">About</div>
-                <Link to="/about-us" className="hover:text-[#faffa4]">About Us</Link>
-                <Link to="/contact-us" className="hover:text-[#faffa4]">Contact Us</Link>
-                <Link to="/career" className="hover:text-[#faffa4]">Career</Link>
+                <Link to="/about-us" className="hover:text-[#faffa4]" onClick={()=> handleFooterClicks("About us")}>About Us</Link>
+                <Link to="/contact-us" className="hover:text-[#faffa4]" onClick={()=> handleFooterClicks("Contact us")}>Contact Us</Link>
+                <Link to="/career" className="hover:text-[#faffa4]" onClick={()=> handleFooterClicks("Career")}>Career</Link>
             </div>
 
             {/* Features Section */}
             <div className="flex flex-col gap-2 min-w-[100px]">
                 <div className="font-bold text-lg mb-2">Features</div>
-                <Link to="/blogs" className="hover:text-[#faffa4]">Blogs</Link>
-                <Link to="/privacy-policy" className="hover:text-[#faffa4]">Privacy Policy</Link>
-                <Link to="/terms-of-service" className="hover:text-[#faffa4]">Terms of Service</Link>
-                <Link to="/cancellation-policy" className="hover:text-[#faffa4]">Cancellation Policy</Link>
+                <Link to="/blogs" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Blogs")}>Blogs</Link>
+                <Link to="/privacy-policy" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Privacy Policy")}>Privacy Policy</Link>
+                <Link to="/terms-of-service" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Terms of Service")}>Terms of Service</Link>
+                <Link to="/cancellation-policy" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Cancellation Policy")}>Cancellation Policy</Link>
             </div>
 
             {/* Install App Section */}
@@ -56,6 +64,7 @@ const Footer = () => {
                     <a
                         href="https://play.google.com/store/apps/details?id=com.letzrent.letzrentnew&referrer=utm_source%3Dplaystore%26utm_medium%3Dreferral%26utm_campaign%3Dapp_launch"
                         target="_blank"
+                        onClick={()=> handleFooterClicks("Play store")}
                     >
                         <img
                             src="/images/Footer/gplay.png"
@@ -66,6 +75,7 @@ const Footer = () => {
                     <a
                         href="https://apps.apple.com/in/app/zymo-self-drive-car-rental/id1547829759?utm_source=apple_ios&utm_medium=referral&utm_campaign=app_launch"
                         target="_blank"
+                        onClick={()=> handleFooterClicks("Apple store")}
                     >
                         <img
                             src="/images/Footer/istore.png"
@@ -102,6 +112,7 @@ const Footer = () => {
                         href="https://www.facebook.com/zymo.official/"
                         target="_blank"
                         className="text-[#faffa4] hover:text-[#faffa4]"
+                        onClick={()=> handleFooterClicks("Facebook")}
                     >
                         <Facebook size={30} />
                     </a>
@@ -109,6 +120,7 @@ const Footer = () => {
                         href="https://x.com/zymoapp"
                         target="_blank"
                         className="text-[#faffa4] hover:text-[#faffa4]"
+                        onClick={()=> handleFooterClicks("X")}
                     >
                         <Twitter size={30} />
                     </a>
@@ -116,6 +128,7 @@ const Footer = () => {
                         href="https://www.instagram.com/zymo.app/"
                         target="_blank"
                         className="text-[#faffa4] hover:text-[#faffa4]"
+                        onClick={()=> handleFooterClicks("Instgram")}
                     >
                         <Instagram size={30} />
                     </a>
@@ -123,6 +136,7 @@ const Footer = () => {
                         href="https://www.linkedin.com/company/zymoapp?originalSubdomain=in"
                         target="_blank"
                         className="text-[#faffa4] hover:text-[#faffa4]"
+                        onClick={()=> handleFooterClicks("LinkedIn")}
                     >
                         <Linkedin size={30} />
                     </a>
@@ -130,6 +144,7 @@ const Footer = () => {
                         href="https://www.youtube.com/channel/UCHUvrPwNYxw7bukWFjhNpag"
                         target="_blank"
                         className="text-[#faffa4] hover:text-[#faffa4]"
+                        onClick={()=> handleFooterClicks("Youtube")}
                     >
                         <Youtube size={30} />
                     </a>
