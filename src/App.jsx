@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useLocation , useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route , useLocation } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
 import HomeScreen from "./screens/HomeScreen";
@@ -32,7 +32,6 @@ import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
-import PageTracker from "./components/PageTracker";
 import Agent from "./components/Agent.jsx";
 import AgentPage from "./components/AgentPage.jsx";
 import PageTracker from "./components/PageTracker.jsx";
@@ -52,10 +51,7 @@ const App = () => {
                             path="/self-drive-car-rentals"
                             element={<HomeScreen />}
                         />
-                        <Route
-                            path="/self-drive-car-rentals/:city"
-                            element={<HomeScreen />}
-                        />
+                      
 
                         {/* Page2 */}
                         <Route
