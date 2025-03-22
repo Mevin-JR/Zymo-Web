@@ -46,7 +46,7 @@ const App = () => {
                     <Routes>
                         {/* HomePage urls */}
                         <Route path="/" element={<HomeScreen />} />
-                        <Route path="/home" element={<HomeScreen />} />
+                        {/* <Route path="/home" element={<HomeScreen />} /> */}
                         <Route
                             path="/self-drive-car-rentals"
                             element={<HomeScreen />}
