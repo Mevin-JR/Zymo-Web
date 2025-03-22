@@ -36,14 +36,69 @@ const fetchWithRetry = async (url, options, retries = 5, delay = 500) => {
     throw new Error("MyChoize API failed after multiple retries.");
 };
 
+const fetchSubscriptionCars = async (CityName, formattedPickDate, formattedDropDate) => {
+    let apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+
+    try {
+        const response = await fetch(`${apiUrl}/mychoize/search-cars`, {
+            method: "POST",
+            body: JSON.stringify({
+                data: {
+                    CityName,
+                    PickDate: formattedPickDate,
+                    DropDate: formattedDropDate,
+                },
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) throw new Error("MyChoize API error");
+
+        const mychoizeData = await response.json();
+
+        if (!mychoizeData.SearchBookingModel) {
+            console.error("MyChoize API response missing expected data.");
+            return [];
+        }
+
+        // Filter cars where RateBasis is "MLK"
+        const subscriptionCars = mychoizeData.SearchBookingModel
+            .filter((car) => car.RateBasis === "MLK" && car.BrandName)
+            .map((car) => ({
+                id: car.TariffKey,
+                brand: toPascalCase(car.BrandName.split(" ")[0]),
+                name: toPascalCase(car.BrandName.split(" ")[1]),
+                options: [car.TransMissionType, car.FuelType, `${car.SeatingCapacity} Seats`],
+                address: car.LocationName,
+                locationkey: car.LocationKey,
+                hourly_amount: car.PerUnitCharges,
+                images: [car.VehicleBrandImageName],
+                ratingData: { text: "No ratings available" },
+                extrakm_charge: `₹${car.ExKMRate}/km`,
+                trips: car.TotalBookinCount,
+                source: "mychoize",
+                sourceImg: "/images/ServiceProvider/mychoize.png",
+                fare: `₹${car.TotalExpCharge}`, // Directly assign fare
+                rateBasis: car.rateBasis,
+            }));
+
+        return subscriptionCars;
+    } catch (error) {
+        console.error("MyChoize API failed:", error);
+        return [];
+    }
+};
+
 const fetchMyChoizeCars = async (
     CityName,
     formattedPickDate,
     formattedDropDate,
     tripDurationHours
 ) => {
-    const apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-    // const apiUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
+    let apiUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+    
 
     try {
         const mychoizeData = await fetchWithRetry(
@@ -94,6 +149,20 @@ const fetchMyChoizeCars = async (
                     sourceImg: "/images/ServiceProvider/mychoize.png",
                     rateBasisFare: {},
                     all_fares: [],
+
+                    brandGroundLength: car.BrandGroundLength,
+            brandKey: car.BrandKey,
+            brandLength: car.BrandLength,
+            fuelType: car.FuelType,
+            groupKey: car.GroupKey,
+            locationKey: car.LocationKey,
+            luggageCapacity: car.LuggageCapacity,
+            rftEngineCapacity: car.RFTEngineCapacity,
+            seatingCapacity: car.SeatingCapacity,
+            tariffKey: car.TariffKey,
+            transmissionType: car.TransmissionType,
+            vtrHybridFlag: car.VTRHybridFlag,
+            vtrSUVFlag: car.VTRSUVFlag,
                 };
             }
 
@@ -146,4 +215,5 @@ export {
     fetchMyChoizeCars,
     fetchMyChoizeLocationList,
     formatDateForMyChoize,
+    fetchSubscriptionCars
 };

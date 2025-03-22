@@ -3,14 +3,14 @@ import { useEffect, useState, useRef } from "react";
 import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { fetchMyChoizeCars, formatDateForMyChoize } from "../utils/mychoize";
-import { formatDate, retryFunction } from "../utils/helperFunctions";
+import { fetchMyChoizeCars, formatDateForMyChoize ,fetchSubscriptionCars} from "../utils/mychoize";
+import { formatDate,retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 
 const Listing = () => {
     const location = useLocation();
-    const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours } =
+    const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours,activeTab } =
         location.state || {};
     const { city } = useParams();
 
@@ -44,36 +44,36 @@ const Listing = () => {
         });
     };
 
-
     useEffect(() => {
         if (hasRun.current) return;
         hasRun.current = true;
-
+    
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
         if (!city || !lat || !lng || !startDateEpoc || !endDateEpoc) {
             return;
         }
-
+    
         const CityName = city;
         const formattedPickDate = formatDateForMyChoize(startDate);
         const formattedDropDate = formatDateForMyChoize(endDate);
-
+    
         if (!formattedPickDate || !formattedDropDate) {
             toast.error("Invalid date format!", { position: "top-center" });
             return;
         }
-
+    
         if (sessionStorage.getItem("fromSearch") !== "true") {
             sessionStorage.setItem("fromSearch", false);
             const cachedCarList = localStorage.getItem("carList");
             if (cachedCarList) {
                 setCarList(JSON.parse(cachedCarList));
-                setCarCount(JSON.parse(cachedCarList).length)
+                setCarCount(JSON.parse(cachedCarList).length);
                 setLoading(false);
                 return;
             }
         }
+    
 
         const search = async () => {
             setLoading(true);
@@ -117,6 +117,18 @@ const Listing = () => {
                     }
                 };
 
+            let allCarData = [];
+
+            if (activeTab === "subscribe") {
+                // Fetch only subscription cars if activeTab is "subscribe"
+                const subscriptionData = await fetchSubscriptionCars(CityName, formattedPickDate, formattedDropDate);
+                if (subscriptionData) {
+                    allCarData = [...subscriptionData];
+                } else {
+                    console.error("Subscription API failed or returned empty data.");
+                }
+            } else {
+
                 // Fetch Zoomcar API
                 const fetchZoomcarData = async () => {
                     const response = await fetch(`${url}/zoomcar/search`, {
@@ -158,8 +170,6 @@ const Listing = () => {
                     firebasePromise ? firebasePromise : Promise.resolve(null)
                 ]);
 
-                let allCarData = [];
-
                 if (zoomData.status === "fulfilled" && zoomData.value) {
                     const zoomCarData = zoomData.value.sections[zoomData.value.sections.length - 1].cards.map((car) => ({
                         id: car.car_data.car_id,
@@ -185,12 +195,14 @@ const Listing = () => {
                         sourceImg: "/images/ServiceProvider/zoomcarlogo.png",
                         rateBasis: "DR"
                     }));
+                    console.log("Zoomcar Data:", zoomCarData);
                     allCarData = [...allCarData, ...zoomCarData];
                 } else {
                     console.error("Zoomcar API failed:", zoomData.reason);
                 }
 
                 if (mychoizeData.status === "fulfilled" && mychoizeData.value) {
+                    console.log("MyChoize Data:", mychoizeData.value);
                     allCarData = [...allCarData, ...mychoizeData.value];
                 } else {
                     console.error("MyChoize API failed:", mychoizeData.reason ? mychoizeData.reason : "Trip duration must be atleast 24hrs");
@@ -201,25 +213,30 @@ const Listing = () => {
                 } else {
                     console.error("Firebase API failed:", firebaseData.reason);
                 }
+            }
 
                 if (allCarData.length === 0) {
                     toast.error("No cars found, Please try modifying input...", {
                         position: "top-center",
-                        autoClose: 1000 * 5,
+                        autoClose: 5000,
                     });
                 }
-
+                console.log(allCarData);
+    
                 setCarList(allCarData);
                 setCarCount(allCarData.length);
                 setLoading(false);
-
+    
                 localStorage.setItem("carList", JSON.stringify(allCarData));
             } catch (error) {
                 console.error("Unexpected error:", error);
             }
         };
+    
         search();
-    }, [city, startDate, endDate]);
+        
+    }, [city, startDate, endDate, activeTab]); // Add activeTab as a dependency
+
 
 
     // Filter functionality
@@ -273,6 +290,7 @@ const Listing = () => {
                 startDate,
                 endDate,
                 car,
+                activeTab,
             },
         });
     };
@@ -282,7 +300,7 @@ const Listing = () => {
             state: {
                 startDate,
                 endDate,
-                car
+                car,
             }
         })
     }
@@ -513,41 +531,33 @@ const Listing = () => {
                                         />
                                     </div>
 
-                                    {/* Right Side Info */}
-                                    <div className="flex flex-col  justify-between text-right w-1/4  border-l border-gray-400">
-                                        <div className="pr-2 ">
-                                            <p className="text-xs text-gray-400">
-                                                Starts at
-                                            </p>
-                                            <p className="text-lg font-semibold text-white">
-                                                {car.fare}
-                                            </p>
-                                            <p className="text-xs text-gray-400">
-                                                {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
-                                            </p>
-                                        </div>
-                                        {car.source === "zoomcar" ? (
-                                            <button
-                                                style={{
-                                                    backgroundColor: "#faffa4",
-                                                }}
-                                                className="rounded-md py-1  px-6 ml-auto"
-                                                onClick={() => goToDetails(car)}
-                                            >
-                                                <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
-                                            </button>
-                                        ) : (
-                                            <button
-                                                style={{
-                                                    backgroundColor: "#faffa4",
-                                                }}
-                                                className="rounded-md py-1  px-6 ml-auto"
-                                                onClick={() => goToPackages(car)}
-                                            >
-                                                <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
-                                            </button>
-                                        )}
-                                    </div>
+{/* Right Side Info */}
+<div className="flex flex-col justify-between text-right w-1/4 border-l border-gray-400">
+    <div className="pr-2">
+        <p className="text-xs text-gray-400">Starts at</p>
+        <p className="text-lg font-semibold text-white">{car.fare}</p>
+        <p className="text-xs text-gray-400">
+            {car.source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
+        </p>
+    </div>
+
+    <button
+        style={{ backgroundColor: "#faffa4" }}
+        className="rounded-md py-1 px-6 ml-auto"
+        onClick={() => {
+            if (car.source === "zoomcar") {
+                goToDetails(car);
+            } else if (activeTab === "subscribe") {
+                goToDetails(car); // If subscribing, go directly to details
+            } else {
+                goToPackages(car); // Otherwise, show package selection
+            }
+        }}
+    >
+        <ArrowLeft className="transform rotate-180 text-[#404040] w-5 h-5" />
+    </button>
+</div>
+
                                 </div>
                             </div>
                         </div>
