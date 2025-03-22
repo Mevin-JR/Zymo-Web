@@ -4,6 +4,16 @@ import { FaCar } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
 import { appAuth } from "../utils/firebase";
 import { toast } from "react-toastify";
+import ReactGA from "react-ga4";
+
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'Link Clicked',
+    label: label, 
+  });
+}
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -24,6 +34,8 @@ const Profile = () => {
           autoClose: 5000
         })
       })
+      
+      UserNavigation("Account Logout");
     } else {
       toast.error("Not signed in..", {
         position: "top-center",
@@ -46,7 +58,7 @@ const Profile = () => {
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
           {/* Your Details Section */}
-          <Link to="/details">
+          <Link to="/details" onClick={()=>UserNavigation("Your Details")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
               <div className="flex items-center space-x-3">
                 <FaUser className="text-gray-700 text-lg" />
@@ -56,7 +68,7 @@ const Profile = () => {
           </Link>
 
           {/* Your Bookings Section */}
-          <Link to="/my-bookings">
+          <Link to="/my-bookings" onClick={()=>UserNavigation("Your Bookings")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <FaCar className="text-gray-700 text-lg" />
