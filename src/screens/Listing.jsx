@@ -7,12 +7,15 @@ import { fetchMyChoizeCars, formatDateForMyChoize } from "../utils/mychoize";
 import { formatDate, retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 const Listing = () => {
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours } =
         location.state || {};
     const { city } = useParams();
+
+    const trackEvent = useTrackEvent();
 
     const startDateFormatted = formatDate(startDate);
     const endDateFormatted = formatDate(endDate);
@@ -266,8 +269,14 @@ const Listing = () => {
         setCarCount(filteredList.length);
     };
 
+    const handleSelectedCar=(label)=>{
+        trackEvent("Car List Section","Clicked on car!",label); 
+    }
+
     const navigate = useNavigate();
     const goToDetails = (car) => {
+        handleSelectedCar(`${car.brand} ${car.name}`);
+        // console.log("car name",car.name);
         navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
             state: {
                 startDate,
@@ -278,6 +287,7 @@ const Listing = () => {
     };
 
     const goToPackages = (car) => {
+        handleSelectedCar(`${car.brand} ${car.name}`);
         navigate(`/self-drive-car-rentals/${city}/cars/packages`, {
             state: {
                 startDate,
