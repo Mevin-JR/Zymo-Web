@@ -10,8 +10,14 @@ import BrandsAvailable from "../components/homecomponent/BrandsAvailable";
 import ServiceProvider from "../components/homecomponent/ServiceProvider";
 import { FaWhatsapp } from "react-icons/fa";
 import NewRSB from "../components/NewRSB";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 const HomeScreen = () => {
+    const trackEvent = useTrackEvent();
+
+    const handleWhatsappClicks=(label)=>{
+        trackEvent("Whatsapp Icon", "Whatsapp Clicked!",label);
+    }
     return (
         <>
             <NavBar />
@@ -33,6 +39,7 @@ const HomeScreen = () => {
                     className="fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={()=> handleWhatsappClicks("Whatsapp")}
                 >
                     <FaWhatsapp className="text-3xl" />
                 </a>
