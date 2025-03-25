@@ -207,6 +207,7 @@ const CarDetails = () => {
                                         >
                                             {car.image.map((image, idx) => (
                                                 <img
+                                                   loading="lazy"
                                                     key={idx}
                                                     src={image}
                                                     alt={`${car.name} ${idx + 1
@@ -280,6 +281,7 @@ const CarDetails = () => {
                                         </p>
                                         <div className="flex items-center">
                                             <img
+                                                loading="lazy"
                                                 src={car.bookingInfo.logo}
                                                 alt="Zoomcar Logo"
                                                 className="h-6"

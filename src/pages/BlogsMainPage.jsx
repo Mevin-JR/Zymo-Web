@@ -4,10 +4,13 @@ import { collection, getDocs } from "firebase/firestore";
 import { webDB } from "../utils/firebase";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const BlogsMainPage = () => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const getBlogs = async () => {
         const blogsCollection = collection(webDB, "blogs");
@@ -40,6 +43,13 @@ const BlogsMainPage = () => {
     return (
         <>
             <NavBar />
+            <button
+                onClick={() => navigate("/")}
+                className="text-white m-5 cursor-pointer"
+            >
+                <ArrowLeft className="w-6 h-6" />
+            </button>
+            
             <div className="container flex flex-col items-center justify-center mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-[#faffa4] mb-6 text-center">
                     <span className="text-blue-600">“</span> Blog{" "}

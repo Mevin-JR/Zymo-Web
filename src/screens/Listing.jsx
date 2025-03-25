@@ -269,8 +269,8 @@ const Listing = () => {
         setCarCount(filteredList.length);
     };
 
-    const handleSelectedCar=(label)=>{
-        trackEvent("Car List Section","Clicked on car!",label); 
+    const handleSelectedCar = (label) => {
+        trackEvent("Car List Section", "Clicked on car!", label);
     }
 
     const navigate = useNavigate();
@@ -439,6 +439,7 @@ const Listing = () => {
                             {/* Small Screens Layout */}
                             <div className="block md:hidden p-3">
                                 <img
+                                    loading="lazy"
                                     src={car.images[0]}
                                     alt={car.name}
                                     className="w-full h-40 object-cover bg-[#353535] rounded-lg  p-1"
@@ -454,6 +455,7 @@ const Listing = () => {
                                         </p>
                                         <div className="img-container">
                                             <img
+                                                loading="lazy"
                                                 src={car.sourceImg}
                                                 alt={car.source}
                                                 className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
@@ -498,7 +500,7 @@ const Listing = () => {
                                             </h3>
                                         </div>
                                         <div className="img-container">
-                                            <img
+                                            <img loading="lazy"
                                                 src={car.sourceImg}
                                                 alt={car.source}
                                                 className="h-5 rounded-sm mt-2 bg-white p-1 text-black"
@@ -516,7 +518,7 @@ const Listing = () => {
 
                                     {/* Middle Car Image */}
                                     <div className="w-2/4 flex justify-center items-center ">
-                                        <img
+                                        <img loading="lazy"
                                             src={car.images[0]}
                                             alt={car.name}
                                             className="w-48 h-32 object-contain bg-[#353535] rounded-md p-1"

@@ -38,6 +38,7 @@ const Card = ( {car} ) => {
             <div className="relative flex items-center justify-center rounded-xl p-1 w-full md:w-auto mt-4 md:mt-0">
 
                 <img
+                loading='lazy'
                     src="/images/Cars/newtnexcar.png"  //add newtnexcar.png image here
                     alt={car.name}
                     className="h-auto object-contain rounded-xl w-full md:w-auto max-h-50 p-2 hover:scale-100 transition-transform duration-700"
