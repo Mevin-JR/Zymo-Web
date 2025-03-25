@@ -1,10 +1,22 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
-const TermsofService = () => {
+const TermsofService = ({ title }) => {
+     useEffect(() => {
+            document.title = title;
+        }, [title]);
     return (
         <>
+           <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Understand the terms and conditions of using Zymo services." />
+                <link rel="canonical" href="https://zymo.app/terms-of-service" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Read Zymo's terms of service to stay informed about our policies." />
+            </Helmet>
             <NavBar />
             <div className="flex justify-center items-center min-h-screen bg-[darkGrey2] text-white p-6">
                 <div className="max-w-4xl  p-8">

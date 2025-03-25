@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
-export default function SubscriptionFormPage() {
+export default function SubscriptionFormPage({ title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { car, startDate, endDate, userData,totalAmount, activeTab ,city} = location.state;
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
  
   const [formData, setFormData] = useState({
     name: "",
@@ -83,6 +88,15 @@ export default function SubscriptionFormPage() {
   };
 
   return (
+    <>
+    <Helmet>
+    <title>{title}</title>
+                <meta name="description" content="Subscribe to Zymo for exclusive self-drive car rental benefits. Join now and enjoy hassle-free bookings!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Explore Zymo's car subscription plans and subscribe now for the best deals!" />
+                <link rel="canonical" href="https://zymo.app/subscribe/subscribe-info" />
+
+    </Helmet>
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
         <button
@@ -134,5 +148,6 @@ export default function SubscriptionFormPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

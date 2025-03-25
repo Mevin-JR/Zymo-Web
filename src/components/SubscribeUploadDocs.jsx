@@ -4,10 +4,10 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { Helmet } from "react-helmet-async";
 import ConfirmPage from "./ConfirmPage";
 import UploadSection from "./buycomponent/UploadSection";
-
+import { useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { webDB, webStorage } from "../utils/firebase";
@@ -41,7 +41,7 @@ const dataURLtoFile = (dataURL, filename) => {
 
 
 
-const SubscriptionUploadDocuments = () => {
+const SubscriptionUploadDocuments = ({ title }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { car, startDate, endDate, userData, activeTab ,city,totalAmount} = location.state;
@@ -74,6 +74,9 @@ const SubscriptionUploadDocuments = () => {
       setCurrentDocType("aadhar");
       setCurrentPage("front");  
     };
+    useEffect(() => {
+      document.title = title;
+    }, [title]);
     
   // To handle image upload
   const handleImageUpload = (type, page, docType) => {
@@ -329,7 +332,9 @@ const SubscriptionUploadDocuments = () => {
       console.error("Error uploading documents to Firebase:", error);
     }
   };
-
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   //On Submit 
   const handleSubmit = async () => {
@@ -382,6 +387,14 @@ const SubscriptionUploadDocuments = () => {
 
 
   return (
+    <>
+    <Helmet>
+    <title>{title}</title>
+                <meta name="description" content="Upload your documents to complete your Zymo subscription. Secure and easy verification process." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Complete your Zymo subscription by uploading the necessary documents safely." />
+                <link rel="canonical" href="https://zymo.app/subscribe/upload-doc" />
+            </Helmet>
     <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
         <button
@@ -478,6 +491,7 @@ const SubscriptionUploadDocuments = () => {
       )}
 
     </div>
+    </>
   );
 };
 

@@ -4,8 +4,9 @@ import { collection, getDocs } from "firebase/firestore";
 import { webDB } from "../utils/firebase";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { Helmet } from "react-helmet-async";
 
-const BlogsMainPage = () => {
+const BlogsMainPage = ({ title }) => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -22,6 +23,10 @@ const BlogsMainPage = () => {
         sessionStorage.setItem("blogs", JSON.stringify(blogsData));
         setLoading(false);
     };
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
+    
 
     useEffect(() => {
         if (sessionStorage.getItem("blogs")) {
@@ -39,6 +44,13 @@ const BlogsMainPage = () => {
 
     return (
         <>
+           <Helmet>
+           <title>{title}</title>
+                <meta name="description" content="Read the latest blogs on car rentals, driving tips, and vehicle trends at Zymo." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Stay updated with Zymo's latest blogs on travel, car rentals, and industry trends." />
+                <link rel="canonical" href="https://zymo.app/blogs" />
+            </Helmet>
             <NavBar />
             <div className="container flex flex-col items-center justify-center mx-auto px-4 py-8">
                 <h1 className="text-2xl font-bold text-[#faffa4] mb-6 text-center">

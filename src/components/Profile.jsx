@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaCar } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
 import { appAuth } from "../utils/firebase";
+import { Helmet } from "react-helmet-async";
 import { toast } from "react-toastify";
+import { useEffect } from "react";
 
-const Profile = () => {
+const Profile = ({ title }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -31,9 +33,19 @@ const Profile = () => {
       });
     }
   }
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
   return (
     <>
+       <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Manage your profile, personal details, and settings at Zymo." />
+                <link rel="canonical" href="https://zymo.app/profile" />
+<meta property="og:title" content={title} />
+                <meta property="og:description" content="Manage your profile, personal details, and settings at Zymo." />
+            </Helmet>
       <button
         onClick={() => navigate(-1)}
         className="text-white m-5 cursor-pointer"

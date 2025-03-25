@@ -7,8 +7,9 @@ import { fetchMyChoizeCars, formatDateForMyChoize ,fetchSubscriptionCars} from "
 import { formatDate,retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
+import { Helmet } from "react-helmet-async";
 
-const Listing = () => {
+const Listing = ({ title }) => {
     const location = useLocation();
     const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours,activeTab } =
         location.state || {};
@@ -243,6 +244,9 @@ const Listing = () => {
     useEffect(() => {
         setFilteredList(carList);
     }, [carList]);
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
     const resetFilters = () => {
         setTransmission("");
@@ -306,6 +310,15 @@ const Listing = () => {
     }
 
     return (
+        <>
+        {/* ✅ Dynamic SEO Tags */}
+        <Helmet>
+                <title>Available Cars in {city} | Zymo</title>
+                <meta name="description" content={`Find self-drive car rentals in ${city}. Browse available cars and book now!`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Discover a variety of cars for your self-drive rental needs." />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars`} />
+            </Helmet>
         <div className="h-100% min-w-screen bg-grey-900 text-white flex flex-col items-center px-4 py-6">
             <header className="w-full max-w-8xl flex flex-col md:flex-row justify-between items-center mb-4 text-center md:text-left">
                 <div className="flex items-center gap-2 text-white text-lg">
@@ -565,6 +578,7 @@ const Listing = () => {
                 </div>
             )}
         </div>
+        </>
     );
 };
 

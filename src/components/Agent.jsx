@@ -1,12 +1,24 @@
 import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
-
-export default function Agent({ onClose }) {
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+export default function Agent({ onClose ,title }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
   return (
+    <>
+  <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Login as an authorized agent to access Zymo's partner portal." />
+                <link rel="canonical" href="https://zymo.app/agent-login" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Secure agent login portal for Zymo partners." />
+            </Helmet>
     <div
       className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50"
       onClick={onClose}
@@ -66,5 +78,6 @@ export default function Agent({ onClose }) {
         </button>
       </div>
     </div>
+    </>
   );
 }

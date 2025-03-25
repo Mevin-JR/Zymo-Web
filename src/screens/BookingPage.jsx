@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useCallback, useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
+import { Helmet } from "react-helmet-async";
 import { formatDate, formatFare, retryFunction, toPascalCase } from "../utils/helperFunctions";
 import { fetchMyChoizeLocationList, findPackage, formatDateForMyChoize } from "../utils/mychoize";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
@@ -26,7 +27,7 @@ function loadScript(src) {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function BookingPage() {
+function BookingPage({ title } ){
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
@@ -595,8 +596,20 @@ function BookingPage() {
 
         setShowFormPopup(true);
     }
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
+    
 
     return (
+        <>
+      <Helmet>
+                <title>Booking Confirmation - {city} | Zymo</title>
+                <meta name="description" content={`Your self-drive car rental in ${city} is confirmed. Get ready for a seamless ride with Zymo.`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Thank you for choosing Zymo. Your self-drive car rental is confirmed!" />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars/booking-details/confirmation`} />
+            </Helmet>
         <div className="min-h-screen bg-[#212121]">
             {/* Header */}
             <div className="bg-[#eeff87] p-4 flex items-center gap-2">
@@ -961,6 +974,7 @@ function BookingPage() {
                 close={() => setIsConfirmPopupOpen(false)}
             />
         </div>
+        </>
     );
 }
 

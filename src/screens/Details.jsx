@@ -8,13 +8,14 @@ import {
     Armchair,
     ArrowLeft,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { appAuth } from "../utils/firebase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
 import { formatDate, toPascalCase } from "../utils/helperFunctions";
 import { findPackage } from "../utils/mychoize";
 
-const CarDetails = () => {
+const CarDetails = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
@@ -40,6 +41,9 @@ const CarDetails = () => {
             goToBooking(authUser);
         }
     }, [authUser]);
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
     // Automatic image scroller
     useEffect(() => {
@@ -136,6 +140,14 @@ const CarDetails = () => {
     ];
 
     return (
+        <>
+       <Helmet>
+                <title>Booking Details for {city} | Zymo</title>
+                <meta name="description" content={`Review your booking details for a self-drive car rental in ${city} before confirming your reservation.`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Ensure all details are correct before completing your car rental booking." />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars/booking-details`} />
+            </Helmet>
         <div>
             <button
                 onClick={() => {
@@ -363,6 +375,7 @@ const CarDetails = () => {
                 onClose={() => setIsLoginModalOpen(false)}
             />
         </div>
+        </>
     );
 };
 

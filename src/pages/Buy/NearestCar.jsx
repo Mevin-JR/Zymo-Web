@@ -8,14 +8,19 @@ import Footer from "../../components/Footer";
 import { ArrowLeft } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
+import { Helmet } from "react-helmet-async";
 
-const NearestCar = () => {
+
+const NearestCar = ({ title }) => {
   const navigate = useNavigate();
-
   const [filteredCars, setFilteredCars] = useState("Electric");
   const [allCars, setAllCars] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
   useEffect(() => {
     const fetchCarsData = async () => {
       try {
@@ -41,6 +46,13 @@ const NearestCar = () => {
 
   return (
     <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Find the best cars for sale near you with Zymo. Browse top deals and book your dream car today!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Browse Zymo's self-drive car options and choose the one that fits your needs." />
+                <link rel="canonical" href="https://zymo.app/buy" />
+            </Helmet>
       <NavBar />
       <div className="head-container flex flex-col sm:flex-row justify-between items-center bg-darkGrey text-white p-4">
         <button

@@ -72,3 +72,4 @@ const retryFunction = async (fn, args = [], maxRetries = 3, delay = 100) => {
 
 export { formatDate, toPascalCase, formatFare, formatTo12, retryFunction };
 
+

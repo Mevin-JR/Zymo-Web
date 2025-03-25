@@ -1,10 +1,21 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-
-const PrivacyPolicy = () => {
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+const PrivacyPolicy = ({ title }) => {
+    useEffect(() => {
+        document.title = title;
+    }, [title]);
     return (
         <>
+            <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Read our privacy policy to understand how we handle your data at Zymo." />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Learn about Zymo's data protection and privacy measures." />
+                <link rel="canonical" href="https://zymo.app/privacy-policy" />
+            </Helmet>
             <NavBar />
             <div className="flex justify-center items-center min-h-screen bg-[darkGrey2] text-white p-6">
                 <div className="max-w-4xl  p-8">
