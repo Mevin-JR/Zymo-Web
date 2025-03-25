@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { webDB, webStorage, appAuth } from "../utils/firebase"; // Import Firebase configuration
 import { collection, addDoc, query, where, getDocs} from "firebase/firestore"; // Firestore functions
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
+import NavBar from "../components/NavBar";
 
 
 function UserNavigation(label) {
@@ -180,8 +181,9 @@ export default function YourDetails() {
 
   return (
     <>
+    <NavBar/>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
       >
         <ArrowLeft className="w-6 h-6" />
