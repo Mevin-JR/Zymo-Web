@@ -11,7 +11,8 @@ import ServiceProvider from "../components/homecomponent/ServiceProvider";
 import { FaWhatsapp } from "react-icons/fa";
 import NewRSB from "../components/NewRSB";
 import useTrackEvent from "../hooks/useTrackEvent";
-
+import { Link } from "react-router-dom";
+import ChatBot from "../components/chatbot/Chatbot";
 const HomeScreen = () => {
     const trackEvent = useTrackEvent();
 
@@ -43,6 +44,8 @@ const HomeScreen = () => {
                 >
                     <FaWhatsapp className="text-3xl" />
                 </a>
+                <ChatBot></ChatBot>
+                
             </div>
             <Footer />
         </>
