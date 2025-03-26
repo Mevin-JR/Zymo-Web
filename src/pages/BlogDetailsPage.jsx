@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { ArrowLeft } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 
 const BlogDetailPage = () => {
     const [blog, setBlog] = useState(null);
@@ -11,6 +12,7 @@ const BlogDetailPage = () => {
 
     useEffect(() => {
         const title = localStorage.getItem("selectedBlogTitle");
+        console.log("Selected blog title:", title); // Debugging line
         const blogs = JSON.parse(sessionStorage.getItem("blogs")) || [];
 
         const foundBlog = blogs.find((b) => b.title === title);
@@ -24,19 +26,32 @@ const BlogDetailPage = () => {
             navigate("/blogs", { replace: true });
         } else {
             setBlog(foundBlog);
+            document.title = `${foundBlog.title} - Zymo Blog`;
         }
     }, [navigate]);
 
     if (!blog) return null;
+
 
     const htmlParser = (htmlContent) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, "text/html");
         return doc.body.innerHTML;
     };
+ s
 
     return (
         <>
+       <Helmet>
+       <title>{blog ? `${blog.title} - Zymo Blog` : "Blog Details - Zymo"}</title>
+                <meta 
+                    name="description"
+                    content={blog.description.substring(0, 150) + "..."} 
+                />
+                 <meta property="og:title" content={`${blog.title} - Zymo Blog`} />
+                 <meta property="og:description" content={blog.description} />
+                <link rel="canonical" href={`https://zymo.app/blogs/${encodeURIComponent(blog.title)}`} />
+            </Helmet>
             <NavBar />
 
             <button

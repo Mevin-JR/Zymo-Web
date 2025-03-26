@@ -1,8 +1,12 @@
 import { useNavigate  } from "react-router-dom";
-
-const TestDrivePopup = ({ isOpen, close, id , carDetail}) => {
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+const TestDrivePopup = ({  title ,isOpen, close, id , carDetail}) => {
   const navigate = useNavigate(); // Get the navigate function
   if (!isOpen) return null;
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   const handleNavigate = () => {
     navigate(`/buy/summary/${id}`, {
@@ -11,6 +15,15 @@ const TestDrivePopup = ({ isOpen, close, id , carDetail}) => {
   };
 
   return (
+    <>
+ <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Book a test drive with Zymo and experience your next car before making a decision!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Schedule a test drive with Zymo and get behind the wheel of your next car." />
+                <link rel="canonical" href="https://zymo.app/testdrive" />
+            </Helmet>
+
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-[#212121] text-white p-6 rounded-lg w-80 shadow-lg">
         <h2 className="text-xl font-semibold text-center mb-4">
@@ -42,6 +55,7 @@ const TestDrivePopup = ({ isOpen, close, id , carDetail}) => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

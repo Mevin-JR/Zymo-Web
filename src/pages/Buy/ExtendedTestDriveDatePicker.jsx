@@ -2,9 +2,11 @@ import { useState } from "react";
 import { format, addDays } from "date-fns";
 import { motion } from "framer-motion";
 import { useNavigate,useLocation } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from "react";
 
-const ExtendedTestDriveDatePicker = () => {
+const ExtendedTestDriveDatePicker = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -16,8 +18,19 @@ const ExtendedTestDriveDatePicker = () => {
     const endDate = new Date(selectedDate);
     endDate.setDate(selectedDate.getDate() + 30);
     const endDateFormatted = format(endDate, "dd MMMM, yyyy");
+    useEffect(() => {
+      document.title = title;
+    }, [title]);
   
   return (
+    <>
+    <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Choose a convenient date and time for your test drive with Zymo." />
+                <link rel="canonical" href="https://zymo.app/buy/date-picker" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Pick the perfect date and time for your test drive experience at Zymo." />
+            </Helmet>
     <div className="min-h-screen bg-[#212121] text-white p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -85,6 +98,7 @@ const ExtendedTestDriveDatePicker = () => {
         </div>
       </motion.div>
     </div>
+    </>
   );
 };
 

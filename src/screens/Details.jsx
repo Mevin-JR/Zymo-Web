@@ -8,6 +8,7 @@ import {
     Armchair,
     ArrowLeft,
 } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { appAuth } from "../utils/firebase";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
@@ -15,12 +16,12 @@ import { formatDate, toPascalCase } from "../utils/helperFunctions";
 import { findPackage } from "../utils/mychoize";
 import useTrackEvent from "../hooks/useTrackEvent";
 
-const CarDetails = () => {
+const CarDetails = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
     const trackEvent =useTrackEvent();
-    const { startDate, endDate, car } = location.state || {};
+    const { startDate, endDate, car ,activeTab} = location.state || {};
 
     const startDateFormatted = formatDate(startDate)
     const endDateFormatted = formatDate(endDate);
@@ -42,6 +43,9 @@ const CarDetails = () => {
             goToBooking(authUser);
         }
     }, [authUser]);
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
     // Automatic image scroller
     useEffect(() => {
@@ -81,6 +85,7 @@ const CarDetails = () => {
                     endDate,
                     userData,
                     car,
+                    activeTab,
                 },
             }
         );
@@ -133,8 +138,10 @@ const CarDetails = () => {
                 { label: "Seats", value: car.options[2] },
                 { label: "Fuel Type", value: car.options[1] },
                 { label: "Transmission", value: car.options[0] },
-                { label: "Package", value: car.source === "zoomcar" ? "Unlimited KMs" : findPackage(car.rateBasis) },
-                { label: "Available KMs", value: car.source === "zoomcar" ? "Unlimited KMs" : car.total_km[car.rateBasis] },
+                { label: "Package", value: activeTab === "subscribe" ? "Subscription" : car.source === "zoomcar" ? "Unlimited KMs" : findPackage(car.rateBasis) },
+                { label: "Available KMs", value: car.source === "zoomcar" ? "Unlimited KMs" : activeTab === "subscribe" && car.source ==="mychoize"? " 3600 KMs" : car.total_km[car.rateBasis] 
+                },
+                
                 { label: "Extra KM Charge", value: car.rateBasis === "DR" ? "No Charge" : car.extrakm_charge }
             ],
             price: car.fare,
@@ -142,6 +149,14 @@ const CarDetails = () => {
     ];
 
     return (
+        <>
+       <Helmet>
+                <title>Booking Details for {city} | Zymo</title>
+                <meta name="description" content={`Review your booking details for a self-drive car rental in ${city} before confirming your reservation.`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Ensure all details are correct before completing your car rental booking." />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars/booking-details`} />
+            </Helmet>
         <div>
             <button
                 onClick={() => {
@@ -371,6 +386,7 @@ const CarDetails = () => {
                 onClose={() => setIsLoginModalOpen(false)}
             />
         </div>
+        </>
     );
 };
 

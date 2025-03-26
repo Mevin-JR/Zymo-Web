@@ -3,11 +3,23 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-
-const PrivacyPolicy = () => {
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+const PrivacyPolicy = ({ title }) => {
     const navigate=useNavigate();
+    useEffect(() => {
+    
+        document.title = title;
+    }, [title]);
     return (
         <>
+            <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Read our privacy policy to understand how we handle your data at Zymo." />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Learn about Zymo's data protection and privacy measures." />
+                <link rel="canonical" href="https://zymo.app/privacy-policy" />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}

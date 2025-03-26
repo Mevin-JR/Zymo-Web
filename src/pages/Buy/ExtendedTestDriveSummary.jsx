@@ -5,9 +5,10 @@ import { useNavigate , useLocation } from 'react-router-dom';
 import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
 import { collection  , getDocs} from "firebase/firestore";
 import { appDB } from "../../utils/firebase";
+import { Helmet } from "react-helmet-async";
 
 
-const ExtendedTestDriveSummary = () => {
+const ExtendedTestDriveSummary = ({ title }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openIndex, setOpenIndex] = useState(null);
@@ -15,6 +16,9 @@ const ExtendedTestDriveSummary = () => {
   const { car } = location.state || {};
   
   // console.log("car data:"car);
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
   
   useEffect(() => {
     const fetchFaqs = async () => {
@@ -35,6 +39,14 @@ const ExtendedTestDriveSummary = () => {
   }, []);
   
   return (
+    <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="View your test drive summary with details on car model, time, and location." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Get a detailed summary of your scheduled test drive, including car details and pickup information." />
+                <link rel="canonical" href={`https://zymo.app/buy/summary/${id}`} />
+            </Helmet>
     <div className="min-h-screen bg-[#212121] px-4 md:px-8 animate-fade-in">
       <div className="container mx-auto max-w-4xl py-8">
         <button
@@ -140,6 +152,7 @@ const ExtendedTestDriveSummary = () => {
 
       </div>
     </div>
+    </>
   );
 };
 
