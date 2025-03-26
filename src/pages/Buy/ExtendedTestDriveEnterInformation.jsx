@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { countryCodes } from '../../api/CountryCode';
-
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 export default function Extended_TestDriveFormPage() {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export default function Extended_TestDriveFormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
+  const trackEvent = useTrackEvent();
   const { car, startDate, endDate } = location.state || {};
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
@@ -84,6 +85,7 @@ export default function Extended_TestDriveFormPage() {
           } 
         } 
       });
+      trackEvent("Extended Test Drive Booking", "Extended Test Drive","User Details Entered");
     }
   };
 

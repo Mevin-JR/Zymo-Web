@@ -55,11 +55,11 @@ const NewRSB = () => {
 
 //Google analytics for RSB section
 const handleRSBClicks =(label)=>{
-    trackEvent("RSB Section","RSB Clicked!",label);
+    trackEvent("RSB Section","RSB Clicked",label);
 
 }
 const handleRSBFunctionClicks =(label)=>{
-    trackEvent("RSB Functions Section","RSB Function Clicked!",label);
+    trackEvent("RSB Functions Section","RSB Function Clicked",label);
 
 }
 

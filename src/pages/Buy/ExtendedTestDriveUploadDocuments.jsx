@@ -12,6 +12,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { webDB, webStorage } from "../../utils/firebase";
 
+import useTrackEvent from "../../hooks/useTrackEvent";
+
 
 
 // Function to dynamically load Razorpay script
@@ -54,6 +56,7 @@ const ExtendedTestDriveUploadDocuments = () => {
   const [currentPage, setCurrentPage] = useState("front");
   const [isConfirmed, setIsConfirmed] = useState(false); 
   const [bookingData,setBookingData]=useState(null)
+  const trackEvent = useTrackEvent();
   const { car, startDate, endDate, userData } = location.state || {};
 
 // console.log("car:",car);
@@ -396,7 +399,9 @@ const ExtendedTestDriveUploadDocuments = () => {
       }
 
       await uploadDataToFirebase(convertedImages,paymentSuccess.orderId, paymentSuccess.paymentId);
-      
+
+      trackEvent("Extended Test Drive Booking", "Extended Test Drive","User Documents Uploaded");
+
     } catch (error) {
       console.error("Error uploading images:", error);
       resetAllState();   

@@ -4,10 +4,15 @@ import { useEffect,useCallback,useRef } from 'react';
 import { collection, addDoc } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
 
+import useTrackEvent from '../../hooks/useTrackEvent';
+
 const TestDriveConfirmPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const trackEvent = useTrackEvent();
+
   const isProcessing = useRef(false);
+  const eventTracked = useRef(false);
   const processingComplete = useRef(false);
 
   const { car, userData } = location.state || {};  
@@ -81,6 +86,10 @@ const TestDriveConfirmPage = () => {
           sendWhatsAppMessage(bookingData),
           uploadDataToFirebase(bookingData)
         ]);
+        if (!eventTracked.current) {
+          trackEvent("Test Drive Booking", "Test Drive", "Payment Successful/Booking Confirmed");
+          eventTracked.current = true; 
+        }
 
         processingComplete.current = true;
 
@@ -92,7 +101,7 @@ const TestDriveConfirmPage = () => {
     };
 
     processBooking();
-  }, [car, userData, sendWhatsAppMessage, uploadDataToFirebase]);
+  }, [car, userData, sendWhatsAppMessage, uploadDataToFirebase, trackEvent ]);
   
   const handlesubmit = ()=>{
     localStorage.clear();

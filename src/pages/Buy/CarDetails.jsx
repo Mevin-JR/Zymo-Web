@@ -56,8 +56,9 @@ const CarDetails = () => {
   if (!carDetail) {
     return <div>No car found</div>;
   }
-  const handleClicks=(label)=>{
-    trackEvent("Test & Extended Test Drive Section", "Test & Extended Test Drive Clicked!", label);
+  const handleClicks=(carDetail,label)=>{
+    trackEvent("Test & Extended Test Drive Section", "Buy Section Button Clicked", label);
+    trackEvent("Buy Section Car",`Buy Section Car`,`${carDetail.name} ${carDetail.model}- ${carDetail.vendor}-${label}`)
   }
 
   return (
@@ -182,7 +183,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
-                    onClick={() => handleClicks("Test Drive")}
+                    onClick={() => handleClicks(carDetail,"Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -208,7 +209,7 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
-                        onClick={() => handleClicks("Extended Test Drive")}
+                        onClick={() => handleClicks(carDetail,"Extended Test Drive")}
 
                       >
                         Extended Test Drive
@@ -329,7 +330,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] mx-1"
-                      onClick={() => handleClicks("Test Drive")}
+                      onClick={() => handleClicks(carDetail,"Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -355,7 +356,7 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg  font-semibold hover:bg-[#e8ff88] mx-1 "
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
-                        onClick={() => handleClicks("Extended Test Drive")}
+                        onClick={() => handleClicks(carDetail,"Extended Test Drive")}
 
                       >
                         Extended Test Drive

@@ -6,12 +6,14 @@ import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTes
 import { collection  , getDocs} from "firebase/firestore";
 import { appDB } from "../../utils/firebase";
 
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 const ExtendedTestDriveSummary = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [openIndex, setOpenIndex] = useState(null);
   const [faqs, setFaqs] = useState([]); 
+  const trackEvent = useTrackEvent();
   const { car } = location.state || {};
   
   // console.log("car data:"car);
@@ -33,6 +35,17 @@ const ExtendedTestDriveSummary = () => {
     };
     fetchFaqs(); 
   }, []);
+  
+  const onSubmit = () => {
+    navigate('/buy/date-picker',
+      { 
+        state: { 
+          car:car 
+        } 
+      }
+    )
+    trackEvent("Extended Test Drive Booking", "Extended Test Drive","Summary Page Seen");
+  }
   
   return (
     <div className="min-h-screen bg-[#212121] px-4 md:px-8 animate-fade-in">
@@ -131,7 +144,7 @@ const ExtendedTestDriveSummary = () => {
         {/* Next Button */}
         <div className="mt-6 md:mt-8">
             <button
-              onClick={() => navigate('/buy/date-picker',{ state: { car:car } })}
+              onClick={onSubmit}
               className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
             >
               Next

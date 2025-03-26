@@ -270,12 +270,14 @@ const Listing = () => {
     };
 
     const handleSelectedCar = (label) => {
-        trackEvent("Car List Section", "Clicked on car!", label);
+        trackEvent("Car List Section", "Rent Section Car", label);
     }
 
     const navigate = useNavigate();
     const goToDetails = (car) => {
-        handleSelectedCar(`${car.brand} ${car.name}`);
+        console.log("Car:", car.source);
+        
+        handleSelectedCar(`${car.brand} ${car.name} - ${car.source}`);
         // console.log("car name",car.name);
         navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
             state: {
