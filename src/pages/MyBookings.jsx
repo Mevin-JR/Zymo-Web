@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useEffect } from "react";
 import UpcomingBookingCard from "./UpcomingBookingCard";
 import PastBookings from "./PastBookings";
 import ReactGA from 'react-ga4';
@@ -15,12 +16,22 @@ function UserNavigation(label) {
     label: label,
   });
 }
-
-export default function MyBookings() {
+import { Helmet } from "react-helmet-async";
+export default function MyBookings({ title }) {
   const [activeTab, setActiveTab] = useState("upcoming");
   const navigate=useNavigate();
-
+  useEffect(() => {
+    document.title = title;
+}, [title]);
   return (
+    <>
+    <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="View and manage all your Zymo car rental bookings in one place." />
+                <link rel="canonical" href="https://zymo.app/my-bookings" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Check your upcoming and past bookings with Zymo." />
+            </Helmet>
     <div className="bg-[#212121] min-h-screen text-white">
       <NavBar />
 
@@ -92,5 +103,6 @@ export default function MyBookings() {
       </div>
       <Footer />
     </div>
+    </>
   );
 }

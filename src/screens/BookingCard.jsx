@@ -2,8 +2,10 @@ import React from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { findPackage } from "../utils/mychoize";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
-const BookingCard = () => {
+const BookingCard = ({ title }) => {
     const location = useLocation();
     const { startDate, endDate, car } = location.state || {};
     const { city } = useParams();
@@ -20,9 +22,19 @@ const BookingCard = () => {
             },
         });
     };
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
     return (
         <>
+            <Helmet>
+                <title>Car Packages in {city} | Zymo</title>
+                <meta name="description" content={`Explore car rental packages in ${city}. Choose the best self-drive rental deals with Zymo.`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Find the right package for your self-drive rental at the best prices." />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars/packages`} />
+            </Helmet>
             <button
                 onClick={() => {
                     sessionStorage.setItem("fromSearch", false);

@@ -1,13 +1,24 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-const ContactUs = () => {
+const ContactUs = ({ title }) => {
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
     const navigate=useNavigate();
     return (
         <>
+       <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Get in touch with Zymo for inquiries, support, or business partnerships. We're here to help!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Contact Zymo for assistance with your bookings, customer support, or business collaborations." />
+                <link rel="canonical" href="https://zymo.app/contact-us" />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}

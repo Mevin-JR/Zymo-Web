@@ -4,16 +4,27 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import NavBar from "./NavBar";
-
-export default function Agent({ onClose }) {
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
+export default function Agent({ onClose ,title }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate=useNavigate();
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
   return (
     <>
+  <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Login as an authorized agent to access Zymo's partner portal." />
+                <link rel="canonical" href="https://zymo.app/agent-login" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Secure agent login portal for Zymo partners." />
+            </Helmet>s
       <NavBar/>
       <button
         onClick={() => navigate("/")}
@@ -79,5 +90,6 @@ export default function Agent({ onClose }) {
       </div>
       <Footer/>
     </>
+  
   );
 }

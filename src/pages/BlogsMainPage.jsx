@@ -6,8 +6,9 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
-const BlogsMainPage = () => {
+const BlogsMainPage = ({ title }) => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -25,6 +26,10 @@ const BlogsMainPage = () => {
         sessionStorage.setItem("blogs", JSON.stringify(blogsData));
         setLoading(false);
     };
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
+    
 
     useEffect(() => {
         if (sessionStorage.getItem("blogs")) {
@@ -42,6 +47,13 @@ const BlogsMainPage = () => {
 
     return (
         <>
+           <Helmet>
+           <title>{title}</title>
+                <meta name="description" content="Read the latest blogs on car rentals, driving tips, and vehicle trends at Zymo." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Stay updated with Zymo's latest blogs on travel, car rentals, and industry trends." />
+                <link rel="canonical" href="https://zymo.app/blogs" />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}

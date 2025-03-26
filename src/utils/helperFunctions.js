@@ -14,6 +14,7 @@ const formatDate = (date) => {
         .replace(" at", "");
 };
 
+
 // 24hr to 12hr format
 const formatTo12 = (time) => {
     let [hour, minutes] = time.split(":").map(Number);
@@ -44,7 +45,6 @@ const formatFare = (fare) => {
 
     return `₹${formatter.format(fare)}`;
 };
-
 // Retry functions
 const retryFunction = async (fn, args = [], maxRetries = 3, delay = 100) => {
     let retry = 0;
@@ -71,3 +71,5 @@ const retryFunction = async (fn, args = [], maxRetries = 3, delay = 100) => {
 };
 
 export { formatDate, toPascalCase, formatFare, formatTo12, retryFunction };
+
+

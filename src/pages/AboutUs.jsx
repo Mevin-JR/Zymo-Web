@@ -3,11 +3,23 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const AboutUs = () => {
-    const navigate = useNavigate()
+import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+const AboutUs = ({ title }) => {
+    const navigate = useNavigate();
+    useEffect(() => {
+  
+        document.title = title;  // Ensures title changes instantly
+      }, [title]);
     return (
         <>
+         <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Learn more about Zymo, our mission, and how we make car renting and buying seamless for you." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Discover how Zymo is transforming the self-drive car rental experience." />
+                <link rel="canonical" href="https://zymo.app/about-us" />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}

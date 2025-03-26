@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route , useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async"; 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
 import HomeScreen from "./screens/HomeScreen";
@@ -30,6 +31,8 @@ import ExtendedTestDriveFormPage from "./pages/Buy/ExtendedTestDriveEnterInforma
 import ExtendedTestDriveUploadDocuments from "./pages/Buy/ExtendedTestDriveUploadDocuments";
 import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker";
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
+import   SubscriptionFormPage from "./components/SubscribeInfo";
+import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
@@ -40,89 +43,93 @@ import ChatBot from './components/chatbot/Chatbot.jsx';
 const App = () => {   
     
     return (
-        <>
+        <HelmetProvider>
             <BrowserRouter>
-                <PageTracker/>
+            <PageTracker/>
+
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
-                    <Routes>
-                        {/* HomePage urls */}
-                        <Route path="/" element={<HomeScreen />} />
-                        {/* <Route path="/home" element={<HomeScreen />} /> */}
-                        <Route
-                            path="/self-drive-car-rentals"
-                            element={<HomeScreen />}
-                        />
-                      
+                <Routes>
+                    {/* HomePage urls */}
+                    <Route path="/" element={<HomeScreen />} />
+                    <Route path="/home" element={<HomeScreen />} />
+                    <Route
+                        path="/self-drive-car-rentals"
+                        element={<HomeScreen />}
+                    />
+                    <Route
+                        path="/self-drive-car-rentals/:city"
+                        element={<HomeScreen />}
+                    />
 
-                        {/* Page2 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars"
-                            element={<Listing />}
-                        />
+                    {/* Page2 */}
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars"
+                        element={<Listing />}
+                    />
 
-                        {/* Page3 */}
-                        <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
+                    {/* Page3 */}
+                    <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
 
-                        {/* Page4 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars/booking-details"
-                            element={<Details />}
-                        />
+                    {/* Page4 */}
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars/booking-details"
+                        element={<Details />}
+                    />
 
-                        {/* Page5 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
-                            element={<BookingPage />}
-                        />
+                    {/* Page5 */}
+                    <Route
+                        path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
+                        element={<BookingPage />}
+                    />
 
-                        {/* Buy Page Routes*/}
-                        <Route path="/buy" element={<NearestCar />} />
-                        <Route path="/testdrive" element={<TestDrivePopup />} />
-                        <Route path="/buy/car-details/:id" element={<CarDetails />} />
+                    {/* Buy Page Routes*/}
+                    <Route path="/buy" element={<NearestCar />} />
+                    <Route path="/testdrive" element={<TestDrivePopup />} />
+                    <Route path="/buy/car-details/:id" element={<CarDetails />} />
 
-                        {/* Extended Test Drive Summary & date picker &  input form and confirm page */}
-                        <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
-                        <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
-                        <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
-                        <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments />} />
+                    {/* Extended Test Drive Summary & date picker &  input form and confirm page */}
+                    <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
+                    <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
+                    <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
+                    <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments />} />
 
-                        {/* Test Drive input form and confirm page */}
-                        <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
-                        <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage />} />
+                    {/* Test Drive input form and confirm page */}
+                    <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
+                    <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage />} />
 
 
 
-                        {/* NavBar Pages */}
-                        {/* About Us */}
-                        <Route path="/about-us" element={<AboutUs />} />
-                        {/* Contact Us */}
-                        <Route path="/contact-us" element={<ContactUs />} />
+                    {/* NavBar Pages */}
+                    {/* About Us */}
+                    <Route path="/about-us" element={<AboutUs />} />
+                    {/* Contact Us */}
+                    <Route path="/contact-us" element={<ContactUs />} />
 
-                        <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile" element={<Profile />} />
 
-                        {/* Carrer */}
-                        <Route path="/career" element={<CareerForm />} />
-                        {/* Blogs  */}
-                        <Route path="/blogs" element={<BlogsMainPage />} />
-                        <Route path="/blogs/:title" element={<BlogDetailPage />} />
-                        <Route path="/createblog/:id" element={<CreateBlogPage />} />
-                        <Route path="/createblog" element={<CreateEditBlogPage />} />
+                    {/* Carrer */}
+                    <Route path="/career" element={<CareerForm />} />
+                    {/* Blogs  */}
+                    <Route path="/blogs" element={<BlogsMainPage />} />
+                    <Route path="/blogs/:title" element={<BlogDetailPage />} />
+                    <Route path="/createblog/:id" element={<CreateBlogPage />} />
+                    <Route path="/createblog" element={<CreateEditBlogPage />} />
 
-                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                        <Route path="/details" element={<YourDetails />} />
-                        <Route
-                            path="/terms-of-service"
-                            element={<TermsofService />}
-                        />
-                        <Route
-                            path="/cancellation-policy"
-                            element={<CancellationPolicy />}
-                        />
-                        <Route
-                            path="/my-bookings"
-                            element={<MyBookings />}
-                        />
-                        <Route
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                    <Route path="/details" element={<YourDetails />} />
+                    <Route
+                        path="/terms-of-service"
+                        element={<TermsofService />}
+                    />
+                    <Route
+                        path="/cancellation-policy"
+                        element={<CancellationPolicy />}
+                    />
+                    <Route
+                        path="/my-bookings"
+                        element={<MyBookings />}
+                    />
+                    <Route
                         path="/agent-login"
                         element={<Agent />}
                     />
@@ -135,10 +142,10 @@ const App = () => {
                         element={<ChatBot/>}
                     />
                     <Route path="*" element={<ErrorPage />} />
-                    </Routes>
-                    <ToastContainer />
+                </Routes>
+                <ToastContainer />
             </BrowserRouter>
-        </>
+        </HelmetProvider>
     );
 };
 

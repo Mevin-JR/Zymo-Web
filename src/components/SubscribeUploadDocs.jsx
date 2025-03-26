@@ -5,12 +5,12 @@ import Webcam from "react-webcam";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Helmet } from "react-helmet-async";
-import ExtendedTestDriveConfirmPage from "../../components/buycomponent/ExtendedTestDriveConfirmPage";
-import UploadSection from "../../components/buycomponent/UploadSection";
+import ConfirmPage from "./ConfirmPage";
+import UploadSection from "./buycomponent/UploadSection";
 import { useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
-import { webDB, webStorage } from "../../utils/firebase";
+import { webDB, webStorage } from "../utils/firebase";
 
 
 
@@ -41,9 +41,11 @@ const dataURLtoFile = (dataURL, filename) => {
 
 
 
-const ExtendedTestDriveUploadDocuments = ({ title }) => {
+const SubscriptionUploadDocuments = ({ title }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { car, startDate, endDate, userData, activeTab ,city,totalAmount} = location.state;
+
 
   const [aadharFrontImage, setAadharFrontImage] = useState(null);
   const [aadharBackImage, setAadharBackImage] = useState(null);
@@ -52,17 +54,9 @@ const ExtendedTestDriveUploadDocuments = ({ title }) => {
   const [cameraOpen, setCameraOpen] = useState(false);
   const [currentDocType, setCurrentDocType] = useState("aadhar");
   const [currentPage, setCurrentPage] = useState("front");
+  // const [allImages , setAllImages]=useState([])
   const [isConfirmed, setIsConfirmed] = useState(false); 
-  const [bookingData,setBookingData]=useState(null)
-  const { car, startDate, endDate, userData } = location.state || {};
 
-// console.log("car:",car);
-// console.log("StartDate:",startDate);
-// console.log("EndDate:",endDate);
-// console.log("UserData:",userData);
-useEffect(() => {
-  document.title = title;
-}, [title]);
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
   const allImagesUploaded =
@@ -70,7 +64,6 @@ useEffect(() => {
     drivingBackImage &&
     aadharFrontImage &&
     aadharBackImage;
-
 
     const resetAllState = () => {
       setAadharFrontImage(null);
@@ -81,6 +74,9 @@ useEffect(() => {
       setCurrentDocType("aadhar");
       setCurrentPage("front");  
     };
+    useEffect(() => {
+      document.title = title;
+    }, [title]);
     
   // To handle image upload
   const handleImageUpload = (type, page, docType) => {
@@ -208,9 +204,9 @@ useEffect(() => {
       });
       return false;
     }
-    toast.dismiss();
+  
     try {
-      const amount = parseInt(car.totalAmount);
+      const amount = parseInt(totalAmount);
       const orderData = await createOrder(amount, "INR");
   
       return new Promise((resolve, reject) => {
@@ -285,14 +281,6 @@ useEffect(() => {
   //Firebase Upload Logic
   const uploadDataToFirebase = async (images,orderId, paymentId) => {
     try {      
-      toast.loading('Verifying your payment...', {
-        style: {
-          backgroundColor: '#edff8d', 
-          color: '#000', 
-          fontWeight: 'bold',
-        },
-        autoClose: 5000,  
-      });
       // Create a timestamp for the folder name once
       const timestamp = Date.now();
       const folderPath = `documents/${userData.email}_${timestamp}`;
@@ -309,14 +297,13 @@ useEffect(() => {
       const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
       
       const data = {
-        carId:car.carId,
-        bookingId: 'Z' + new Date().getTime().toString(), 
+        carId: car.id,
         carName: car.name,
         carModel: car.model,
         carType: car.type,
         startDate: startDate,
         endDate: endDate,
-        userName: userData.userName,
+        userName: userData.name,
         email: userData.email,
         phone: userData.phone,
         dob: userData.dob,
@@ -332,23 +319,22 @@ useEffect(() => {
         orderId: orderId,
         paymentId: paymentId,
         price: car.totalAmount,
-        bookingType:"Extended Test Drive",
         createdAt: new Date(),
       };
 
       // Add data to Firebase collection
-      await addDoc(collection(webDB, "BuySectionBookingDetail"), data);
-      setBookingData(data)
+      await addDoc(collection(webDB, "webBuyPaymentSuccessDetail"), data);
       // console.log("Data uploaded to Firebase:", data);
 
-      toast.dismiss()
       setIsConfirmed(true);          
       resetAllState();
     } catch (error) {
       console.error("Error uploading documents to Firebase:", error);
     }
   };
-
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   //On Submit 
   const handleSubmit = async () => {
@@ -382,14 +368,6 @@ useEffect(() => {
         });
         return;
       }
-      toast.loading('Redirecting to Payment Dashboard...', {
-        style: {
-          backgroundColor: '#edff8d', 
-          color: '#000',
-          fontWeight: 'bold',
-        },
-        autoClose: 5000, 
-      });
       // Proceed with payment first & After payment is successful, upload the data to Firebase
       const paymentSuccess = await handlePayment();
     
@@ -410,12 +388,12 @@ useEffect(() => {
 
   return (
     <>
-     <Helmet>
-                <title>{title}</title>
-                <meta name="description" content="Upload required documents to confirm your test drive appointment with Zymo." />
+    <Helmet>
+    <title>{title}</title>
+                <meta name="description" content="Upload your documents to complete your Zymo subscription. Secure and easy verification process." />
                 <meta property="og:title" content={title} />
-        <meta property="og:description" content="Securely upload your driving license and other documents to confirm your test drive." />
-                <link rel="canonical" href="https://zymo.app/buy/upload-doc" />
+        <meta property="og:description" content="Complete your Zymo subscription by uploading the necessary documents safely." />
+                <link rel="canonical" href="https://zymo.app/subscribe/upload-doc" />
             </Helmet>
     <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
@@ -504,10 +482,11 @@ useEffect(() => {
       
 
       {isConfirmed && (
-        <ExtendedTestDriveConfirmPage
+        <ConfirmPage
           isOpen={isConfirmed}
           close={() => setIsConfirmed(false)}
-          bookingData={bookingData}
+          car={car}
+          userData={userData}
         />
       )}
 
@@ -516,4 +495,4 @@ useEffect(() => {
   );
 };
 
-export default ExtendedTestDriveUploadDocuments;
+export default SubscriptionUploadDocuments;

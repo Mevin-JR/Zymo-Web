@@ -1,8 +1,12 @@
 import React from 'react'
-
+import { Helmet } from "react-helmet-async";
 const ExtendedTestDriveBenefits = () => {
   return (
     <>
+        <Helmet>
+            <title>Extended Test Drive Benefits - Zymo</title>
+        </Helmet>
+        
        <div className=" mt-2 w-[85%] p-4 bg-[#2d2d2d] border border-[#faffa4] rounded-lg shadow-lg text-sm text-gray-200 ">
           <p className="font-bold text-2xl text-white text-center mb-4">Benefits of Extended Test Drive with Zymo</p>
           <ul className="mt-2 space-y-2">

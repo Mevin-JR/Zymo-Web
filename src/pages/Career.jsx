@@ -4,10 +4,12 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { webDB, webStorage } from "../utils/firebase";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const CareerForm = () => {
+const CareerForm = ({title}) => {
     const [selectedType, setSelectedType] = useState("Internship");
     const [formData, setFormData] = useState({
         fullName: "",
@@ -21,6 +23,9 @@ const CareerForm = () => {
         expectedStipend: "",
     });
     const [showPopup, setShowPopup] = useState(false);
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
     const navigate = useNavigate();
 
@@ -91,6 +96,13 @@ const CareerForm = () => {
 
     return (
         <>
+            <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Join Zymo and be part of an innovative team transforming car rentals and sales. Explore open positions today!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Looking for a rewarding career? Check out Zymo's job openings and become part of our growing team." />
+                <link rel="canonical" href="https://zymo.app/career" />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}

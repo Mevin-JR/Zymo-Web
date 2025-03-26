@@ -3,11 +3,23 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 
-const CancellationPolicy = () => {
+const CancellationPolicy = ({ title }) => {
     const navigate=useNavigate();
+    useEffect(() => {
+        document.title = title;
+    }, [title]);
     return (
         <>
+         <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Check our cancellation and refund policies at Zymo." />
+                <link rel="canonical" href="https://zymo.app/cancellation-policy" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Read about Zymo's cancellation and refund policy for a hassle-free experience." />
+            </Helmet>
             <NavBar />
             <button
                 onClick={() => navigate("/")}
