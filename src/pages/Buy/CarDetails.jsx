@@ -6,11 +6,12 @@ import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTes
 
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { webDB } from "../../utils/firebase";
-
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 const CarDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const trackEvent = useTrackEvent();
   const [isTestDrivePopupOpen, setIsTestDrivePopupOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [carDetail, setCarDetail] = useState(null);
@@ -54,6 +55,9 @@ const CarDetails = () => {
 
   if (!carDetail) {
     return <div>No car found</div>;
+  }
+  const handleClicks=(label)=>{
+    trackEvent("Test & Extended Test Drive Section", "Test & Extended Test Drive Clicked!", label);
   }
 
   return (
@@ -178,7 +182,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
-                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                    onClick={() => handleClicks("Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -204,6 +208,8 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
+                        onClick={() => handleClicks("Extended Test Drive")}
+
                       >
                         Extended Test Drive
                       </button>
@@ -323,7 +329,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] mx-1"
-                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                      onClick={() => handleClicks("Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -349,6 +355,8 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg  font-semibold hover:bg-[#e8ff88] mx-1 "
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
+                        onClick={() => handleClicks("Extended Test Drive")}
+
                       >
                         Extended Test Drive
                       </button>

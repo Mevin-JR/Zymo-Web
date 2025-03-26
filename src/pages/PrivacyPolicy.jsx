@@ -1,11 +1,21 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const PrivacyPolicy = () => {
+    const navigate=useNavigate();
     return (
         <>
             <NavBar />
+            <button
+                onClick={() => navigate("/")}
+                className="text-white m-5 cursor-pointer"
+            >
+                <ArrowLeft className="w-6 h-6" />
+            </button>
+
             <div className="flex justify-center items-center min-h-screen bg-[darkGrey2] text-white p-6">
                 <div className="max-w-4xl  p-8">
                     <h1 className="text-2xl font-bold text-[#faffa4] mb-6">

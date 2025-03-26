@@ -5,7 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { appAuth } from "../utils/firebase";
 import { toast } from "react-toastify";
 import ReactGA from "react-ga4";
-
+import NavBar from "./NavBar";
+import Footer from "./Footer";
 
 function UserNavigation(label) {
   ReactGA.event({
@@ -46,8 +47,9 @@ const Profile = () => {
 
   return (
     <>
+    <NavBar/>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
       >
         <ArrowLeft className="w-6 h-6" />
@@ -87,6 +89,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

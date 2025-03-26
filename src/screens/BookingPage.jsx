@@ -13,6 +13,7 @@ import DropupPopup from "../components/DropupPopup";
 import BookingPageFormPopup from "../components/BookingPageFormPopup";
 import BookingPageUploadPopup from "../components/BookingPageUploadPopup";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 function loadScript(src) {
     return new Promise((resolve) => {
@@ -31,6 +32,8 @@ function BookingPage() {
     const location = useLocation();
     const { city } = useParams();
     const { startDate, endDate, userData, car } = location.state || {};
+
+    const trackEvent =useTrackEvent();
 
     const startDateFormatted = formatDate(startDate);
     const endDateFormatted = formatDate(endDate);
@@ -512,8 +515,13 @@ function BookingPage() {
         return true;
     };
 
+    const handleBooknpay=(label)=>{
+        trackEvent("Car Book&Pay Section","Clicked book&pay car!",label); 
+    }
+
     const handlePayment = async () => {
-        if (car.source !== "mychoize" && !handleCustomerDetails()) {
+        handleBooknpay("Book & Pay")
+        if (car.source != "mychoize" && !handleCustomerDetails()) {
             return;
         }
 
