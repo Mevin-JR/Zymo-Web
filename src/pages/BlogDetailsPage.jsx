@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
+import { ArrowLeft } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 
 const BlogDetailPage = () => {
@@ -52,6 +53,15 @@ const BlogDetailPage = () => {
                 <link rel="canonical" href={`https://zymo.app/blogs/${encodeURIComponent(blog.title)}`} />
             </Helmet>
             <NavBar />
+
+            <button
+                onClick={() => navigate("/blogs")}
+                className="mt-4 px-4 py-2 bg-[#faffa4] text-[#212121] rounded"
+            >
+                Back to Blogs
+            </button>
+
+
             <div className="container mx-auto px-4 py-8">
                 <img
                     src={blog.cover}

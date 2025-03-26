@@ -6,6 +6,8 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const CareerForm = ({title}) => {
     const [selectedType, setSelectedType] = useState("Internship");
@@ -24,6 +26,8 @@ const CareerForm = ({title}) => {
     useEffect(() => {
         document.title = title;
       }, [title]);
+
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -100,6 +104,12 @@ const CareerForm = ({title}) => {
                 <link rel="canonical" href="https://zymo.app/career" />
             </Helmet>
             <NavBar />
+            <button
+                onClick={() => navigate("/")}
+                className="text-white m-5 cursor-pointer"
+            >
+                <ArrowLeft className="w-6 h-6" />
+            </button>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[darkGrey2] text-white relative">
                 {showPopup && (
                     <div className="absolute top-10 bg-green-500 text-white p-3 rounded-lg shadow-lg">
@@ -113,8 +123,8 @@ const CareerForm = ({title}) => {
                 <div className="flex space-x-4">
                     <button
                         className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${selectedType === "Internship"
-                                ? "bg-[#faffa4]"
-                                : "bg-gray-300"
+                            ? "bg-[#faffa4]"
+                            : "bg-gray-300"
                             }`}
                         onClick={() => setSelectedType("Internship")}
                     >
@@ -122,8 +132,8 @@ const CareerForm = ({title}) => {
                     </button>
                     <button
                         className={`px-6 py-2 text-black font-semibold rounded-lg transition duration-300 ${selectedType === "Full-time"
-                                ? "bg-[#faffa4]"
-                                : "bg-gray-300"
+                            ? "bg-[#faffa4]"
+                            : "bg-gray-300"
                             }`}
                         onClick={() => setSelectedType("Full-time")}
                     >

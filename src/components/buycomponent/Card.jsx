@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 const Card = ( {car} ) => {
+    const trackEvent = useTrackEvent();
+    const handleClick=(label)=>{
+        trackEvent("Buy Cars Section",`Clicked on buy car section`,label)
+    }
     return (
 
         <div className="flex flex-col md:flex-row bg-[#303030] border border-gray-500 rounded-2xl p-4 py-1 text-white mx-auto w-full max-w-[900px] min-h-[300px] md:items-center">
@@ -33,6 +38,7 @@ const Card = ( {car} ) => {
             <div className="relative flex items-center justify-center rounded-xl p-1 w-full md:w-auto mt-4 md:mt-0">
 
                 <img
+                loading='lazy'
                     src="/images/Cars/newtnexcar.png"  //add newtnexcar.png image here
                     alt={car.name}
                     className="h-auto object-contain rounded-xl w-full md:w-auto max-h-50 p-2 hover:scale-100 transition-transform duration-700"
@@ -54,7 +60,8 @@ const Card = ( {car} ) => {
 
                 </div>
                 <Link to={`/buy/car-details/${car.carId}`} className="mt-3">
-                    <button className="w-20 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors">
+                    <button className="w-20 h-10 rounded-lg bg-[#faffa4] flex items-center justify-center hover:bg-[#dff566] transition-colors"
+                    onClick={()=>handleClick(`${car.name} ${car.model}`)}>
                         <i className="fa-solid fa-arrow-right text-darkGrey2"></i>
                     </button>
                 </Link>

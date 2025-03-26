@@ -5,6 +5,17 @@ import { ArrowLeft } from "lucide-react";
 import { appAuth } from "../utils/firebase";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-toastify";
+import ReactGA from "react-ga4";
+import NavBar from "./NavBar";
+import Footer from "./Footer";
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'Link Clicked',
+    label: label, 
+  });
+}
 import { useEffect } from "react";
 
 const Profile = ({ title }) => {
@@ -26,6 +37,8 @@ const Profile = ({ title }) => {
           autoClose: 5000
         })
       })
+      
+      UserNavigation("Account Logout");
     } else {
       toast.error("Not signed in..", {
         position: "top-center",
@@ -46,8 +59,9 @@ const Profile = ({ title }) => {
 <meta property="og:title" content={title} />
                 <meta property="og:description" content="Manage your profile, personal details, and settings at Zymo." />
             </Helmet>
+    <NavBar/>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
       >
         <ArrowLeft className="w-6 h-6" />
@@ -58,7 +72,7 @@ const Profile = ({ title }) => {
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
           {/* Your Details Section */}
-          <Link to="/details">
+          <Link to="/details" onClick={()=>UserNavigation("Your Details")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
               <div className="flex items-center space-x-3">
                 <FaUser className="text-gray-700 text-lg" />
@@ -68,7 +82,7 @@ const Profile = ({ title }) => {
           </Link>
 
           {/* Your Bookings Section */}
-          <Link to="/my-bookings">
+          <Link to="/my-bookings" onClick={()=>UserNavigation("Your Bookings")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <FaCar className="text-gray-700 text-lg" />
@@ -87,6 +101,7 @@ const Profile = ({ title }) => {
           </div>
         </div>
       </div>
+      <Footer/>
     </>
   );
 };

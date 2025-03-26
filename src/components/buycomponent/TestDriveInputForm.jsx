@@ -5,7 +5,7 @@ import {countryCodes} from "../../api/CountryCode"
 import { Helmet } from 'react-helmet-async';
 import { useEffect } from 'react';
 
-export default function Extended_TestDriveFormPage({ title }) {
+export default function TestDriveFormPage({ title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -110,7 +110,7 @@ export default function Extended_TestDriveFormPage({ title }) {
 
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl p-2 md:text-4xl font-bold text-appColor">
-            Extended Test Drive Booking
+             Test Drive Booking
           </h1>
         </div>
 

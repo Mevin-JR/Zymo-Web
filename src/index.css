@@ -10,6 +10,11 @@ body {
     font-style: normal;
     font-variation-settings: "wdth" 100;
 }
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(100%);
+}
+
+
 
 /* Hide the calendar picker icon */
 .peer::-webkit-calendar-picker-indicator {

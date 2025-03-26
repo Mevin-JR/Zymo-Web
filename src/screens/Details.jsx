@@ -14,11 +14,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoginPage from "../components/LoginPage"; // Import the LoginPage component
 import { formatDate, toPascalCase } from "../utils/helperFunctions";
 import { findPackage } from "../utils/mychoize";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 const CarDetails = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
+    const trackEvent =useTrackEvent();
     const { startDate, endDate, car ,activeTab} = location.state || {};
 
     const startDateFormatted = formatDate(startDate)
@@ -58,6 +60,7 @@ const CarDetails = ({ title }) => {
     }, [car?.images]);
 
     const handleBooking = () => {
+        handleCarBooking("Book");
         const user = appAuth.currentUser;
         console.log(user);
         if (!user) {
@@ -87,6 +90,12 @@ const CarDetails = ({ title }) => {
             }
         );
     };
+
+    //ga for car booking
+    const handleCarBooking=(label)=>{
+        trackEvent("Car Booking Section","Clicked on car booking!",label); 
+    }
+
 
     const carDetails = [
         {
@@ -213,6 +222,7 @@ const CarDetails = ({ title }) => {
                                         >
                                             {car.image.map((image, idx) => (
                                                 <img
+                                                   loading="lazy"
                                                     key={idx}
                                                     src={image}
                                                     alt={`${car.name} ${idx + 1
@@ -286,6 +296,7 @@ const CarDetails = ({ title }) => {
                                         </p>
                                         <div className="flex items-center">
                                             <img
+                                                loading="lazy"
                                                 src={car.bookingInfo.logo}
                                                 alt="Zoomcar Logo"
                                                 className="h-6"

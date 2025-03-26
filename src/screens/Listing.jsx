@@ -7,6 +7,7 @@ import { fetchMyChoizeCars, formatDateForMyChoize ,fetchSubscriptionCars} from "
 import { formatDate,retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
+import useTrackEvent from "../hooks/useTrackEvent";
 import { Helmet } from "react-helmet-async";
 
 const Listing = ({ title }) => {
@@ -14,6 +15,8 @@ const Listing = ({ title }) => {
     const { address, lat, lng, startDate, endDate, tripDuration, tripDurationHours,activeTab } =
         location.state || {};
     const { city } = useParams();
+
+    const trackEvent = useTrackEvent();
 
     const startDateFormatted = formatDate(startDate);
     const endDateFormatted = formatDate(endDate);
@@ -287,8 +290,14 @@ const Listing = ({ title }) => {
         setCarCount(filteredList.length);
     };
 
+    const handleSelectedCar = (label) => {
+        trackEvent("Car List Section", "Clicked on car!", label);
+    }
+
     const navigate = useNavigate();
     const goToDetails = (car) => {
+        handleSelectedCar(`${car.brand} ${car.name}`);
+        // console.log("car name",car.name);
         navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
             state: {
                 startDate,
@@ -300,6 +309,7 @@ const Listing = ({ title }) => {
     };
 
     const goToPackages = (car) => {
+        handleSelectedCar(`${car.brand} ${car.name}`);
         navigate(`/self-drive-car-rentals/${city}/cars/packages`, {
             state: {
                 startDate,
@@ -460,6 +470,7 @@ const Listing = ({ title }) => {
                             {/* Small Screens Layout */}
                             <div className="block md:hidden p-3">
                                 <img
+                                    loading="lazy"
                                     src={car.images[0]}
                                     alt={car.name}
                                     className="w-full h-40 object-cover bg-[#353535] rounded-lg  p-1"
@@ -475,6 +486,7 @@ const Listing = ({ title }) => {
                                         </p>
                                         <div className="img-container">
                                             <img
+                                                loading="lazy"
                                                 src={car.sourceImg}
                                                 alt={car.source}
                                                 className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
@@ -519,7 +531,7 @@ const Listing = ({ title }) => {
                                             </h3>
                                         </div>
                                         <div className="img-container">
-                                            <img
+                                            <img loading="lazy"
                                                 src={car.sourceImg}
                                                 alt={car.source}
                                                 className="h-5 rounded-sm mt-2 bg-white p-1 text-black"
@@ -537,7 +549,7 @@ const Listing = ({ title }) => {
 
                                     {/* Middle Car Image */}
                                     <div className="w-2/4 flex justify-center items-center ">
-                                        <img
+                                        <img loading="lazy"
                                             src={car.images[0]}
                                             alt={car.name}
                                             className="w-48 h-32 object-contain bg-[#353535] rounded-md p-1"

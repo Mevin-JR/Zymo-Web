@@ -9,6 +9,17 @@ import { webDB, webStorage, appAuth } from "../utils/firebase"; // Import Fireba
 import { collection, addDoc, query, where, getDocs} from "firebase/firestore"; // Firestore functions
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
 import { Helmet } from "react-helmet-async";
+import NavBar from "../components/NavBar";
+
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'Button Clicked',
+    label: label, 
+  });
+}
+
 
 export default function YourDetails({title}) {
   const [formData, setFormData] = useState({
@@ -119,6 +130,7 @@ export default function YourDetails({title}) {
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
+    UserNavigation("Account Deleted");
   };
 
   // Function to upload a file to Firebase Storage and return its download URL
@@ -161,6 +173,8 @@ export default function YourDetails({title}) {
       const docRef = await addDoc(collection(webDB, "webUserProfiles"), userProfile);
       console.log("Document written with ID: ", docRef.id);
       setIsSaved(true); // Set saved state instead of alert
+
+      UserNavigation("Profile Saved");
     } catch (error) {
       console.error("Error saving profile: ", error);
       alert("Failed to save profile. Please try again.");
@@ -178,8 +192,9 @@ export default function YourDetails({title}) {
                 <meta property="og:title" content={title} />
                 <meta property="og:description" content="Keep your personal details up to date on Zymo." />
             </Helmet>
+    <NavBar/>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
       >
         <ArrowLeft className="w-6 h-6" />
