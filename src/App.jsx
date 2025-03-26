@@ -38,6 +38,7 @@ import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
 import AgentPage from "./components/AgentPage.jsx";
 import PageTracker from "./components/PageTracker.jsx";
+import ChatBot from './components/chatbot/Chatbot.jsx';
 
 const App = () => {   
     
@@ -135,6 +136,10 @@ const App = () => {
                     <Route
                         path="/agent-info"
                         element={<AgentPage/>}
+                    />
+                    <Route
+                        path="/Zymo-AI"
+                        element={<ChatBot/>}
                     />
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
