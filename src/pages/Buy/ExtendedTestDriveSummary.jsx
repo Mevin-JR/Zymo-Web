@@ -1,7 +1,7 @@
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { useState , useEffect } from 'react';
 import { useNavigate , useLocation } from 'react-router-dom';
-
+import { useParams } from 'react-router-dom';
 import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
 import { collection  , getDocs} from "firebase/firestore";
 import { appDB } from "../../utils/firebase";
@@ -10,6 +10,7 @@ import { Helmet } from "react-helmet-async";
 
 const ExtendedTestDriveSummary = ({ title }) => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const location = useLocation();
   const [openIndex, setOpenIndex] = useState(null);
   const [faqs, setFaqs] = useState([]); 
