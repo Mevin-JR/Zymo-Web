@@ -32,7 +32,8 @@ import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
-import AgentPage from "./components/AgentPage.jsx";
+import AgentBookingList from "./components/AgentManage.jsx";
+import MasterAgentLogin from "./components/MasterAgentLogin.jsx";
 
 const App = () => {
     return (
@@ -126,8 +127,12 @@ const App = () => {
                     />
                     <Route
                         path="/agent-info"
-                        element={<AgentPage/>}
+                        element={<AgentBookingList />}
                     />
+                     <Route path="/master-agent" 
+                     element={<MasterAgentLogin />}
+                     />
+                     
                     <Route path="*" element={<ErrorPage />} />
                 </Routes>
                 <ToastContainer />

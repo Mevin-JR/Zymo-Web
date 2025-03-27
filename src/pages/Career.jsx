@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { collection, addDoc } from "firebase/firestore";
+import { useState , useEffect} from "react";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { webDB, webStorage } from "../utils/firebase";
 import NavBar from "../components/NavBar";
@@ -17,8 +17,27 @@ const CareerForm = () => {
         skillsDescription: "",
         resume: null,
         expectedStipend: "",
+         stipendAmountOption: "",
+        stipendAmountCustom: "",
+        applyFor: ""
     });
+    const [hasSubmitted, setHasSubmitted] = useState(false);
     const [showPopup, setShowPopup] = useState(false);
+
+    useEffect(() => {
+        const checkSubmission = async () => {
+            const submittedEmail = localStorage.getItem('careerFormSubmittedEmail');
+            if (submittedEmail) {
+                const q = query(
+                    collection(webDB, "careerApplications"),
+                    where("email", "==", submittedEmail)
+                );
+                const querySnapshot = await getDocs(q);
+                setHasSubmitted(!querySnapshot.empty);
+            }
+        };
+        checkSubmission();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -31,6 +50,24 @@ const CareerForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Check for existing application
+        const emailQuery = query(
+            collection(webDB, "careerApplications"),
+            where("email", "==", formData.email)
+        );
+        const emailSnapshot = await getDocs(emailQuery);
+        if (!emailSnapshot.empty) {
+            alert("You've already submitted an application with this email.");
+            return;
+        }
+
+        // Existing validation logic
+        const isPaid = formData.expectedStipend === "Paid";
+        const amountValid = isPaid 
+            ? (formData.stipendAmountOption === "Other" 
+                ? formData.stipendAmountCustom 
+                : formData.stipendAmountOption)
+            : true;
 
         if (
             !formData.fullName ||
@@ -41,7 +78,8 @@ const CareerForm = () => {
             !formData.primarySkill ||
             !formData.skillsDescription ||
             !formData.resume ||
-            !formData.expectedStipend
+            !formData.expectedStipend||
+            !formData.applyFor
         ) {
             alert("All fields are required!");
             return;
@@ -57,27 +95,33 @@ const CareerForm = () => {
                 await uploadBytes(resumeRef, formData.resume);
                 resumeURL = await getDownloadURL(resumeRef);
             }
-            await addDoc(collection(webDB, "careerApplications"), {
-                ...formData,
+
+            const applicationData = {
+                fullName: formData.fullName,
+                email: formData.email,
+                city: formData.city,
+                phoneNumber: formData.phoneNumber,
+                aspirations: formData.aspirations,
+                primarySkill: formData.primarySkill,
+                skillsDescription: formData.skillsDescription,
                 resume: resumeURL,
+                expectedStipend: formData.expectedStipend,
                 jobType: selectedType,
                 timestamp: new Date(),
-            });
-            setFormData({
-                fullName: "",
-                email: "",
-                city: "",
-                phoneNumber: "",
-                aspirations: "",
-                primarySkill: "",
-                skillsDescription: "",
-                resume: null,
-                expectedStipend: "",
-            });
-            setShowPopup(true);
-            setTimeout(() => setShowPopup(false), 3000);
+                applyFor: formData.applyFor
+            };
 
-            // Scroll to the top of the page after submission
+            if (isPaid) {
+                applicationData.experience = formData.experience;
+                applicationData.stipendAmount = formData.stipendAmountOption === "Other"
+                    ? formData.stipendAmountCustom
+                    : formData.stipendAmountOption;
+            }
+
+            await addDoc(collection(webDB, "careerApplications"), applicationData);
+            
+            localStorage.setItem('careerFormSubmittedEmail', formData.email);
+            setHasSubmitted(true);
             window.scrollTo({ top: 0, behavior: "smooth" });
         } catch (error) {
             console.error("Error submitting application: ", error);
@@ -85,15 +129,23 @@ const CareerForm = () => {
         }
     };
 
+
     return (
         <>
             <NavBar />
             <div className="flex flex-col items-center justify-center min-h-screen bg-[darkGrey2] text-white relative">
-                {showPopup && (
-                    <div className="absolute top-10 bg-green-500 text-white p-3 rounded-lg shadow-lg">
-                        Your application has been submitted successfully!
+                {hasSubmitted ? (
+                    <div className="text-center">
+                        <div className="text-4xl mb-4 text-[#faffa4]">✓</div>
+                        <h2 className="text-2xl font-bold mb-4 text-[#faffa4]">
+                            Form submitted successfully!
+                        </h2>
+                        <p className="text-gray-300">
+                            Check your email for further details.
+                        </p>
                     </div>
-                )}
+                ) : (
+                    <>
                 <h1 className="text-2xl font-bold text-[#faffa4] mb-6">
                     “Join Us”
                 </h1>
@@ -167,6 +219,15 @@ const CareerForm = () => {
                         className="w-full p-3 mb-4 bg-gray-200 rounded-lg"
                         required
                     />
+                    <input
+                        type="text"
+                        name="Applying For: "
+                        value={formData.applyFor}
+                        onChange={handleChange}
+                        placeholder="Applying For:"
+                        className="w-full p-3 mb-4 bg-gray-200 rounded-lg"
+                        required
+                    />
                     <label className="block font-semibold text-gray-100 mb-2">
                         Pick your superpower
                     </label>
@@ -218,6 +279,54 @@ const CareerForm = () => {
                         <option value="Paid">Paid</option>
                         <option value="Unpaid">Unpaid</option>
                     </select>
+                    {formData.expectedStipend === "Paid" && (
+                        <>
+                            <label className="block font-semibold text-gray-100 mb-2">
+                                Experience
+                            </label>
+                            <select
+                                name="experience"
+                                value={formData.experience}
+                                onChange={handleChange}
+                                className="w-full p-3 mb-4 bg-gray-200 rounded-lg"
+                                required
+                            >
+                                <option value="">Select Experience</option>
+                                <option value="3-6 months">3-6 months</option>
+                                <option value="6+ months">6+ months</option>
+                            </select>
+
+                            <label className="block font-semibold text-gray-100 mb-2">
+                                Expected Amount
+                            </label>
+                            <select
+                                name="stipendAmountOption"
+                                value={formData.stipendAmountOption}
+                                onChange={handleChange}
+                                className="w-full p-3 mb-4 bg-gray-200 rounded-lg"
+                                required
+                            >
+                                <option value="">Select Amount</option>
+                                <option value="2000">2000</option>
+                                <option value="5000">5000</option>
+                                <option value="10000">10,000</option>
+                                <option value="Other">Other</option>
+                            </select>
+
+                            {formData.stipendAmountOption === "Other" && (
+                                <input
+                                    type="text"
+                                    name="stipendAmountCustom"
+                                    value={formData.stipendAmountCustom}
+                                    onChange={handleChange}
+                                    placeholder="Enter Custom Amount"
+                                    className="w-full p-3 mb-4 bg-gray-200 rounded-lg"
+                                    required
+                                />
+                            )}
+                        </>
+                    )}
+ 
                     <button
                         type="submit"
                         className="w-full bg-[#faffa4] text-black py-3 rounded-lg font-semibold transition duration-300 hover:bg-[#faffa4]-700"
@@ -225,7 +334,9 @@ const CareerForm = () => {
                         Submit Application
                     </button>
                 </form>
-            </div>
+            </>
+                )}
+                </div>
             <Footer />
         </>
     );
