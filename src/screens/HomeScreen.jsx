@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet-async";
 import NewRSB from "../components/NewRSB";
 import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
-
+import ChatBot from "../components/chatbot/Chatbot";
 const HomeScreen = ({ title }) => {
     useEffect(() => {
     const trackEvent = useTrackEvent();
@@ -55,6 +55,8 @@ const HomeScreen = ({ title }) => {
                 >
                     <FaWhatsapp className="text-3xl" />
                 </a>
+               
+                <ChatBot></ChatBot>
             </div>
             <Footer />
         </>
