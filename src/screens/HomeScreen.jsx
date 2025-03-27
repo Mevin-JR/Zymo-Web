@@ -30,7 +30,7 @@ const HomeScreen = ({ title }) => {
                 <meta name="description" content="Book affordable self-drive car rentals with Zymo. Compare, save, and start your journey today!" />
                 <meta property="og:title" content={title} />
         <meta property="og:description" content="Explore top self-drive car rentals with amazing deals and offers!" />
-                <link rel="canonical" href="https://zymo.app/self-drive-car-rentals" />
+                <link rel="canonical" href="https://zymo.app/" />
             </Helmet>
             <NavBar />
             <div className="container flex flex-col w-full mx-auto">

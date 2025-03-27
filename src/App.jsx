@@ -38,7 +38,7 @@ import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
 import AgentPage from "./components/AgentPage.jsx";
 import PageTracker from "./components/PageTracker.jsx";
-
+import { Navigate } from "react-router-dom";
 const App = () => {   
     
     return (
@@ -49,8 +49,7 @@ const App = () => {
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
                 <Routes>
                 <Route path="/" element={<HomeScreen title="Home - Zymo Car Rentals" />} />
-                     <Route path="/self-drive-car-rentals" element={<HomeScreen title="Home - Zymo Car Rentals" />} />
- 
+                     <Route path="/self-drive-car-rentals" element={<Navigate to="/" replace />} />
                      <Route path="/self-drive-car-rentals/:city/cars" element={<Listing title="Available Cars - Zymo" />} />
                      <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard title="Car Packages - Zymo" />} />
                      <Route path="/self-drive-car-rentals/:city/cars/booking-details" element={<Details title="Booking Details - Zymo" />} />
