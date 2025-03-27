@@ -225,7 +225,8 @@ const handleRSBFunctionClicks =(label)=>{
                 startDate,
                 endDate,
                 tripDuration,
-                tripDurationHours
+                tripDurationHours,
+                activeTab,
             };
             handleRSBFunctionClicks("Search"); //search btn clicked
             sessionStorage.setItem("fromSearch", true);

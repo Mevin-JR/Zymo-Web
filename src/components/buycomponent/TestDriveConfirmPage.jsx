@@ -1,12 +1,12 @@
 import { useLocation ,useNavigate  } from 'react-router-dom';
 import { useEffect,useCallback,useRef } from 'react';
-
+import { Helmet } from 'react-helmet-async';
 import { collection, addDoc } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
 
 import useTrackEvent from '../../hooks/useTrackEvent';
 
-const TestDriveConfirmPage = () => {
+const TestDriveConfirmPage = ({ title }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const trackEvent = useTrackEvent();
@@ -18,6 +18,9 @@ const TestDriveConfirmPage = () => {
   const { car, userData } = location.state || {};  
   
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   const sendWhatsAppMessage = useCallback(async (bookingData) => {
     try {
@@ -109,6 +112,14 @@ const TestDriveConfirmPage = () => {
     navigate('/')
   }
   return (
+    <>
+ <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Confirm your test drive details and get ready to experience your selected car with Zymo!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Thank you for booking your test drive with Zymo. Check your confirmation details here." />
+                <link rel="canonical" href="https://zymo.app/buy/test-drive-confirmpage" />
+            </Helmet>
     <div className="flex items-center justify-center min-h-screen bg-[#212121]">
       <div className="w-full max-w-md p-6 bg-[#2c2c2c] border rounded-lg shadow-lg border-appColor text-center transform transition duration-300 hover:scale-105">
         <h2 className="text-2xl font-semibold text-appColor mt-3">
@@ -133,6 +144,7 @@ const TestDriveConfirmPage = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

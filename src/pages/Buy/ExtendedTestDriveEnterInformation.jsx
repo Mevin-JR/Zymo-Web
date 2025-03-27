@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { countryCodes } from '../../api/CountryCode';
+import { Helmet } from "react-helmet-async";
+import { useEffect } from 'react';
 import useTrackEvent from '../../hooks/useTrackEvent';
 
-export default function Extended_TestDriveFormPage() {
+export default function Extended_TestDriveFormPage( {title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -21,6 +23,9 @@ export default function Extended_TestDriveFormPage() {
   const trackEvent = useTrackEvent();
   const { car, startDate, endDate } = location.state || {};
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -90,6 +95,14 @@ export default function Extended_TestDriveFormPage() {
   };
 
   return (
+    <>
+  <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Provide your details to complete your test drive booking with Zymo." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Fill in your personal information to complete the test drive booking process." />
+                <link rel="canonical" href="https://zymo.app/buy/upload-info" />
+            </Helmet>
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
         <button
@@ -248,5 +261,6 @@ export default function Extended_TestDriveFormPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

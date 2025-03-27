@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { webDB, webStorage, appAuth } from "../utils/firebase"; // Import Firebase configuration
 import { collection, addDoc, query, where, getDocs} from "firebase/firestore"; // Firestore functions
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
+import { Helmet } from "react-helmet-async";
 import NavBar from "../components/NavBar";
 
 
@@ -20,7 +21,7 @@ function UserNavigation(label) {
 }
 
 
-export default function YourDetails() {
+export default function YourDetails({title}) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -41,6 +42,9 @@ export default function YourDetails() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);  // Loading state for save button
   const navigate = useNavigate();
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
     // Fetch user data on component mount
     useEffect(() => {
@@ -181,6 +185,13 @@ export default function YourDetails() {
 
   return (
     <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Enter your personal details for a seamless experience with Zymo." />
+                <link rel="canonical" href="https://zymo.app/your-details" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Keep your personal details up to date on Zymo." />
+            </Helmet>
     <NavBar/>
       <button
         onClick={() => navigate("/")}

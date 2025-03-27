@@ -2,7 +2,7 @@ import "./createblogpage.scss";
 import "react-quill-new/dist/quill.snow.css";
 import React, { useState } from "react";
 import ReactQuill from "react-quill-new";
-
+import { Helmet } from "react-helmet-async";
 import { webDB } from "../../utils/firebase";
 import { useEffect } from "react";
 import { TextField } from "@mui/material";
@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { PasswordDialog } from "./PasswordDialog";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
-function CreateBlogPage() {
+function CreateBlogPage({ title }) {
   const { id } = useParams();
   const [values, setValues] = useState({
     title: "",
@@ -24,6 +24,9 @@ function CreateBlogPage() {
   const [open, setOpen] = useState(false);
 
   const blogsCollectionRef = collection(webDB, "blogs");
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
   let blogSlug = "";
   if (id !== "create") {
@@ -100,6 +103,16 @@ function CreateBlogPage() {
   }, []);
 
   return (
+    <>
+      <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Edit and update your Zymo blog post with new insights and information." />
+                <link rel="canonical" href="https://zymo.app/createblog/:id" />
+                <meta name="robots" content="noindex, nofollow" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Start writing and publishing your blog with Zymo's easy-to-use editor." />
+            </Helmet>
+        
     <div className="wrapper">
       <div className="blog-form-container">
         {id === "create" ? (
@@ -188,6 +201,7 @@ function CreateBlogPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

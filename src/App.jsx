@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route , useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async"; 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import ErrorPage from "./components/ErrorPage";
 import HomeScreen from "./screens/HomeScreen";
@@ -30,6 +31,8 @@ import ExtendedTestDriveFormPage from "./pages/Buy/ExtendedTestDriveEnterInforma
 import ExtendedTestDriveUploadDocuments from "./pages/Buy/ExtendedTestDriveUploadDocuments";
 import ExtendedTestDriveDatePicker from "./pages/Buy/ExtendedTestDriveDatePicker";
 import ExtendedTestDriveSummary from "./pages/Buy/ExtendedTestDriveSummary";
+import   SubscriptionFormPage from "./components/SubscribeInfo";
+import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/Agent.jsx";
@@ -39,101 +42,50 @@ import PageTracker from "./components/PageTracker.jsx";
 const App = () => {   
     
     return (
-        <>
+        <HelmetProvider>
             <BrowserRouter>
-                <PageTracker/>
+            <PageTracker/>
+
                 <ScrollToTop /> {/* Ensures scrolling to top on route change */}
-                    <Routes>
-                        {/* HomePage urls */}
-                        <Route path="/" element={<HomeScreen />} />
-                        {/* <Route path="/home" element={<HomeScreen />} /> */}
-                        <Route
-                            path="/self-drive-car-rentals"
-                            element={<HomeScreen />}
-                        />
-                      
-
-                        {/* Page2 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars"
-                            element={<Listing />}
-                        />
-
-                        {/* Page3 */}
-                        <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard />} />
-
-                        {/* Page4 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars/booking-details"
-                            element={<Details />}
-                        />
-
-                        {/* Page5 */}
-                        <Route
-                            path="/self-drive-car-rentals/:city/cars/booking-details/confirmation"
-                            element={<BookingPage />}
-                        />
-
-                        {/* Buy Page Routes*/}
-                        <Route path="/buy" element={<NearestCar />} />
-                        <Route path="/testdrive" element={<TestDrivePopup />} />
-                        <Route path="/buy/car-details/:id" element={<CarDetails />} />
-
-                        {/* Extended Test Drive Summary & date picker &  input form and confirm page */}
-                        <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary />} />
-                        <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker />} />
-                        <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage />} />
-                        <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments />} />
-
-                        {/* Test Drive input form and confirm page */}
-                        <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm />} />
-                        <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage />} />
-
-
-
-                        {/* NavBar Pages */}
-                        {/* About Us */}
-                        <Route path="/about-us" element={<AboutUs />} />
-                        {/* Contact Us */}
-                        <Route path="/contact-us" element={<ContactUs />} />
-
-                        <Route path="/profile" element={<Profile />} />
-
-                        {/* Carrer */}
-                        <Route path="/career" element={<CareerForm />} />
-                        {/* Blogs  */}
-                        <Route path="/blogs" element={<BlogsMainPage />} />
-                        <Route path="/blogs/:title" element={<BlogDetailPage />} />
-                        <Route path="/createblog/:id" element={<CreateBlogPage />} />
-                        <Route path="/createblog" element={<CreateEditBlogPage />} />
-
-                        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                        <Route path="/details" element={<YourDetails />} />
-                        <Route
-                            path="/terms-of-service"
-                            element={<TermsofService />}
-                        />
-                        <Route
-                            path="/cancellation-policy"
-                            element={<CancellationPolicy />}
-                        />
-                        <Route
-                            path="/my-bookings"
-                            element={<MyBookings />}
-                        />
-                        <Route
-                        path="/agent-login"
-                        element={<Agent />}
-                    />
-                    <Route
-                        path="/agent-info"
-                        element={<AgentPage/>}
-                    />
-                    <Route path="*" element={<ErrorPage />} />
-                    </Routes>
-                    <ToastContainer />
+                <Routes>
+                <Route path="/" element={<HomeScreen title="Home - Zymo Car Rentals" />} />
+                     <Route path="/self-drive-car-rentals" element={<HomeScreen title="Home - Zymo Car Rentals" />} />
+ 
+                     <Route path="/self-drive-car-rentals/:city/cars" element={<Listing title="Available Cars - Zymo" />} />
+                     <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard title="Car Packages - Zymo" />} />
+                     <Route path="/self-drive-car-rentals/:city/cars/booking-details" element={<Details title="Booking Details - Zymo" />} />
+                     <Route path="/self-drive-car-rentals/:city/cars/booking-details/confirmation" element={<BookingPage title="Booking Confirmation - Zymo" />} />
+                     <Route path="/subscribe/subscribe-info" element={<SubscriptionFormPage title="Subscribe to Zymo" />} />
+                     <Route path="/subscribe/upload-doc" element={<SubscriptionUploadDocuments title="Upload Documents - Subscription" />} />
+                     <Route path="/buy" element={<NearestCar title="Find Your Car - Zymo" />} />
+                     <Route path = "/testdrive" element= {<TestDrivePopup title="Test Drive - Zymo" />} />
+                     <Route path="/buy/car-details/:id" element={<CarDetails title="Car Details - Zymo" />} />
+                     <Route path="/buy/summary/:id" element={<ExtendedTestDriveSummary title="Test Drive Summary - Zymo" />} />
+                     <Route path="/buy/date-picker" element={<ExtendedTestDriveDatePicker title="Pick a Date - Test Drive" />} />
+                     <Route path="/buy/upload-info" element={<ExtendedTestDriveFormPage title="Enter Your Info - Test Drive" />} />
+                     <Route path="/buy/upload-doc" element={<ExtendedTestDriveUploadDocuments title="Upload Documents - Test Drive" />} />
+                     <Route path="/buy/test-drive-inputform" element={<TestDriveInputForm title="Schedule Test Drive - Zymo" />} />
+                     <Route path="/buy/test-drive-confirmpage" element={<TestDriveConfirmPage title="Confirm Test Drive - Zymo" />} />
+                     <Route path="/about-us" element={<AboutUs title="About Us - Zymo" />} />
+                     <Route path="/contact-us" element={<ContactUs title="Contact Us - Zymo" />} />
+                     <Route path="/career" element={<CareerForm title="Careers at Zymo" />} />
+                     <Route path="/blogs" element={<BlogsMainPage title="Blogs - Zymo" />} />
+                     <Route path="/blogs/:title" element={<BlogDetailPage title="Blog Details - Zymo" />} />
+                     <Route path="/createblog/:id" element={<CreateBlogPage title="Edit Blog - Zymo" />} />
+                     <Route path="/createblog" element={<CreateEditBlogPage title="Create Blog - Zymo" />} />
+                     <Route path="/privacy-policy" element={<PrivacyPolicy title="Privacy Policy - Zymo" />} />
+                     <Route path="/terms-of-service" element={<TermsofService title="Terms of Service - Zymo" />} />
+                     <Route path="/cancellation-policy" element={<CancellationPolicy title="Cancellation Policy - Zymo" />} />
+                     <Route path="/my-bookings" element={<MyBookings title="My Bookings - Zymo" />} />
+                     <Route path="/profile" element={<Profile title="Profile - Zymo" />} />
+                     <Route path="/your-details" element={<YourDetails title="Your Details - Zymo" />} />
+                     <Route path="/agent-login" element={<Agent title="Agent Login - Zymo" />} />
+                     <Route path="/agent-info" element={<AgentPage title="Agent Info - Zymo" />} />
+                     <Route path="*" element={<ErrorPage title="404 - Page Not Found" />} />
+                </Routes>
+                <ToastContainer />
             </BrowserRouter>
-        </>
+        </HelmetProvider>
     );
 };
 

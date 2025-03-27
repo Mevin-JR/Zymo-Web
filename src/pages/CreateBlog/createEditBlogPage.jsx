@@ -5,14 +5,18 @@ import { webDB } from "../../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { getDocs, collection } from "firebase/firestore";
 import { PasswordDialog } from "./PasswordDialog";
+import { Helmet } from "react-helmet-async";
 
-function CreateEditBlogPage() {
+function CreateEditBlogPage({title}) {
   const [isDialogOpen, setDialogOpen] = useState(true);
   const navigate = useNavigate();
   const blogsCollectionRef = collection(webDB, "blogs");
   const [open, setOpen] = useState(true);
   const [isPageVisible, setPageVisible] = useState(false);
   const [blogsList, setBlogsList] = useState([]);
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -39,6 +43,15 @@ function CreateEditBlogPage() {
   }
 
   return (
+    <>
+    <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Create a new blog post on Zymo and share your insights on cars, rentals, and travel." />
+                <link rel="canonical" href="https://zymo.app/createblog" />
+                <meta name="robots" content="noindex, nofollow" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Modify and update your blog content easily on Zymo." />
+            </Helmet>
     <div>
       <PasswordDialog
         open={open}
@@ -66,6 +79,7 @@ function CreateEditBlogPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
 
