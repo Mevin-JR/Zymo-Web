@@ -17,7 +17,6 @@ import ChatBot from "../components/Chatbot/ChatBot";
 const HomeScreen = ({ title }) => {
   useEffect(() => {
     const trackEvent = useTrackEvent();
-
     const handleWhatsappClicks = (label) => {
       trackEvent("Whatsapp Icon", "Whatsapp Clicked!", label);
     };
