@@ -12,7 +12,7 @@ import Footer from "./Footer";
 function UserNavigation(label) {
   ReactGA.event({
     category: 'User Interaction',
-    action: 'Link Clicked',
+    action: 'User Dashboard',
     label: label, 
   });
 }
@@ -72,7 +72,7 @@ const Profile = ({ title }) => {
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
           {/* Your Details Section */}
-          <Link to="/details" onClick={()=>UserNavigation("Your Details")}>
+          <Link to="/details" onClick={()=>UserNavigation("User Details")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
               <div className="flex items-center space-x-3">
                 <FaUser className="text-gray-700 text-lg" />
@@ -82,7 +82,7 @@ const Profile = ({ title }) => {
           </Link>
 
           {/* Your Bookings Section */}
-          <Link to="/my-bookings" onClick={()=>UserNavigation("Your Bookings")}>
+          <Link to="/my-bookings" onClick={()=>UserNavigation("My Bookings")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <FaCar className="text-gray-700 text-lg" />

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapPinIcon, CalendarIcon, SparklesIcon, LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadScriptNext, Autocomplete } from "@react-google-maps/api";
@@ -55,12 +55,10 @@ const NewRSB = () => {
 
 //Google analytics for RSB section
 const handleRSBClicks =(label)=>{
-    trackEvent("RSB Section","RSB Clicked!",label);
-
+    trackEvent("RSB Section","RSB User Choice",label);
 }
 const handleRSBFunctionClicks =(label)=>{
-    trackEvent("RSB Functions Section","RSB Function Clicked!",label);
-
+    trackEvent("RSB Functions Section","RSB Function Action Chosen",`${label} - ${activeTab}`);
 }
 
 

@@ -93,7 +93,7 @@ const CarDetails = ({ title }) => {
 
     //ga for car booking
     const handleCarBooking=(label)=>{
-        trackEvent("Car Booking Section","Clicked on car booking!",label); 
+        trackEvent("Car Booking Section","Rent Section Button Clicked",label); 
     }
 
 

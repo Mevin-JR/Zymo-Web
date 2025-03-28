@@ -517,7 +517,7 @@ function BookingPage({ title } ){
     };
 
     const handleBooknpay=(label)=>{
-        trackEvent("Car Book&Pay Section","Clicked book&pay car!",label); 
+        trackEvent("Car Book&Pay Section","Rent Section Buttons",label); 
     }
 
     const handlePayment = async () => {

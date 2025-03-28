@@ -1,14 +1,20 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
+import useTrackEvent from '../../hooks/useTrackEvent';
+
 
 const CarType = ["Automatic", "Hybrid", "Electric"];
 const Filter = ({setFilterCar }) => {
   const [selectedFilter, setSelectedFilter] = useState("Electric");
+  const trackEvent = useTrackEvent();
 
+  
   // Function to handle the filter button click
   const handleFilterClick = (filter) => {
     setFilterCar(filter);
     setSelectedFilter(filter);
+    trackEvent("Buy Section Filter Changed", "Buy Section Button Clicked", `${filter} Selected`);
   };
+
   return (
     <>
       <div className="filter-container text-md flex justify-center my-3 mx-3 gap-2">
