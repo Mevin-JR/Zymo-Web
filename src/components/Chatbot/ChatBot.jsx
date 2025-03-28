@@ -6,7 +6,7 @@ import { TiWeatherSnow } from "react-icons/ti";
 import chatBotIcon from './images/assistant.png'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-
+import useTrackEvent from '../../hooks/useTrackEvent';
 //import { logEvent } from "firebase/analytics";
 
 //import { analytics } from '../../firebase-config';
@@ -23,7 +23,9 @@ const ChatBot = ({ forApp }) => {
     const inputRef = useRef(null);
     const [show, setShow] = useState(false);
     const [userPerference, setUserPreference] = useState('')
+    const trackEvent = useTrackEvent();
 
+  
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
@@ -294,13 +296,17 @@ const ChatBot = ({ forApp }) => {
         setDropdownVisible(!isDropdownVisible);
     };
 
+    const handleBotClicks = (label) => {
+        trackEvent("Bot Icon", "Icon Clicks", label);
+    };
+
     return (
         <>
             <div className='icon-main'>
                 
                 <button
                     className="chatbot-toggle-button"
-                    onClick={(e) => { e.preventDefault(); toggleChat(); handleShow(); }}
+                    onClick={(e) => { e.preventDefault();handleBotClicks("Bot Icon"); toggleChat(); handleShow(); }}
                     aria-label="Toggle chat"
                     style={{ display: 'flex', alignItems: 'center' }} // Adjust gap as needed
                 >

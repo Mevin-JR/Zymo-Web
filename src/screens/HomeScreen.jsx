@@ -15,11 +15,14 @@ import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
 import ChatBot from "../components/Chatbot/ChatBot";
 const HomeScreen = ({ title }) => {
+
+  const trackEvent = useTrackEvent();
+  const handleWhatsappClicks = (label) => {
+    trackEvent("Whatsapp Icon", "Icon Clicks", label);
+  };
+
+
   useEffect(() => {
-    const trackEvent = useTrackEvent();
-    const handleWhatsappClicks = (label) => {
-      trackEvent("Whatsapp Icon", "Whatsapp Clicked!", label);
-    };
     document.title = title;
   }, [title]);
   return (
@@ -56,7 +59,7 @@ const HomeScreen = ({ title }) => {
           className="fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300"
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => handleWhatsappClicks("Whatsapp")}
+          onClick={() => handleWhatsappClicks("Whatsapp Icon")}
         >
           <FaWhatsapp className="text-3xl" />
         </a>
