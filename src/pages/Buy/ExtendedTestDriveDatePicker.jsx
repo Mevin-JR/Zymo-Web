@@ -2,12 +2,17 @@ import { useState } from "react";
 import { format, addDays } from "date-fns";
 import { motion } from "framer-motion";
 import { useNavigate,useLocation } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from 'lucide-react';
+import { useEffect } from "react";
+import useTrackEvent from "../../hooks/useTrackEvent";
 
-const ExtendedTestDriveDatePicker = () => {
+
+const ExtendedTestDriveDatePicker = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const trackEvent = useTrackEvent();
     const { car } = location.state || {};
     const dates = Array.from({ length: 90 }, (_, i) => addDays(new Date(), i));
 
@@ -16,8 +21,30 @@ const ExtendedTestDriveDatePicker = () => {
     const endDate = new Date(selectedDate);
     endDate.setDate(selectedDate.getDate() + 30);
     const endDateFormatted = format(endDate, "dd MMMM, yyyy");
+    useEffect(() => {
+      document.title = title;
+    }, [title]);
   
+    const onSubmit = () => {
+      navigate('/buy/upload-info',
+        { 
+          state: { 
+            car:car , startDate:startDateFormatted , endDate:endDateFormatted
+          } 
+        }
+      )
+      trackEvent("Extended Test Drive Booking", "Extended Test Drive","Start Date Selected");
+    }
+
   return (
+    <>
+    <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Choose a convenient date and time for your test drive with Zymo." />
+                <link rel="canonical" href="https://zymo.app/buy/date-picker" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Pick the perfect date and time for your test drive experience at Zymo." />
+            </Helmet>
     <div className="min-h-screen bg-[#212121] text-white p-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -78,13 +105,14 @@ const ExtendedTestDriveDatePicker = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
-            onClick={() => navigate('/buy/upload-info',{ state: { car, startDate:startDateFormatted , endDate:endDateFormatted } })}
+            onClick={onSubmit}
             >
             Next
             </motion.button>
         </div>
       </motion.div>
     </div>
+    </>
   );
 };
 

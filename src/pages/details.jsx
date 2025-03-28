@@ -8,8 +8,20 @@ import { useNavigate } from "react-router-dom";
 import { webDB, webStorage, appAuth } from "../utils/firebase"; // Import Firebase configuration
 import { collection, addDoc, query, where, getDocs} from "firebase/firestore"; // Firestore functions
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Firebase Storage functions
+import { Helmet } from "react-helmet-async";
+import NavBar from "../components/NavBar";
 
-export default function YourDetails() {
+
+function UserNavigation(label) {
+  ReactGA.event({
+    category: 'User Interaction',
+    action: 'User Dashboard',
+    label: label, 
+  });
+}
+
+
+export default function YourDetails({title}) {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -30,6 +42,9 @@ export default function YourDetails() {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);  // Loading state for save button
   const navigate = useNavigate();
+  useEffect(() => {
+    document.title = title;
+}, [title]);
 
     // Fetch user data on component mount
     useEffect(() => {
@@ -115,6 +130,7 @@ export default function YourDetails() {
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
+    UserNavigation("User Deleted Account");
   };
 
   // Function to upload a file to Firebase Storage and return its download URL
@@ -157,6 +173,8 @@ export default function YourDetails() {
       const docRef = await addDoc(collection(webDB, "webUserProfiles"), userProfile);
       console.log("Document written with ID: ", docRef.id);
       setIsSaved(true); // Set saved state instead of alert
+
+      UserNavigation("User Profile Saved");
     } catch (error) {
       console.error("Error saving profile: ", error);
       alert("Failed to save profile. Please try again.");
@@ -167,8 +185,16 @@ export default function YourDetails() {
 
   return (
     <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Enter your personal details for a seamless experience with Zymo." />
+                <link rel="canonical" href="https://zymo.app/your-details" />
+                <meta property="og:title" content={title} />
+                <meta property="og:description" content="Keep your personal details up to date on Zymo." />
+            </Helmet>
+    <NavBar/>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
       >
         <ArrowLeft className="w-6 h-6" />

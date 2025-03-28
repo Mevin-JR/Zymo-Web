@@ -2,19 +2,20 @@ import { ArrowLeft, MapPin, Calendar, IndianRupee, Car } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ConfirmPage from "../components/ConfirmPage";
+import { Helmet } from "react-helmet-async";
 import { formatDate, formatFare, retryFunction, toPascalCase } from "../utils/helperFunctions";
 import { fetchMyChoizeLocationList, findPackage, formatDateForMyChoize } from "../utils/mychoize";
-import { addDoc, collection, doc, getDoc } from "firebase/firestore";
-import { appDB, appStorage } from "../utils/firebase";
+import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { webDB, webStorage } from "../utils/firebase"; 
 import PickupPopup from "../components/PickupPopup";
 import DropupPopup from "../components/DropupPopup";
 import BookingPageFormPopup from "../components/BookingPageFormPopup";
 import BookingPageUploadPopup from "../components/BookingPageUploadPopup";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import useTrackEvent from "../hooks/useTrackEvent";
 
-// Function to dynamically load Razorpay script
 function loadScript(src) {
     return new Promise((resolve) => {
         const script = document.createElement("script");
@@ -24,16 +25,19 @@ function loadScript(src) {
         document.body.appendChild(script);
     });
 }
+
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function BookingPage() {
+function BookingPage({ title } ){
     const navigate = useNavigate();
     const location = useLocation();
     const { city } = useParams();
     const { startDate, endDate, userData, car } = location.state || {};
 
+    const trackEvent =useTrackEvent();
+
     const startDateFormatted = formatDate(startDate);
-    const endDateFormatted = formatDate(endDate)
+    const endDateFormatted = formatDate(endDate);
 
     const [customerName, setCustomerName] = useState(userData.name);
     const [customerPhone, setCustomerPhone] = useState(userData.phone);
@@ -62,16 +66,20 @@ function BookingPage() {
     const customerUploadDetails = formData && uploadDocData;
 
     const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
-    // const functionsUrl = "http://127.0.0.1:5001/zymo-prod/us-central1/api";
 
     const vendor = car.source === "zoomcar" ? "ZoomCar" : car.source === "mychoize" ? "Mychoize" : car.source;
+
     useEffect(() => {
         const fetchVendorDetails = async () => {
-            const docRef = doc(appDB, "carvendors", vendor);
+            const docRef = doc(webDB, "carvendors", vendor); 
             const docSnap = await getDoc(docRef);
 
-            setVendorDetails(docSnap.data());
-        }
+            if (docSnap.exists()) {
+                setVendorDetails(docSnap.data());
+            } else {
+                console.error("Vendor details not found for:", vendor);
+            }
+        };
 
         fetchVendorDetails();
     }, [car.source]);
@@ -84,7 +92,7 @@ function BookingPage() {
         const discountPercent = parseFloat(vendorDetails?.DiscountSd) || 0;
         const deposit = parseInt(vendorDetails?.Securitydeposit) || 0;
 
-        const gstValue = gstPercent != 1 ? rawFare * gstPercent : 0;
+        const gstValue = gstPercent !== 1 ? rawFare * gstPercent : 0;
         const discountValue = rawFare * (1 - discountPercent);
 
         setGst(gstValue);
@@ -97,12 +105,12 @@ function BookingPage() {
     useEffect(() => {
         if (selectedPickupLocation && selectedDropLocation) {
             const newDeliveryCharges = parseInt(selectedPickupLocation.DeliveryCharge) + parseInt(selectedDropLocation.DeliveryCharge);
-            setPayableAmount(prevAmount => {
+            setPayableAmount((prevAmount) => {
                 return prevAmount - deliveryCharges + newDeliveryCharges;
-            })
+            });
             setDeliveryCharges(newDeliveryCharges);
         }
-    }, [selectedPickupLocation, selectedDropLocation])
+    }, [selectedPickupLocation, selectedDropLocation]);
 
     const formattedFare = formatFare(car.fare);
 
@@ -141,47 +149,53 @@ function BookingPage() {
     };
 
     const filterLocationLists = (locationList) => {
-        const filteredLocationList = locationList
-            .filter(location => !location.LocationName.includes("Monthly"));
+        const filteredLocationList = locationList.filter(
+            (location) => !location.LocationName.includes("Monthly")
+        );
 
-        const hubLocations = filteredLocationList
-            .filter(location => !location.IsPickDropChargesApplicable)
+        const hubLocations = filteredLocationList.filter(
+            (location) => !location.IsPickDropChargesApplicable
+        );
         const doorstepDeliveryLocations = filteredLocationList
-            .filter(location => location.LocationName.includes("Doorstep"))
-            .filter(location => location.IsPickDropChargesApplicable);
-        const airportLocations = filteredLocationList
-            .filter(location => location.LocationName.includes("Airport"))
+            .filter((location) => location.LocationName.includes("Doorstep"))
+            .filter((location) => location.IsPickDropChargesApplicable);
+        const airportLocations = filteredLocationList.filter((location) =>
+            location.LocationName.includes("Airport")
+        );
 
         const filteredLocations = new Set([
             ...hubLocations,
             ...doorstepDeliveryLocations,
-            ...airportLocations
-        ])
-        const nearbyLocations = filteredLocationList
-            .filter(location => !filteredLocations.has(location))
+            ...airportLocations,
+        ]);
+        const nearbyLocations = filteredLocationList.filter(
+            (location) => !filteredLocations.has(location)
+        );
 
         return {
             hubs: hubLocations,
             doorstep_delivery: doorstepDeliveryLocations,
             airport_locations: airportLocations,
             nearby_locations: nearbyLocations,
-        }
-    }
+        };
+    };
 
     useEffect(() => {
         const mychoizeFormattedPickDate = formatDateForMyChoize(startDate);
         const mychoizeFormattedDropDate = formatDateForMyChoize(endDate);
 
-        const fetchLocationList = () => fetchMyChoizeLocationList(city, mychoizeFormattedDropDate, mychoizeFormattedPickDate)
-            .then((data) => {
-                const pickupLocations = filterLocationLists(data.BranchesPickupLocationList);
-                const dropupLocations = filterLocationLists(data.BranchesDropupLocationList);
+        const fetchLocationList = () =>
+            fetchMyChoizeLocationList(city, mychoizeFormattedDropDate, mychoizeFormattedPickDate).then(
+                (data) => {
+                    const pickupLocations = filterLocationLists(data.BranchesPickupLocationList);
+                    const dropupLocations = filterLocationLists(data.BranchesDropupLocationList);
 
-                setMychoizePickupLocations(pickupLocations);
-                setMychoizeDropupLocations(dropupLocations);
-            });
+                    setMychoizePickupLocations(pickupLocations);
+                    setMychoizeDropupLocations(dropupLocations);
+                }
+            );
         fetchLocationList();
-    }, [selectedPickupLocation, selectedDropLocation])
+    }, [selectedPickupLocation, selectedDropLocation]);
 
     const uploadDocs = async (images) => {
         try {
@@ -191,7 +205,7 @@ function BookingPage() {
                     LicenseFront: null,
                     aadhaarBack: null,
                     aadhaarFront: null,
-                }
+                };
             }
 
             const timestamp = Date.now();
@@ -199,13 +213,12 @@ function BookingPage() {
 
             const imageUrls = await Promise.all(
                 images.map(async (image) => {
-                    const fileRef = ref(appStorage, `${folderPath}/${image.name}`);
+                    const fileRef = ref(webStorage, `${folderPath}/${image.name}`); 
                     await uploadBytes(fileRef, image.file_object);
                     return await getDownloadURL(fileRef);
                 })
             );
 
-            // URLs of uploaded images
             const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
 
             const documents = {
@@ -216,61 +229,88 @@ function BookingPage() {
             };
 
             return documents;
-
         } catch (error) {
             console.error("Error uploading documents to Firebase:", error);
+            throw error;
         }
-    }
+    };
 
     const saveSuccessfulBooking = async (paymentId, booking_id = null) => {
-        const formattedPhoneNumber = customerPhone.startsWith("+91") ? customerPhone : `+91${customerPhone}`;
-        const bookingId = booking_id || 'Z' + new Date().getTime().toString();
-        const documents = await uploadDocs(uploadDocData);
+        try {
+            const formattedPhoneNumber = customerPhone.startsWith("+91")
+                ? customerPhone
+                : `+91${customerPhone}`;
+            const documents = await uploadDocs(uploadDocData);
 
-        const bookingDataStructure = {
-            Balance: 0,
-            CarImage: car.images[0],
-            CarName: car.name,
-            City: city,
-            DateOfBirth: formData?.dob || "",
-            DateOfBooking: Date.now(),
-            Documents: documents,
-            Drive: "",
-            Email: formData?.email || customerEmail,
-            EndDate: endDateFormatted,
-            EndTime: "",
-            FirstName: formData?.userName || customerName,
-            MapLocation: car.address,
-            "Package Selected": findPackage(car.rateBasis),
-            PhoneNumber: formData?.phone || formattedPhoneNumber,
-            "Pickup Location": selectedPickupLocation?.LocationName || car.address,
-            "Promo Code Used": "",
-            SecurityDeposit: vendorDetails?.Securitydeposit,
-            StartDate: startDateFormatted,
-            StartTime: "",
-            Street1: "",
-            Street2: "",
-            TimeStamp: formatDate(Date.now()),
-            Transmission: car.options[0],
-            UserId: userData.uid,
-            Vendor: vendor,
-            Zipcode: "",
-            actualPrice: parseInt(car.fare.slice(1)),
-            bookingId,
-            deliveryType: selectedPickupLocation?.LocationName?.includes("Doorstep") ? "Doorstep Delivery" : "Self Pickup",
-            paymentId,
-            price: payableAmount
+            // Reference the user document in webUserProfiles
+            const userDocRef = doc(webDB, "webUserProfiles", userData.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (!userDocSnap.exists()) {
+                await setDoc(userDocRef, {
+                    uid: userData.uid,
+                    email: customerEmail,
+                    name: customerName,
+                    phone: customerPhone,
+                    createdAt: Date.now(),
+                });
+            }
+
+            const bookingsCollectionRef = collection(userDocRef, "bookings");
+
+            const bookingId = booking_id || bookingsCollectionRef.id;
+
+            const bookingDataStructure = {
+                Balance: 0,
+                CarImage: car.images[0],
+                CarName: car.name,
+                City: city,
+                DateOfBirth: formData?.dob || "",
+                DateOfBooking: Date.now(),
+                Documents: documents,
+                Drive: "",
+                Email: formData?.email || customerEmail,
+                EndDate: endDateFormatted,
+                EndTime: "",
+                FirstName: formData?.userName || customerName,
+                MapLocation: car.address,
+                "Package Selected": findPackage(car.rateBasis),
+                PhoneNumber: formData?.phone || formattedPhoneNumber,
+                "Pickup Location": selectedPickupLocation?.LocationName || car.address,
+                "Promo Code Used": "",
+                SecurityDeposit: vendorDetails?.Securitydeposit,
+                StartDate: startDateFormatted,
+                StartTime: "",
+                Street1: "",
+                Street2: "",
+                TimeStamp: formatDate(Date.now()),
+                Transmission: car.options[0],
+                UserId: userData.uid,
+                Vendor: vendor,
+                Zipcode: "",
+                actualPrice: parseInt(car.fare.slice(1)),
+                bookingId,
+                deliveryType: selectedPickupLocation?.LocationName?.includes("Doorstep")
+                    ? "Doorstep Delivery"
+                    : "Self Pickup",
+                paymentId,
+                price: payableAmount,
+            };
+
+        
+            await addDoc(bookingsCollectionRef, bookingDataStructure);
+            setBookingData(bookingDataStructure);
+            return bookingId;
+        } catch (error) {
+            console.error("Error saving booking to Firestore:", error);
+            throw error;
         }
+    };
 
-        await addDoc(collection(appDB, "CarsPaymentSuccessDetails"), bookingDataStructure);
-        setBookingData(bookingDataStructure);
-
-        return bookingId;
-    }
-
-    // Sends whatsapp notif to both user and zymo
     const sendWhatsappNotif = async (bookingId) => {
-        const formattedPhoneNumber = customerPhone.startsWith("+91") ? customerPhone : `+91${customerPhone}`;
+        const formattedPhoneNumber = customerPhone.startsWith("+91")
+            ? customerPhone
+            : `+91${customerPhone}`;
         const data = {
             id: bookingId,
             customerName: formData?.userName || customerName,
@@ -283,7 +323,7 @@ function BookingPage() {
             pickupLocation: selectedPickupLocation?.HubAddress || car.address,
             amount: formatFare(payableAmount),
             vendorName: vendor,
-            vendorPhone: "+919987933348", // TODO: Change this later
+            vendorPhone: "+919987933348", 
             vendorLocation: car.address,
             model: `${car.brand} ${car.name}`,
             transmission: car.options[0],
@@ -291,95 +331,80 @@ function BookingPage() {
             freeKMs: "",
             paymentMode: "Online (Razorpay)",
             serviceType: "",
-        }
+        };
 
         await fetch(`${functionsUrl}/message/booking-confirmation`, {
             method: "POST",
-            body: JSON.stringify({
-                data
-            }),
+            body: JSON.stringify({ data }),
             headers: {
                 "Content-Type": "application/json",
-            }
+            },
         });
-    }
+    };
 
-    // Booking handling
     const handleMychoizeBooking = async (paymentData) => {
-        const bookingId = saveSuccessfulBooking(paymentData.razorpay_payment_id);
-        sendWhatsappNotif(bookingId);
-        setIsConfirmPopupOpen(true);
-    }
-
-    const handleZoomcarBooking = async (paymentData) => {
-
         try {
-            const bookingId = await retryFunction(createBooking);
-            saveSuccessfulBooking(paymentData.razorpay_payment_id, bookingId);
-            sendWhatsappNotif(bookingId);
+            const bookingId = await saveSuccessfulBooking(paymentData.razorpay_payment_id);
+            await sendWhatsappNotif(bookingId);
             setIsConfirmPopupOpen(true);
         } catch (error) {
-            console.error(error.message);
+            console.error("Error handling Mychoize booking:", error);
+            toast.error("Failed to process Mychoize booking", {
+                position: "top-center",
+                autoClose: 5000,
+            });
+        }
+    };
+
+    const handleZoomcarBooking = async (paymentData) => {
+        try {
+            const bookingId = await retryFunction(createBooking);
+            await saveSuccessfulBooking(paymentData.razorpay_payment_id, bookingId);
+            await sendWhatsappNotif(bookingId);
+            setIsConfirmPopupOpen(true);
+        } catch (error) {
+            console.error("Error handling Zoomcar booking:", error);
             toast.error("Booking Creation Failed...", {
                 position: "top-center",
                 autoClose: 5000,
             });
         }
-        // initiateRefund(data.razorpay_payment_id).then(
-        //     (refundResponse) => {
-        //         if (refundResponse.status === "processed") {
-        //             navigate("/");
-        //             toast.success(
-        //                 "A refund has been processed, please check your mail for more details",
-        //                 {
-        //                     position: "top-center",
-        //                     autoClose: 1000 * 10,
-        //                 }
-        //             );
-        //         }
-        //     }
-        // );
-    }
+    };
 
     const createBooking = async () => {
         const startDateEpoc = Date.parse(startDate);
         const endDateEpoc = Date.parse(endDate);
 
-        const response = await fetch(
-            `${functionsUrl}/zoomcar/bookings/create-booking`,
-            {
-                method: "POST",
-                body: JSON.stringify({
-                    customer: {
-                        uid: userData.uid,
-                        name: customerName,
-                        phone: customerPhone,
-                        email: customerEmail,
-                    },
-                    booking_params: {
-                        type: "normal",
-                        cargroup_id: car.cargroup_id,
-                        car_id: car.id,
-                        city: city,
-                        search_location_id: car.location_id,
-                        ends: endDateEpoc,
-                        fuel_included: false,
-                        lat: car.lat,
-                        lng: car.lng,
-                        pricing_id: car.pricing_id,
-                        starts: startDateEpoc,
-                    }
-                }),
-                headers: {
-                    "Content-Type": "application/json",
+        const response = await fetch(`${functionsUrl}/zoomcar/bookings/create-booking`, {
+            method: "POST",
+            body: JSON.stringify({
+                customer: {
+                    uid: userData.uid,
+                    name: customerName,
+                    phone: customerPhone,
+                    email: customerEmail,
                 },
-            }
-        );
+                booking_params: {
+                    type: "normal",
+                    cargroup_id: car.cargroup_id,
+                    car_id: car.id,
+                    city: city,
+                    search_location_id: car.location_id,
+                    ends: endDateEpoc,
+                    fuel_included: false,
+                    lat: car.lat,
+                    lng: car.lng,
+                    pricing_id: car.pricing_id,
+                    starts: startDateEpoc,
+                },
+            }),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
 
         if (!response.ok) {
-            throw new Error(
-                `Error: ${response.status} - ${response.statusText}`
-            );
+            throw new Error(`Error: ${response.status} - ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -402,14 +427,13 @@ function BookingPage() {
         const amount = data.booking.fare.total_amount;
 
         const paymentUpdateData = await retryFunction(updateBookingPayment, [bookingId, amount]);
-        if (paymentUpdateData.status != 1) {
+        if (paymentUpdateData.status !== 1) {
             toast.error(paymentUpdateData.msg || "Error while payment update", {
                 position: "top-center",
                 autoClose: 1000 * 5,
             });
         }
         return bookingId;
-
     };
 
     const updateBookingPayment = async (bookingId, amount) => {
@@ -434,25 +458,19 @@ function BookingPage() {
         });
 
         if (!response.ok) {
-            throw new Error(
-                `${response.status} (${response.statusText})`
-            );
+            throw new Error(`${response.status} (${response.statusText})`);
         }
 
         const data = await response.json();
         return data;
     };
 
-    //Create order
     const createOrder = async (amount, currency) => {
         try {
-            const response = await axios.post(
-                `${functionsUrl}/payment/create-order`,
-                {
-                    amount,
-                    currency,
-                }
-            );
+            const response = await axios.post(`${functionsUrl}/payment/create-order`, {
+                amount,
+                currency,
+            });
             return response.data.data;
         } catch (error) {
             console.error("Error creating order:", error);
@@ -466,12 +484,9 @@ function BookingPage() {
 
     const initiateRefund = async (payment_id) => {
         try {
-            const response = await axios.post(
-                `${functionsUrl}/payment/refund`,
-                {
-                    payment_id,
-                }
-            );
+            const response = await axios.post(`${functionsUrl}/payment/refund`, {
+                payment_id,
+            });
             return response.data.data;
         } catch (error) {
             console.error("Error refunding order:", error);
@@ -501,15 +516,18 @@ function BookingPage() {
         return true;
     };
 
+    const handleBooknpay=(label)=>{
+        trackEvent("Car Book&Pay Section","Rent Section Buttons",label); 
+    }
+
     const handlePayment = async () => {
+        handleBooknpay("Book & Pay")
         if (car.source != "mychoize" && !handleCustomerDetails()) {
             return;
         }
 
         await delay(1000);
-        const res = await loadScript(
-            "https://checkout.razorpay.com/v1/checkout.js"
-        );
+        const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
         if (!res) {
             console.error("Razorpay SDK failed to load!");
@@ -532,23 +550,15 @@ function BookingPage() {
                 image: "/images/AppLogo/zymo2.jpg",
                 order_id: orderData.id,
                 handler: async function (response) {
-                    const data = {
-                        ...response,
-                    };
-                    const res = await axios.post(
-                        `${functionsUrl}/payment/verifyPayment`,
-                        data
-                    );
+                    const data = { ...response };
+                    const res = await axios.post(`${functionsUrl}/payment/verifyPayment`, data);
 
-
-                    // Payment successful
                     if (res.data.success) {
                         if (vendor === "Mychoize") {
-                            handleMychoizeBooking(data);
+                            await handleMychoizeBooking(data);
                         } else if (vendor === "ZoomCar") {
-                            handleZoomcarBooking(data);
+                            await handleZoomcarBooking(data);
                         }
-
                     } else {
                         toast.error("Payment error, Please try again...", {
                             position: "top-center",
@@ -567,20 +577,24 @@ function BookingPage() {
                 },
             };
 
-            var rzp1 = new window.Razorpay(options);
-            rzp1.on("payment.failed", async function (response) {
+            const rzp1 = new window.Razorpay(options);
+            rzp1.on("payment.failed", async (response) => {
                 console.log("Payment failed:", response.error);
                 console.log(response.error.metadata.order_id);
                 console.log(response.error.metadata.payment_id);
             });
 
-            rzp1.on("payment.error", function (response) {
+            rzp1.on("payment.error", (response) => {
                 console.log("Payment error:", response.error);
             });
 
             rzp1.open();
         } catch (error) {
             console.error("Error during payment initiation:", error);
+            toast.error("Error during payment initiation", {
+                position: "top-center",
+                autoClose: 1000 * 5,
+            });
         }
     };
 
@@ -594,9 +608,21 @@ function BookingPage() {
         }
 
         setShowFormPopup(true);
-    }
+    };
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
+    
 
     return (
+        <>
+      <Helmet>
+                <title>Booking Confirmation - {city} | Zymo</title>
+                <meta name="description" content={`Your self-drive car rental in ${city} is confirmed. Get ready for a seamless ride with Zymo.`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Thank you for choosing Zymo. Your self-drive car rental is confirmed!" />
+                <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}/cars/booking-details/confirmation`} />
+            </Helmet>
         <div className="min-h-screen bg-[#212121]">
             {/* Header */}
             <div className="bg-[#eeff87] p-4 flex items-center gap-2">
@@ -606,7 +632,7 @@ function BookingPage() {
                 >
                     <ArrowLeft className="w-6 h-6" />
                 </button>
-                <h1 className=" text-3xl font-bold  flex-grow text-center">
+                <h1 className="text-3xl font-bold flex-grow text-center">
                     Confirm Booking
                 </h1>
             </div>
@@ -623,10 +649,7 @@ function BookingPage() {
 
                     <div className="flex-1 flex justify-center -mt-10">
                         <img
-                            src={
-                                preBookingData.headerDetails.image ||
-                                "/placeholder.svg"
-                            }
+                            src={preBookingData.headerDetails.image || "/placeholder.svg"}
                             alt={`${preBookingData.headerDetails.name}`}
                             className="w-full sm:w-96 lg:w-80 h-[200px] sm:h-[280px] lg:h-[200px] object-cover rounded-lg"
                         />
@@ -636,11 +659,7 @@ function BookingPage() {
                         <div className="flex flex-row items-center gap-2">
                             <p className="text-muted-foreground whitespace-nowrap">
                                 Fulfilled by:{" "}
-                                <img
-                                    src={car.sourceImg}
-                                    alt={car.source}
-                                    className="h-10"
-                                />
+                                <img src={car.sourceImg} alt={car.source} className="h-10" />
                             </p>
                         </div>
                     </div>
@@ -653,7 +672,6 @@ function BookingPage() {
                     </h3>
                     <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
-
                         {/* Start Date */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -680,32 +698,75 @@ function BookingPage() {
                     {car.source === "mychoize" ? (
                         <>
                             <div className="mt-5 mb-4">
-                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">Pickup Location | Time | Charges</label>
+                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">
+                                    Pickup Location | Time | Charges
+                                </label>
                                 <div
                                     className="bg-[#404040] text-white p-3 rounded-md cursor-pointer"
                                     onClick={() => setShowPickupPopup(true)}
                                 >
-                                    {selectedPickupLocation ? `${selectedPickupLocation.LocationName} | ${selectedPickupLocation.IsPickDropChargesApplicable ? `₹${selectedPickupLocation.DeliveryCharge}` : "FREE"}` : "Select pickup location"}
+                                    {selectedPickupLocation
+                                        ? `${selectedPickupLocation.LocationName} | ${
+                                              selectedPickupLocation.IsPickDropChargesApplicable
+                                                  ? `₹${selectedPickupLocation.DeliveryCharge}`
+                                                  : "FREE"
+                                          }`
+                                        : "Select pickup location"}
                                 </div>
-                                <textarea disabled className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" placeholder={selectedPickupLocation ? selectedPickupLocation.HubAddress : ""} rows="3"></textarea>
+                                <textarea
+                                    disabled
+                                    className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]"
+                                    placeholder={
+                                        selectedPickupLocation
+                                            ? selectedPickupLocation.HubAddress
+                                            : ""
+                                    }
+                                    rows="3"
+                                ></textarea>
                             </div>
 
                             <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">Drop Location | Time | Charges</label>
+                                <label className="block text-sm font-medium mb-1 text-[#faffa4]">
+                                    Drop Location | Time | Charges
+                                </label>
                                 <div
                                     className="bg-[#404040] text-white p-3 rounded-md cursor-pointer"
                                     onClick={() => setShowDropupPopup(true)}
                                 >
-                                    {selectedDropLocation ? `${selectedDropLocation.LocationName} | ${selectedDropLocation.IsPickDropChargesApplicable ? `₹${selectedDropLocation.DeliveryCharge}` : "FREE"}` : "Select drop location"}
+                                    {selectedDropLocation
+                                        ? `${selectedDropLocation.LocationName} | ${
+                                              selectedDropLocation.IsPickDropChargesApplicable
+                                                  ? `₹${selectedDropLocation.DeliveryCharge}`
+                                                  : "FREE"
+                                          }`
+                                        : "Select drop location"}
                                 </div>
-                                <textarea disabled className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]" placeholder={selectedDropLocation ? selectedDropLocation.HubAddress : ""} rows="3"></textarea>
+                                <textarea
+                                    disabled
+                                    className="w-full mt-2 p-3 bg-[#404040] rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#faffa5]"
+                                    placeholder={
+                                        selectedDropLocation ? selectedDropLocation.HubAddress : ""
+                                    }
+                                    rows="3"
+                                ></textarea>
                             </div>
 
-                            {showPickupPopup && <PickupPopup setIsOpen={setShowPickupPopup} pickupLocations={mychoizePickupLocations} setSelectedPickupLocation={setSelectedPickupLocation} />}
-                            {showDropupPopup && <DropupPopup setIsOpen={setShowDropupPopup} dropupLocations={mychoizeDropupLocations} setSelectedDropLocation={setSelectedDropLocation} />}
+                            {showPickupPopup && (
+                                <PickupPopup
+                                    setIsOpen={setShowPickupPopup}
+                                    pickupLocations={mychoizePickupLocations}
+                                    setSelectedPickupLocation={setSelectedPickupLocation}
+                                />
+                            )}
+                            {showDropupPopup && (
+                                <DropupPopup
+                                    setIsOpen={setShowDropupPopup}
+                                    dropupLocations={mychoizeDropupLocations}
+                                    setSelectedDropLocation={setSelectedDropLocation}
+                                />
+                            )}
                         </>
-                    ) : ""}
-
+                    ) : null}
                 </div>
 
                 {/* Car Details */}
@@ -715,13 +776,15 @@ function BookingPage() {
                     </h3>
                     <hr className="my-1 mb-5 border-gray-500" />
                     <div className="space-y-2">
-                        {/* Registeration */}
+                        {/* Registration */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Car className="w-5 h-5 text-[#eeff87]" />
-                                <p>Registeration</p>
+                                <p>Registration</p>
                             </div>
-                            <p className="ml-auto text-white">{preBookingData.carDetails.registration}</p>
+                            <p className="ml-auto text-white">
+                                {preBookingData.carDetails.registration}
+                            </p>
                         </div>
 
                         {/* Package */}
@@ -790,7 +853,12 @@ function BookingPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
-                                <span>GST {car.source !== "zoomcar" ? `(${(vendorDetails?.TaxSd * 100).toFixed(0)}%)` : ""}</span>
+                                <span>
+                                    GST{" "}
+                                    {car.source !== "zoomcar"
+                                        ? `(${(vendorDetails?.TaxSd * 100).toFixed(0)}%)`
+                                        : ""}
+                                </span>
                             </div>
                             <span className="ml-auto text-white">
                                 {preBookingData.fareDetails.gst}
@@ -812,7 +880,10 @@ function BookingPage() {
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <IndianRupee className="w-5 h-5 text-[#eeff87]" />
-                                <span>Discount {`(${((1 - vendorDetails?.DiscountSd) * 100).toFixed(0)}%)`}</span>
+                                <span>
+                                    Discount{" "}
+                                    {`(${((1 - vendorDetails?.DiscountSd) * 100).toFixed(0)}%)`}
+                                </span>
                             </div>
                             <span className="ml-auto text-white">
                                 {`- ${preBookingData.fareDetails.discount}`}
@@ -829,7 +900,7 @@ function BookingPage() {
                                     {formatFare(deliveryCharges)}
                                 </span>
                             </div>
-                        ) : ""}
+                        ) : null}
 
                         <hr className="my-0 border-gray-600" />
 
@@ -855,21 +926,17 @@ function BookingPage() {
                         <p className="text-center text-gray-400 text-sm mb-4">
                             (You must add your details and documents to continue)
                         </p>
-                    ) : ""}
+                    ) : null}
                     <hr className="my-1 mb-5 border-gray-500" />
                     {car.source === "zoomcar" ? (
                         <div className="space-y-4">
                             {/* Name Input */}
                             <div className="flex flex-col">
-                                <label className="text-lg text-[#eeff87]">
-                                    Name
-                                </label>
+                                <label className="text-lg text-[#eeff87]">Name</label>
                                 <input
                                     type="text"
                                     value={customerName}
-                                    onChange={(e) =>
-                                        setCustomerName(e.target.value)
-                                    }
+                                    onChange={(e) => setCustomerName(e.target.value)}
                                     className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your name"
                                 />
@@ -877,17 +944,13 @@ function BookingPage() {
 
                             {/* Phone Input */}
                             <div className="flex flex-col">
-                                <label className="text-lg text-[#eeff87]">
-                                    Phone
-                                </label>
+                                <label className="text-lg text-[#eeff87]">Phone</label>
                                 <input
                                     type="text"
                                     pattern="[0-9]{10}"
                                     maxLength={10}
                                     value={customerPhone}
-                                    onChange={(e) =>
-                                        setCustomerPhone(e.target.value)
-                                    }
+                                    onChange={(e) => setCustomerPhone(e.target.value)}
                                     className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your phone number"
                                 />
@@ -895,15 +958,11 @@ function BookingPage() {
 
                             {/* Email Input */}
                             <div className="flex flex-col">
-                                <label className="text-lg text-[#eeff87]">
-                                    Email
-                                </label>
+                                <label className="text-lg text-[#eeff87]">Email</label>
                                 <input
                                     type="email"
                                     value={customerEmail}
-                                    onChange={(e) =>
-                                        setCustomerEmail(e.target.value)
-                                    }
+                                    onChange={(e) => setCustomerEmail(e.target.value)}
                                     className="p-2 rounded-lg bg-gray-500/30 text-white border border-gray-500 focus:outline-none focus:ring-2 focus:ring-[#eeff87]"
                                     placeholder="Enter your email"
                                 />
@@ -912,32 +971,47 @@ function BookingPage() {
                     ) : (
                         <div className="flex flex-col justify-center items-center">
                             <button
-                                className={`px-6 py-2 rounded-lg font-semibold  transition-colors
-                                ${!customerUploadDetails
+                                className={`px-6 py-2 rounded-lg font-semibold transition-colors
+                                ${
+                                    !customerUploadDetails
                                         ? "text-black bg-[#eeff87] hover:bg-[#e2ff5d] cursor-pointer"
                                         : "text-[#eeff87] bg-transparent border-2 border-[#eeff87] cursor-not-allowed"
-                                    }`}
+                                }`}
                                 onClick={handleUploadDocuments}
                                 disabled={customerUploadDetails}
                             >
                                 Upload Documents
                             </button>
                             {customerUploadDetails ? (
-                                <p className="mt-4 text-green-400 text-sm">Details and Documents uploaded successfully</p>
-                            ) : ""}
+                                <p className="mt-4 text-green-400 text-sm">
+                                    Details and Documents uploaded successfully
+                                </p>
+                            ) : null}
 
-                            {showFormPopup && <BookingPageFormPopup isOpen={showFormPopup} setIsOpen={setShowFormPopup} setUserFormData={setFormData} showUploadPopup={setShowUploadPopup} />}
-                            {showUploadPopup && <BookingPageUploadPopup isOpen={showUploadPopup} setIsOpen={setShowUploadPopup} setUserUploadData={setUploadDocData} />}
+                            {showFormPopup && (
+                                <BookingPageFormPopup
+                                    isOpen={showFormPopup}
+                                    setIsOpen={setShowFormPopup}
+                                    setUserFormData={setFormData}
+                                    showUploadPopup={setShowUploadPopup}
+                                />
+                            )}
+                            {showUploadPopup && (
+                                <BookingPageUploadPopup
+                                    isOpen={showUploadPopup}
+                                    setIsOpen={setShowUploadPopup}
+                                    setUserUploadData={setUploadDocData}
+                                />
+                            )}
                         </div>
                     )}
                 </div>
-
 
                 {/* Book Button */}
                 {car.source === "zoomcar" ? (
                     <div className="flex justify-center items-center">
                         <button
-                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold transition-colors"
                             onClick={handlePayment}
                         >
                             Book & Pay
@@ -946,7 +1020,7 @@ function BookingPage() {
                 ) : (
                     <div className="flex justify-center items-center">
                         <button
-                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold  transition-colors"
+                            className="text-black bg-[#eeff87] hover:bg-[#e2ff5d] px-6 py-2 rounded-lg font-semibold transition-colors"
                             onClick={handlePayment}
                             disabled={!customerUploadDetails}
                         >
@@ -961,6 +1035,7 @@ function BookingPage() {
                 close={() => setIsConfirmPopupOpen(false)}
             />
         </div>
+        </>
     );
 }
 

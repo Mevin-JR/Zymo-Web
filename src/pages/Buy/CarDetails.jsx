@@ -3,19 +3,25 @@ import { useParams , Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ExtendedTestDriveBenefits from '../../components/buycomponent/ExtendedTestDriveBenefits';
-
+import { Helmet } from 'react-helmet-async';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { webDB } from "../../utils/firebase";
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 
-const CarDetails = () => {
+const CarDetails = ({ title }) => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const trackEvent = useTrackEvent();
   const [isTestDrivePopupOpen, setIsTestDrivePopupOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [carDetail, setCarDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
 
   useEffect(() => {
     const fetchCarData = async () => {
@@ -55,9 +61,20 @@ const CarDetails = () => {
   if (!carDetail) {
     return <div>No car found</div>;
   }
+  const handleClicks=(carDetail,label)=>{
+    trackEvent("Test & Extended Test Drive Section", "Buy Section Button Clicked", label);
+    trackEvent("Buy Section Car",`Buy Section Car`,`${carDetail.name} ${carDetail.model}- ${carDetail.vendor}-${label}`)
+  }
 
   return (
     <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content={`Discover detailed specifications and features of your selected car. Book a test drive now!`} />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Check out in-depth details about the car you're interested in before making a decision." />
+                <link rel="canonical" href={`https://zymo.app/buy/car-details/${id}`} />
+            </Helmet>
       <div className="min-h-screen flex items-center justify-center p-3 bg-darkGrey text-white">
         {/* Back Button */}
         <button
@@ -178,7 +195,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
-                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                    onClick={() => handleClicks(carDetail,"Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -204,6 +221,8 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold hover:bg-[#e8ff88] mx-1"
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
+                        onClick={() => handleClicks(carDetail,"Extended Test Drive")}
+
                       >
                         Extended Test Drive
                       </button>
@@ -323,7 +342,7 @@ const CarDetails = () => {
                   state={{ car: carDetail }} >
                     <button
                       className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg font-semibold text-sm hover:bg-[#e8ff88] mx-1"
-                    // onClick={() => setIsTestDrivePopupOpen(true)}
+                      onClick={() => handleClicks(carDetail,"Test Drive")}
                     >
                       Test Drive
                     </button>
@@ -349,6 +368,8 @@ const CarDetails = () => {
                         className="bg-[#e8ff81] text-darkGrey px-6 py-3 rounded-lg  font-semibold hover:bg-[#e8ff88] mx-1 "
                         onMouseEnter={() => setShowPopup(true)}
                         onMouseLeave={() => setShowPopup(false)}
+                        onClick={() => handleClicks(carDetail,"Extended Test Drive")}
+
                       >
                         Extended Test Drive
                       </button>

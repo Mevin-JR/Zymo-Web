@@ -1,11 +1,32 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
-
-const AboutUs = () => {
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Helmet } from "react-helmet-async";
+const AboutUs = ({ title }) => {
+    const navigate = useNavigate();
+    useEffect(() => {
+  
+        document.title = title;  // Ensures title changes instantly
+      }, [title]);
     return (
         <>
+         <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Learn more about Zymo, our mission, and how we make car renting and buying seamless for you." />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Discover how Zymo is transforming the self-drive car rental experience." />
+                <link rel="canonical" href="https://zymo.app/about-us" />
+            </Helmet>
             <NavBar />
+            <button
+                onClick={() => navigate("/")}
+                className="text-white m-5 cursor-pointer"
+            >
+                <ArrowLeft className="w-6 h-6" />
+            </button>
             <div className="flex justify-center items-center min-h-screen bg-[darkGrey2] text-white p-6">
                 <div className="max-w-4xl  p-8">
                     <h1 className="text-2xl font-bold text-[#faffa4] mb-6">

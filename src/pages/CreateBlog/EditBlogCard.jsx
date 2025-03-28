@@ -1,7 +1,7 @@
 import "./editBlog.scss";
 import React from "react";
 import { Link } from "react-router-dom";
-
+ import { Helmet } from "react-helmet-async";
 function EditBlogCard({ editblog }) {
   const slug = editblog?.title
     .split("-")
@@ -36,6 +36,12 @@ function EditBlogCard({ editblog }) {
   // }
 
   return (
+    <>
+    <Helmet>
+      <title>{editblog.title}</title>
+      <meta name="description" content={editblog.metaDescription} />
+    </Helmet>
+
     <Link className="link" to={`/createblog/${slug}`}>
       {/* <MetaTags> */}
       <meta
@@ -58,6 +64,7 @@ function EditBlogCard({ editblog }) {
         <p>{editblog.metaDescription}</p>
       </div>
     </Link>
+    </>
   );
 }
 

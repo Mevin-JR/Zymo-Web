@@ -1,10 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MapPinIcon, CalendarIcon, SparklesIcon, LocateFixed } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { LoadScriptNext, Autocomplete } from "@react-google-maps/api";
 import { toast } from "react-toastify";
 import DateTimeOverlay from "./DateTimeOverlay"; // Import the custom DateTimeOverlay
 import { getCurrentTime } from "../utils/DateFunction";
+import { constructNow } from "date-fns";
+// import RectGA from "react-ga4";
+import useTrackEvent from "../hooks/useTrackEvent";
 
 const NewRSB = () => {
     const [activeTab, setActiveTab] = useState("rent");
@@ -23,6 +26,8 @@ const NewRSB = () => {
     const [disableBtn, setDisableBtn] = useState(false);
 
     const navigate = useNavigate();
+    const trackEvent = useTrackEvent();
+
 
     // Header text rotation
     const headerTexts = [
@@ -46,6 +51,16 @@ const NewRSB = () => {
         }, 3000);
         return () => clearInterval(interval);
     }, [headerTexts.length]);
+
+
+//Google analytics for RSB section
+const handleRSBClicks =(label)=>{
+    trackEvent("RSB Section","RSB User Choice",label);
+}
+const handleRSBFunctionClicks =(label)=>{
+    trackEvent("RSB Functions Section","RSB Function Action Chosen",`${label} - ${activeTab}`);
+}
+
 
     // Places API
     const placesAPILibraries = useMemo(() => ["places"], []);
@@ -208,9 +223,10 @@ const NewRSB = () => {
                 startDate,
                 endDate,
                 tripDuration,
-                tripDurationHours
+                tripDurationHours,
+                activeTab,
             };
-
+            handleRSBFunctionClicks("Search"); //search btn clicked
             sessionStorage.setItem("fromSearch", true);
 
             navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
@@ -226,6 +242,7 @@ const NewRSB = () => {
 
 
     const handleTabClick = (tab) => {
+        handleRSBClicks(tab); // RSB clicked
         setActiveTab(tab);
         if (tab === "buy") {
             navigate("/buy"); // Navigate to the buy page
@@ -324,6 +341,7 @@ const NewRSB = () => {
                             onClick={() => {
                                 setIsStartPickerOpen(true);
                                 setIsEndPickerOpen(false);
+                                handleRSBFunctionClicks("Start Date Selected");
                             }}
                         >
                             <CalendarIcon className="w-6 h-4 text-gray-400 absolute left-4" />
@@ -364,6 +382,7 @@ const NewRSB = () => {
                                 if (activeTab !== "subscribe") {
                                     setIsEndPickerOpen(true);
                                     setIsStartPickerOpen(false);
+                                    handleRSBFunctionClicks("End Date Selected")
                                 }
                             }}
                             disabled={activeTab === "subscribe"}

@@ -8,14 +8,19 @@ import Footer from "../../components/Footer";
 import { ArrowLeft } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
+import { Helmet } from "react-helmet-async";
 
-const NearestCar = () => {
+
+const NearestCar = ({ title }) => {
   const navigate = useNavigate();
-
   const [filteredCars, setFilteredCars] = useState("Electric");
   const [allCars, setAllCars] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
   useEffect(() => {
     const fetchCarsData = async () => {
       try {
@@ -23,7 +28,7 @@ const NearestCar = () => {
         const querySnapshot = await getDocs(carsCollectionRef);
 
         const cars = querySnapshot.docs.map((doc) => doc.data());
-        setAllCars(cars); 
+        setAllCars(cars);
         setSearchResults(cars);  // Store all cars in searchResults
       } catch (err) {
         console.error("Error fetching cars data:", err);
@@ -41,13 +46,20 @@ const NearestCar = () => {
 
   return (
     <>
+     <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Find the best cars for sale near you with Zymo. Browse top deals and book your dream car today!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Browse Zymo's self-drive car options and choose the one that fits your needs." />
+                <link rel="canonical" href="https://zymo.app/buy" />
+            </Helmet>
       <NavBar />
       <div className="head-container flex flex-col sm:flex-row justify-between items-center bg-darkGrey text-white p-4">
         <button
-          onClick={() => navigate(-1)}
-          className="absolute left-1 md:left-5 top-8 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all"
+          onClick={() => navigate("/")}
+          className="text-white m-5 cursor-pointer"
         >
-          <ArrowLeft size={28} />
+          <ArrowLeft className="w-6 h-6" />
         </button>
 
         <h1 className="text-white text-3xl font-bold pl-5">Nearest Car</h1>
@@ -59,13 +71,13 @@ const NearestCar = () => {
       <Filter setFilterCar={setFilteredCars} />
 
       {searchResults.length > 0 ? (
-        <Cards cars={searchResults} /> 
+        <Cards cars={searchResults} />
       ) : (
         <div className="flex justify-center items-center h-[60vh] p-4 bg-darkGrey">
           <p className="text-white text-xl font-semibold">No cars at the moment. Please try another filter</p>
-        </div>  
+        </div>
       )}
-      
+
       <Footer />
     </>
   );

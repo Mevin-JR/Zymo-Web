@@ -2,8 +2,11 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ChevronDown } from 'lucide-react';
 import {countryCodes} from "../../api/CountryCode"
+import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
+import useTrackEvent from '../../hooks/useTrackEvent';
 
-export default function Extended_TestDriveFormPage() {
+export default function TestDriveFormPage({ title }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -17,9 +20,13 @@ export default function Extended_TestDriveFormPage() {
     dob: '',
   });
   const [errors, setErrors] = useState({});
+  const trackEvent = useTrackEvent();
   const { car } = location.state || {};
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
   const validateForm = () => {
     const newErrors = {};
 
@@ -81,10 +88,20 @@ export default function Extended_TestDriveFormPage() {
           } 
         } 
       });
+      trackEvent("Test Drive Booking", "Test Drive", "User Details Entered");
     }
   };
 
   return (
+    <>
+ <Helmet>
+                <title>{title}</title>
+                <meta name="description" content="Fill out the form to schedule your test drive with Zymo. Choose a car and pick a convenient time!" />
+                <meta property="og:title" content={title} />
+        <meta property="og:description" content="Customize your test drive experience by choosing the car and preferences that suit you best." />
+                <link rel="canonical" href="https://zymo.app/buy/test-drive-inputform" />
+            </Helmet>
+
     <div className="min-h-screen bg-[#212121] text-white px-4 md:px-8">
       <div className="container mx-auto max-w-4xl py-8">
         <button
@@ -96,7 +113,7 @@ export default function Extended_TestDriveFormPage() {
 
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-xl p-2 md:text-4xl font-bold text-appColor">
-            Extended Test Drive Booking
+             Test Drive Booking
           </h1>
         </div>
 
@@ -243,5 +260,6 @@ export default function Extended_TestDriveFormPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
