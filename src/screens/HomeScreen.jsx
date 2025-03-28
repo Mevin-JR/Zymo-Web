@@ -13,7 +13,7 @@ import { Helmet } from "react-helmet-async";
 import NewRSB from "../components/NewRSB";
 import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
-import ChatBot from "../components/Chatbot/Chatbot";
+import ChatBot from "../components/Chatbot/ChatBot";
 const HomeScreen = ({ title }) => {
   useEffect(() => {
     const trackEvent = useTrackEvent();
