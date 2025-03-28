@@ -11,12 +11,15 @@ import ServiceProvider from "../components/homecomponent/ServiceProvider";
 import { FaWhatsapp } from "react-icons/fa";
 import NewRSB from "../components/NewRSB";
 import useTrackEvent from "../hooks/useTrackEvent";
+import { Link } from "lucide-react";
+import {  useParams } from "react-router-dom";
 
 const HomeScreen = () => {
     const trackEvent = useTrackEvent();
-
-    const handleWhatsappClicks=(label)=>{
-        trackEvent("Whatsapp Icon", "Whatsapp Clicked!",label);
+    const {city} =useParams();
+    console.log("City from URL:", city);
+    const handleWhatsappClicks = (label) => {
+        trackEvent("Whatsapp Icon", "Whatsapp Clicked!", label);
     }
     return (
         <>
@@ -24,7 +27,7 @@ const HomeScreen = () => {
             <div className="container flex flex-col w-full mx-auto">
                 <div className="container">
                     <Header />
-                    <NewRSB />
+                    <NewRSB urlcity={city}/>
                     <HeroImage />
                     {/* <RSB /> */}
                     <Benefits />
@@ -39,10 +42,13 @@ const HomeScreen = () => {
                     className="fixed bottom-5 right-5 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300"
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={()=> handleWhatsappClicks("Whatsapp")}
+                    onClick={() => handleWhatsappClicks("Whatsapp")}
                 >
                     <FaWhatsapp className="text-3xl" />
                 </a>
+               
+
+
             </div>
             <Footer />
         </>

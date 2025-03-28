@@ -9,9 +9,9 @@ import { constructNow } from "date-fns";
 // import RectGA from "react-ga4";
 import useTrackEvent from "../hooks/useTrackEvent";
 
-const NewRSB = () => {
+const NewRSB = ({urlcity}) => {
     const [activeTab, setActiveTab] = useState("rent");
-    const [placeInput, setPlaceInput] = useState("");
+    const [placeInput, setPlaceInput] = useState(urlcity );
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -38,6 +38,14 @@ const NewRSB = () => {
         "Compare and save on rental",
     ];
     const [headerIndex, setHeaderIndex] = useState(0);
+
+    // Sync state when urlcity changes
+    useEffect(() => {
+        console.log("urlcity:", urlcity);
+
+        setPlaceInput(urlcity);
+    }, [urlcity]);
+
 
     useEffect(() => {
         const interval = setInterval(() => {
