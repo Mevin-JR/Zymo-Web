@@ -1,14 +1,14 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 
-import './index.css';
-import App from './App.jsx';
+import "./index.css";
+import App from "./App.jsx";
 import ReactGA from "react-ga4";
 
-ReactGA.initialize(import.meta.env.VITE_WEBSITE_FIREBASE_MEASUREMENT_ID); // Replace with your Google Analytics Measurement ID
+ReactGA.initialize(import.meta.env.VITE_GOOGLE_ANALYTICS_MEASUREMENT_ID);
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-     <App />
+    <App />
   </StrictMode>
 );
