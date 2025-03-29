@@ -11,7 +11,7 @@ import useTrackEvent from "../hooks/useTrackEvent";
 
 const NewRSB = ({urlcity}) => {
     const [activeTab, setActiveTab] = useState("rent");
-    const [placeInput, setPlaceInput] = useState(urlcity);
+    const [placeInput, setPlaceInput] = useState("");
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -39,12 +39,64 @@ const NewRSB = ({urlcity}) => {
     ];
     const [headerIndex, setHeaderIndex] = useState(0);
 
-    // Sync state when urlcity changes
     useEffect(() => {
-        console.log("urlcity:", urlcity);
-        setPlaceInput(urlcity );
-        // triggerAutocomplete(urlcity);
+        if (!urlcity || !window.google) return;
+    
+        setPlaceInput(urlcity);
+    
+        const autocompleteService = new window.google.maps.places.AutocompleteService();
+        autocompleteService.getPlacePredictions(
+            { input: urlcity, componentRestrictions: { country: "IN" } },
+            (predictions, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                    // Get the first place suggestion
+                    const placeId = predictions[0].place_id;
+    
+                    // Fetch place details using PlacesService
+                    const placesService = new window.google.maps.places.PlacesService(
+                        document.createElement("div")
+                    );
+    
+                    placesService.getDetails({ placeId }, (placeDetails, status) => {
+                        if (status === window.google.maps.places.PlacesServiceStatus.OK && placeDetails?.geometry) {
+                            // Ensure place details are valid before proceeding
+                            setAutocomplete(placeDetails);
+    
+                            // Update state with selected place details
+                            setPlace({
+                                name: placeDetails.name,
+                                lat: placeDetails.geometry.location.lat(),
+                                lng: placeDetails.geometry.location.lng(),
+                            });
+    
+                            setPlaceInput(placeDetails.formatted_address);
+                            //
+                            const address = placeDetails.formatted_address.split(",");
+                            setAddress(
+                                address.length > 2
+                                    ? `${address[0]}, ${address[1]}, ${address.at(-2)}`
+                                    : address
+                            );
+                            //
+                            // Extract city name if available
+                            const cityComponent = placeDetails.address_components?.find(
+                                (component) => component.types.includes("locality")
+                            );
+                            setCity(cityComponent ? cityComponent.long_name : "");
+                        } else {
+                            console.error("Failed to fetch place details.");
+                        }
+                    });
+                } else {
+                    console.error("No place predictions found.");
+                }
+            }
+        );
     }, [urlcity]);
+    
+    
+    
+
 
 
     useEffect(() => {
@@ -99,6 +151,7 @@ const NewRSB = ({urlcity}) => {
             }
         }
     };
+    
 
     const getCurrentLocation = () => {
         if (navigator.geolocation) {
@@ -162,15 +215,7 @@ const NewRSB = ({urlcity}) => {
         }
     };
 
-    // const getCurrentLocation = () => {
-    //     if (navigator.geolocation) {
-    //         navigator.geolocation.getCurrentPosition((position) => {
-    //             const { latitude, longitude } = position.coords;
-
-    //         })
-    //     }
-    // }
-
+ 
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
         const start = new Date(currentStartDate);
@@ -219,34 +264,43 @@ const NewRSB = ({urlcity}) => {
 
     const handleSearch = () => {
         if (city && startDate && endDate) {
-            const lat = place.lat;
-            const lng = place.lng;
-            const formattedCity =
-                city === "Bengaluru" ? "bangalore" : city.toLowerCase();
-
+            if (!place || !place.lat || !place.lng) {
+                toast.error("Please select a valid location", {
+                    position: "top-center",
+                    autoClose: 5000,
+                });
+                return;
+            }
+    
+            const formattedCity = city === "Bengaluru" ? "bangalore" : city.toLowerCase();
+    console.log("adddddddresss",place.name)
             const stateData = {
-                address,
-                lat,
-                lng,
+                address: address || place.name,  // Ensure the address is included
+                lat: place.lat,
+                lng: place.lng,
                 startDate,
                 endDate,
                 tripDuration,
                 tripDurationHours,
                 activeTab,
             };
-            handleRSBFunctionClicks("Search"); //search btn clicked
+    
+            console.log("Navigating with:", stateData); // Debugging
+    
+            handleRSBFunctionClicks("Search");
             sessionStorage.setItem("fromSearch", true);
-
+    
             navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
             });
         } else {
             toast.error("Required fields are empty", {
                 position: "top-center",
-                autoClose: 1000 * 5,
+                autoClose: 5000,
             });
         }
     };
+    
 
 
     const handleTabClick = (tab) => {
@@ -314,8 +368,9 @@ const NewRSB = ({urlcity}) => {
 
                             {/* Input Field */}
                             <Autocomplete
-                                onLoad={setAutocomplete}
-                                onPlaceChanged={handlePlaceSelect}
+                               onLoad={(autocompleteInstance) => setAutocomplete(autocompleteInstance)}
+                               onPlaceChanged={handlePlaceSelect}
+                                
                                 options={{ componentRestrictions: { country: "IN" } }}
                             >
                                 <input
@@ -324,7 +379,7 @@ const NewRSB = ({urlcity}) => {
                                     className="bg-transparent text-white outline-none w-full placeholder-gray-400 flex-grow truncate"
                                     value={placeInput}
                                     onChange={(e) => setPlaceInput(e.target.value)}
-                                    onFocus={(e) => e.target.select()} // Ensures re-selection
+                                    // onFocus={(e) => e.target.select()} // Ensures re-selection
                                 />
                             </Autocomplete>
 
