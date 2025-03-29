@@ -273,7 +273,6 @@ const NewRSB = ({urlcity}) => {
             }
     
             const formattedCity = city === "Bengaluru" ? "bangalore" : city.toLowerCase();
-    console.log("adddddddresss",place.name)
             const stateData = {
                 address: address || place.name,  // Ensure the address is included
                 lat: place.lat,

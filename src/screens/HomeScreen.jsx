@@ -22,8 +22,7 @@ const HomeScreen = ({ title }) => {
   const handleWhatsappClicks = (label) => {
     trackEvent("Whatsapp Icon", "Icon Clicks", label);
   };
-  console.log("City from URL:", city); // Debugging log
-
+  
   useEffect(() => {
     document.title = title;
   }, [title]);
