@@ -42,7 +42,6 @@ import AgentBookingList from './components/AgentManagement.jsx';
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
 const App = () => {   
-    
     return (
         <HelmetProvider>
             <BrowserRouter>
@@ -52,7 +51,7 @@ const App = () => {
                 <Routes>
                 <Route path="/" element={<HomeScreen title="Home - Zymo Car Rentals" />} />
                      <Route path="/self-drive-car-rentals" element={<Navigate to="/" replace />} />
-                     <Route path="/self-drive-car-rentals/:city" element={<HomeScreen />} />
+                     <Route path="/self-drive-car-rentals/:city" element={<HomeScreen title="City - Zymo Car Rentals" />} />
                      <Route path="/self-drive-car-rentals/:city/cars" element={<Listing title="Available Cars - Zymo" />} />
                      <Route path="/self-drive-car-rentals/:city/cars/packages" element={<BookingCard title="Car Packages - Zymo" />} />
                      <Route path="/self-drive-car-rentals/:city/cars/booking-details" element={<Details title="Booking Details - Zymo" />} />

@@ -11,7 +11,7 @@ import useTrackEvent from "../hooks/useTrackEvent";
 
 const NewRSB = ({urlcity}) => {
     const [activeTab, setActiveTab] = useState("rent");
-    const [placeInput, setPlaceInput] = useState("");
+    const [placeInput, setPlaceInput] = useState(urlcity || "");
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -39,46 +39,39 @@ const NewRSB = ({urlcity}) => {
     ];
     const [headerIndex, setHeaderIndex] = useState(0);
 
-    useEffect(() => {
-        if (!urlcity || !window.google) return;
-    
-        setPlaceInput(urlcity);
-    
+
+     
+
+    const fetchAutocompleteDetails = (inputCity) => {
+        if (!inputCity || !window.google) return;
+        
         const autocompleteService = new window.google.maps.places.AutocompleteService();
         autocompleteService.getPlacePredictions(
-            { input: urlcity, componentRestrictions: { country: "IN" } },
+            { input: inputCity, componentRestrictions: { country: "IN" } },
             (predictions, status) => {
                 if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
-                    // Get the first place suggestion
                     const placeId = predictions[0].place_id;
-    
-                    // Fetch place details using PlacesService
                     const placesService = new window.google.maps.places.PlacesService(
                         document.createElement("div")
                     );
-    
+                    
                     placesService.getDetails({ placeId }, (placeDetails, status) => {
                         if (status === window.google.maps.places.PlacesServiceStatus.OK && placeDetails?.geometry) {
-                            // Ensure place details are valid before proceeding
                             setAutocomplete(placeDetails);
-    
-                            // Update state with selected place details
                             setPlace({
                                 name: placeDetails.name,
                                 lat: placeDetails.geometry.location.lat(),
                                 lng: placeDetails.geometry.location.lng(),
                             });
-    
                             setPlaceInput(placeDetails.formatted_address);
-                            //
+                            
                             const address = placeDetails.formatted_address.split(",");
                             setAddress(
                                 address.length > 2
                                     ? `${address[0]}, ${address[1]}, ${address.at(-2)}`
                                     : address
                             );
-                            //
-                            // Extract city name if available
+                            
                             const cityComponent = placeDetails.address_components?.find(
                                 (component) => component.types.includes("locality")
                             );
@@ -92,10 +85,20 @@ const NewRSB = ({urlcity}) => {
                 }
             }
         );
-    }, [urlcity]);
+    };
     
-    
-    
+    // Effect to trigger autocomplete on page load when `urlcity` changes
+    useEffect(() => {
+        if (!urlcity) return;
+
+        // Ensure we have a short delay before calling autocomplete (after city is set)
+        const timer = setTimeout(() => {
+            fetchAutocompleteDetails(urlcity);
+        }, 1000); // 1-second delay to ensure the input field is populated
+
+        return () => clearTimeout(timer); // Clean up timeout
+    }, [urlcity]); // Re-run the effect when the `urlcity` changes
+  
 
 
 
