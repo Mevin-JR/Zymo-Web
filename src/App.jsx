@@ -39,6 +39,7 @@ import Agent from "./components/Agent.jsx";
 import AgentPage from "./components/AgentPage.jsx";
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
+import ChatBotModal from './components/Chatbot/ChatBotModal.jsx';
 const App = () => {   
     
     return (
@@ -81,6 +82,7 @@ const App = () => {
                      <Route path="/agent-login" element={<Agent title="Agent Login - Zymo" />} />
                      <Route path="/agent-info" element={<AgentPage title="Agent Info - Zymo" />} />
                      <Route path="*" element={<ErrorPage title="404 - Page Not Found" />} />
+                     <Route path="/Zymo-AI" element={<ChatBotModal />}/>
                 </Routes>
                 <ToastContainer />
             </BrowserRouter>
