@@ -9,9 +9,9 @@ import { constructNow } from "date-fns";
 // import RectGA from "react-ga4";
 import useTrackEvent from "../hooks/useTrackEvent";
 
-const NewRSB = () => {
+const NewRSB = ({urlcity}) => {
     const [activeTab, setActiveTab] = useState("rent");
-    const [placeInput, setPlaceInput] = useState("");
+    const [placeInput, setPlaceInput] = useState(urlcity || "");
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -39,6 +39,69 @@ const NewRSB = () => {
     ];
     const [headerIndex, setHeaderIndex] = useState(0);
 
+
+     
+
+    const fetchAutocompleteDetails = (inputCity) => {
+        if (!inputCity || !window.google) return;
+        
+        const autocompleteService = new window.google.maps.places.AutocompleteService();
+        autocompleteService.getPlacePredictions(
+            { input: inputCity, componentRestrictions: { country: "IN" } },
+            (predictions, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions?.length > 0) {
+                    const placeId = predictions[0].place_id;
+                    const placesService = new window.google.maps.places.PlacesService(
+                        document.createElement("div")
+                    );
+                    
+                    placesService.getDetails({ placeId }, (placeDetails, status) => {
+                        if (status === window.google.maps.places.PlacesServiceStatus.OK && placeDetails?.geometry) {
+                            setAutocomplete(placeDetails);
+                            setPlace({
+                                name: placeDetails.name,
+                                lat: placeDetails.geometry.location.lat(),
+                                lng: placeDetails.geometry.location.lng(),
+                            });
+                            setPlaceInput(placeDetails.formatted_address);
+                            
+                            const address = placeDetails.formatted_address.split(",");
+                            setAddress(
+                                address.length > 2
+                                    ? `${address[0]}, ${address[1]}, ${address.at(-2)}`
+                                    : address
+                            );
+                            
+                            const cityComponent = placeDetails.address_components?.find(
+                                (component) => component.types.includes("locality")
+                            );
+                            setCity(cityComponent ? cityComponent.long_name : "");
+                        } else {
+                            console.error("Failed to fetch place details.");
+                        }
+                    });
+                } else {
+                    console.error("No place predictions found.");
+                }
+            }
+        );
+    };
+    
+    // Effect to trigger autocomplete on page load when `urlcity` changes
+    useEffect(() => {
+        if (!urlcity) return;
+
+        // Ensure we have a short delay before calling autocomplete (after city is set)
+        const timer = setTimeout(() => {
+            fetchAutocompleteDetails(urlcity);
+        }, 1000); // 1-second delay to ensure the input field is populated
+
+        return () => clearTimeout(timer); // Clean up timeout
+    }, [urlcity]); // Re-run the effect when the `urlcity` changes
+  
+
+
+
     useEffect(() => {
         const interval = setInterval(() => {
             setFade(true);
@@ -53,13 +116,13 @@ const NewRSB = () => {
     }, [headerTexts.length]);
 
 
-//Google analytics for RSB section
-const handleRSBClicks =(label)=>{
-    trackEvent("RSB Section","RSB User Choice",label);
-}
-const handleRSBFunctionClicks =(label)=>{
-    trackEvent("RSB Functions Section","RSB Function Action Chosen",`${label} - ${activeTab}`);
-}
+    //Google analytics for RSB section
+    const handleRSBClicks = (label) => {
+        trackEvent("RSB Section", "RSB User Choice", label);
+    }
+    const handleRSBFunctionClicks = (label) => {
+        trackEvent("RSB Functions Section", "RSB Function Action Chosen", `${label} - ${activeTab}`);
+    }
 
 
     // Places API
@@ -91,6 +154,7 @@ const handleRSBFunctionClicks =(label)=>{
             }
         }
     };
+    
 
     const getCurrentLocation = () => {
         if (navigator.geolocation) {
@@ -154,15 +218,7 @@ const handleRSBFunctionClicks =(label)=>{
         }
     };
 
-    // const getCurrentLocation = () => {
-    //     if (navigator.geolocation) {
-    //         navigator.geolocation.getCurrentPosition((position) => {
-    //             const { latitude, longitude } = position.coords;
-
-    //         })
-    //     }
-    // }
-
+ 
     // Calculate Trip Duration
     const calculateDuration = (currentStartDate, currentEndDate) => {
         const start = new Date(currentStartDate);
@@ -211,34 +267,42 @@ const handleRSBFunctionClicks =(label)=>{
 
     const handleSearch = () => {
         if (city && startDate && endDate) {
-            const lat = place.lat;
-            const lng = place.lng;
-            const formattedCity =
-                city === "Bengaluru" ? "bangalore" : city.toLowerCase();
-
+            if (!place || !place.lat || !place.lng) {
+                toast.error("Please select a valid location", {
+                    position: "top-center",
+                    autoClose: 5000,
+                });
+                return;
+            }
+    
+            const formattedCity = city === "Bengaluru" ? "bangalore" : city.toLowerCase();
             const stateData = {
-                address,
-                lat,
-                lng,
+                address: address || place.name,  // Ensure the address is included
+                lat: place.lat,
+                lng: place.lng,
                 startDate,
                 endDate,
                 tripDuration,
                 tripDurationHours,
                 activeTab,
             };
-            handleRSBFunctionClicks("Search"); //search btn clicked
+    
+            console.log("Navigating with:", stateData); // Debugging
+    
+            handleRSBFunctionClicks("Search");
             sessionStorage.setItem("fromSearch", true);
-
+    
             navigate(`/self-drive-car-rentals/${formattedCity}/cars`, {
                 state: stateData,
             });
         } else {
             toast.error("Required fields are empty", {
                 position: "top-center",
-                autoClose: 1000 * 5,
+                autoClose: 5000,
             });
         }
     };
+    
 
 
     const handleTabClick = (tab) => {
@@ -306,8 +370,9 @@ const handleRSBFunctionClicks =(label)=>{
 
                             {/* Input Field */}
                             <Autocomplete
-                                onLoad={setAutocomplete}
-                                onPlaceChanged={handlePlaceSelect}
+                               onLoad={(autocompleteInstance) => setAutocomplete(autocompleteInstance)}
+                               onPlaceChanged={handlePlaceSelect}
+                                
                                 options={{ componentRestrictions: { country: "IN" } }}
                             >
                                 <input
@@ -316,6 +381,7 @@ const handleRSBFunctionClicks =(label)=>{
                                     className="bg-transparent text-white outline-none w-full placeholder-gray-400 flex-grow truncate"
                                     value={placeInput}
                                     onChange={(e) => setPlaceInput(e.target.value)}
+                                    // onFocus={(e) => e.target.select()} // Ensures re-selection
                                 />
                             </Autocomplete>
 

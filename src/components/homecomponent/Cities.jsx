@@ -58,18 +58,11 @@ const cities = [
 ];
 
 const Cities = () => {
+    const navigate=useNavigate();
     const handleCityClick = (city) => {
-        window.history.pushState(
-            {},
-            "",
-            `/self-drive-car-rentals/${city.toLowerCase()}`
-        ); // Updates the URL without navigating
-
-        const input = document.getElementById("location-input");
-        if (input) {
-            input.value = city;
-        }
+        navigate(`/self-drive-car-rentals/${city.toLowerCase()}`); // Navigate properly
     };
+
 
     return (
         <section className="text-black py-10">
