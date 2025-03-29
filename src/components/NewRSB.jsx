@@ -9,9 +9,9 @@ import { constructNow } from "date-fns";
 // import RectGA from "react-ga4";
 import useTrackEvent from "../hooks/useTrackEvent";
 
-const NewRSB = () => {
+const NewRSB = ({urlcity}) => {
     const [activeTab, setActiveTab] = useState("rent");
-    const [placeInput, setPlaceInput] = useState("");
+    const [placeInput, setPlaceInput] = useState(urlcity);
     const [place, setPlace] = useState(null);
     const [autocomplete, setAutocomplete] = useState(null);
     const [city, setCity] = useState("");
@@ -39,6 +39,14 @@ const NewRSB = () => {
     ];
     const [headerIndex, setHeaderIndex] = useState(0);
 
+    // Sync state when urlcity changes
+    useEffect(() => {
+        console.log("urlcity:", urlcity);
+        setPlaceInput(urlcity );
+        // triggerAutocomplete(urlcity);
+    }, [urlcity]);
+
+
     useEffect(() => {
         const interval = setInterval(() => {
             setFade(true);
@@ -53,13 +61,13 @@ const NewRSB = () => {
     }, [headerTexts.length]);
 
 
-//Google analytics for RSB section
-const handleRSBClicks =(label)=>{
-    trackEvent("RSB Section","RSB User Choice",label);
-}
-const handleRSBFunctionClicks =(label)=>{
-    trackEvent("RSB Functions Section","RSB Function Action Chosen",`${label} - ${activeTab}`);
-}
+    //Google analytics for RSB section
+    const handleRSBClicks = (label) => {
+        trackEvent("RSB Section", "RSB User Choice", label);
+    }
+    const handleRSBFunctionClicks = (label) => {
+        trackEvent("RSB Functions Section", "RSB Function Action Chosen", `${label} - ${activeTab}`);
+    }
 
 
     // Places API
@@ -316,6 +324,7 @@ const handleRSBFunctionClicks =(label)=>{
                                     className="bg-transparent text-white outline-none w-full placeholder-gray-400 flex-grow truncate"
                                     value={placeInput}
                                     onChange={(e) => setPlaceInput(e.target.value)}
+                                    onFocus={(e) => e.target.select()} // Ensures re-selection
                                 />
                             </Autocomplete>
 

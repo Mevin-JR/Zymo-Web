@@ -14,13 +14,15 @@ import NewRSB from "../components/NewRSB";
 import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
 import ChatBot from "../components/Chatbot/ChatBot";
+import { useParams } from "react-router-dom";
 const HomeScreen = ({ title }) => {
 
+  const {city} =useParams();
   const trackEvent = useTrackEvent();
   const handleWhatsappClicks = (label) => {
     trackEvent("Whatsapp Icon", "Icon Clicks", label);
   };
-
+  console.log("City from URL:", city); // Debugging log
 
   useEffect(() => {
     document.title = title;
@@ -44,7 +46,7 @@ const HomeScreen = ({ title }) => {
       <div className="container flex flex-col w-full mx-auto">
         <div className="container">
           <Header />
-          <NewRSB />
+          <NewRSB urlcity={city}/>
           <HeroImage />
           {/* <RSB /> */}
           <Benefits />
