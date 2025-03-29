@@ -35,8 +35,10 @@ import   SubscriptionFormPage from "./components/SubscribeInfo";
 import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
-import Agent from "./components/Agent.jsx";
+import Agent from "./components/AgentLogin.jsx";
 import AgentPage from "./components/AgentPage.jsx";
+import MasterAgentLogin from './components/MasterAgentLogin.jsx';
+import AgentBookingList from './components/AgentManagement.jsx';
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
 const App = () => {   
@@ -79,7 +81,8 @@ const App = () => {
                      <Route path="/profile" element={<Profile title="Profile - Zymo" />} />
                      <Route path="/your-details" element={<YourDetails title="Your Details - Zymo" />} />
                      <Route path="/agent-login" element={<Agent title="Agent Login - Zymo" />} />
-                     <Route path="/agent-info" element={<AgentPage title="Agent Info - Zymo" />} />
+                     <Route path="/agent-info" element={<AgentBookingList title="Agent Management - Zymo" />} />
+                     <Route path="/master-agent" element={<MasterAgentLogin title="Master Agent Login - Zymo" />} />
                      <Route path="*" element={<ErrorPage title="404 - Page Not Found" />} />
                 </Routes>
                 <ToastContainer />
