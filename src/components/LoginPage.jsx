@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { appAuth } from "../utils/firebase";
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
 } from "firebase/auth";
 import { toast } from "react-toastify";
 import { IoClose } from "react-icons/io5";
@@ -15,7 +17,8 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
 
-    // Toast notification helpers
+    const googleProvider = new GoogleAuthProvider();
+
     const successMessage = (message) => {
         toast.success(message, {
             position: "top-center",
@@ -30,49 +33,35 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
         });
     };
 
-    // Handle authentication (login or sign up)
+    const closePopup = () => {
+        const user = appAuth.currentUser;
+        onAuth(user);
+        onClose();
+    };
+
     const handleAuth = async (e) => {
         e.preventDefault();
         setMessage("");
 
-        // Trim inputs to remove leading/trailing spaces
-        const trimmedEmail = email.trim();
-        const trimmedPassword = password.trim();
-
-        // Basic validation
-        if (!trimmedEmail || !trimmedPassword) {
-            errorMessage("Email and password are required.");
-            return;
-        }
-
         try {
             if (isLogin) {
-                // Login flow
-                await signInWithEmailAndPassword(appAuth, trimmedEmail, trimmedPassword);
-                // Extra security: Verify email domain after login
-                if (!trimmedEmail.endsWith("@company.com")) {
-                    await appAuth.signOut();
-                    errorMessage("Only company agents can log in.");
-                    return;
-                }
+                await signInWithEmailAndPassword(appAuth, email, password);
                 successMessage("Login successful!");
             } else {
-                // Sign up flow
-                if (!trimmedEmail.endsWith("@company.com")) {
-                    errorMessage("Only company agents can sign up.");
-                    return;
-                }
-                if (trimmedPassword.length < 6) {
-                    errorMessage("Password must be at least 6 characters long.");
-                    return;
-                }
-                await createUserWithEmailAndPassword(appAuth, trimmedEmail, trimmedPassword);
+                await createUserWithEmailAndPassword(appAuth, email, password);
                 successMessage("Account created successfully!");
             }
-            // Pass the authenticated user to the parent component and close the modal
-            const user = appAuth.currentUser;
-            onAuth(user);
-            onClose();
+            closePopup();
+        } catch (error) {
+            errorMessage(error.message);
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        try {
+            await signInWithPopup(appAuth, googleProvider);
+            successMessage("Google sign-in successful!");
+            closePopup();
         } catch (error) {
             errorMessage(error.message);
         }
@@ -81,11 +70,11 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
     return (
         <div
             className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50"
-            onClick={onClose}
+            onClick={onClose} // Close when clicking outside the modal
         >
             <div
                 className="relative bg-darkGrey text-white p-8 rounded-2xl shadow-xl w-96 border border-[#faffa4]"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
             >
                 {/* Close Button */}
                 <button
@@ -125,7 +114,9 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
                 </form>
 
                 <p className="mt-4 text-sm text-center">
-                    {isLogin ? "Don't have an account?" : "Already have an account?"}
+                    {isLogin
+                        ? "Don't have an account?"
+                        : "Already have an account?"}
                     <button
                         className="text-[#faffa4] font-semibold ml-1"
                         onClick={() => setIsLogin(!isLogin)}
@@ -133,6 +124,14 @@ const LoginPage = ({ onAuth, isOpen, onClose }) => {
                         {isLogin ? "Sign Up" : "Login"}
                     </button>
                 </p>
+
+                {/* Google Sign-In Button */}
+                <button
+                    onClick={handleGoogleLogin}
+                    className="mt-4 w-full bg-[#ffffff] text-darkGrey py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-200"
+                >
+                    Sign in with Google
+                </button>
             </div>
         </div>
     );
