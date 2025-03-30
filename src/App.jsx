@@ -41,11 +41,14 @@ import MasterAgentLogin from "./components/MasterAgentLogin.jsx";
 import AgentBookingList from "./components/AgentManagement.jsx";
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
+import CookiesConsent from "./components/CookiesConsent.jsx";
+
 const App = () => {
   return (
     <HelmetProvider>
       <BrowserRouter>
         <PageTracker />
+        <CookiesConsent /> {/* Cookie consent component */}
         <ScrollToTop /> {/* Ensures scrolling to top on route change */}
         <Routes>
           <Route
