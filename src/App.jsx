@@ -146,7 +146,7 @@ const App = () => {
             element={<BlogsMainPage title="Blogs - Zymo" />}
           />
           <Route
-            path="/blogs/:title"
+            path="/blogs/:id/:title"
             element={<BlogDetailPage title="Blog Details - Zymo" />}
           />
           <Route
