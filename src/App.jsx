@@ -23,6 +23,7 @@ import Profile from "./components/Profile";
 import NearestCar from "./pages/Buy/NearestCar";
 import CarDetails from "./pages/Buy/CarDetails";
 import MyBookings from "./pages/MyBookings";
+
 import TestDrivePopup from "./components/buycomponent/TestDrivePopup";
 import TestDriveInputForm from "./components/buycomponent/TestDriveInputForm";
 import TestDriveConfirmPage from "./components/buycomponent/TestDriveConfirmPage";
@@ -35,9 +36,9 @@ import SubscriptionUploadDocuments from "./components/SubscribeUploadDocs";
 import CreateBlogPage from "./pages/CreateBlog/CreateBlogPage";
 import CreateEditBlogPage from "./pages/CreateBlog/createEditBlogPage";
 import Agent from "./components/AgentLogin.jsx";
-import AgentBookingList from "./components/AgentManagement.jsx";
-import MasterAgentLogin from "./components/MasterAgentLogin.jsx";
 import AgentPage from "./components/AgentPage.jsx";
+import MasterAgentLogin from "./components/MasterAgentLogin.jsx";
+import AgentBookingList from "./components/AgentManagement.jsx";
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
 const App = () => {
@@ -184,7 +185,7 @@ const App = () => {
           />
           <Route
             path="/master-agent"
-            element={<MasterAgentLogin title="Master Agent - Zymo" />}
+            element={<MasterAgentLogin title="Master Agent Login - Zymo" />}
           />
           <Route
             path="*"

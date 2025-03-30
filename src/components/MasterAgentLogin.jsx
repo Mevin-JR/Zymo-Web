@@ -24,8 +24,8 @@ const MasterAgentLogin = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [newAgent, setNewAgent] = useState({ userId: '', password: '' });
-  const [successMessage, setSuccessMessage] = useState('');
   const [agents, setAgents] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   const handleMasterLogin = async (e) => {
@@ -56,13 +56,13 @@ const MasterAgentLogin = () => {
         password: hashedPassword,
         createdAt: new Date()
       });
-
+      // Set success message
       setSuccessMessage(`Agent ${newAgent.userId} created successfully!`);
-
       setNewAgent({ userId: '', password: '' });
       await loadAgents();
-      // Clear success message after 3 seconds
-      setTimeout(() => {
+
+       // Clear success message after 3 seconds
+       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
     } catch (error) {
@@ -86,7 +86,7 @@ const MasterAgentLogin = () => {
           boxShadow: `0 0 20px ${colorScheme.appColor}33`
         }}
       >
-        {successMessage && (
+         {successMessage && (
           <div 
             className="flex items-center justify-center p-3 rounded-lg mb-4 animate-pulse"
             style={{ 
@@ -98,6 +98,7 @@ const MasterAgentLogin = () => {
             {successMessage}
           </div>
         )}
+
         {!isAuthenticated ? (
           <div className="space-y-6">
             <div className="flex justify-center mb-6">

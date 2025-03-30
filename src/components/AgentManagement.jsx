@@ -211,7 +211,7 @@ const AgentBookingList = () => {
 
   return (
     <div className="flex min-h-screen p-8" style={{ backgroundColor: colorScheme.darkGrey }}>
-       <nav className="w-30 space-y-4 mr-8">
+      <nav className="w-30 space-y-4 mr-8">
         <Link
           to="/agent-info"
           className={`w-full p-4 rounded-lg flex flex-col items-center justify-center gap-2 transition-all duration-300 hover:bg-gray-700 ${
@@ -258,7 +258,7 @@ const AgentBookingList = () => {
         `}
       </style>
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center overflow-hidden">
+        <h1 className="text-5xl font-bold mb-8 text-center overflow-hidden">
           <span className="inline-block animate-text-reveal zymo-title" style={{ color: colorScheme.appColor }}>
             ZYMO PANEL
           </span>
@@ -420,10 +420,10 @@ const AgentBookingList = () => {
                 <table className="w-full divide-y divide-gray-700">
                   <tbody>
                     <tr style={{ backgroundColor: colorScheme.darkGrey2 }} className="border-b border-gray-700">
-                      <td className="px-6 py-4 text-xl font-bold uppercase" style={{ color: colorScheme.appColor, width: '50%' }}>
+                      <td className="px-6 py-4 text-xl font-bold uppercase" style={{ color: colorScheme.appColor, width: '30%' }}>
                         Booking ID
                       </td>
-                      <td className="px-6 py-4 text-lg" style={{ width: '50%' }}>
+                      <td className="px-6 py-4 text-lg" style={{ width: '30%' }}>
                         <RenderValue value={selectedBooking.bookingId} field="bookingId" />
                       </td>
                       <td className="px-6 py-4 text-lg text-right" style={{ width: '10%' }}>
