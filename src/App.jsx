@@ -41,6 +41,7 @@ import MasterAgentLogin from './components/MasterAgentLogin.jsx';
 import AgentBookingList from './components/AgentManagement.jsx';
 import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
+import ChatBotModal from './components/Chatbot/ChatBotModal.jsx';
 const App = () => {   
     
     return (
@@ -84,6 +85,7 @@ const App = () => {
                      <Route path="/agent-info" element={<AgentBookingList title="Agent Management - Zymo" />} />
                      <Route path="/master-agent" element={<MasterAgentLogin title="Master Agent Login - Zymo" />} />
                      <Route path="*" element={<ErrorPage title="404 - Page Not Found" />} />
+                     <Route path="/Zymo-AI" element={<ChatBotModal />}/>
                 </Routes>
                 <ToastContainer />
             </BrowserRouter>
