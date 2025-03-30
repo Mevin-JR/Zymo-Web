@@ -4,7 +4,7 @@ import { FiMapPin } from "react-icons/fi";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchMyChoizeCars, formatDateForMyChoize ,fetchSubscriptionCars} from "../utils/mychoize";
-import { formatDate,retryFunction } from "../utils/helperFunctions";
+import { formatDate,formatFare,retryFunction } from "../utils/helperFunctions";
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { appDB } from "../utils/firebase";
 import useTrackEvent from "../hooks/useTrackEvent";
@@ -91,20 +91,38 @@ const Listing = ({ title }) => {
                         const snapshot = await getDocs(collectionGroup(appDB, "uploadedCars"));
                         console.log("Firebase Snapshot:", snapshot.docs.map(doc => doc.data()));
 
+                        const getHourlyRate = (car) => {
+                            if (car.hourlyRate) {
+                                return car.hourlyRate;
+                            } else if (car.hourlyRental) {
+                                return car.hourlyRental.limited.packages[0].hourlyRate;
+                            } else {
+                                return 0;
+                            }
+                        }
+
+                        const calcFirebaseFare = (car) => {
+                            if (car.hourlyRate) {
+                                return `₹${car.hourlyRate * tripDurationHours}`;
+                            } else if (car.hourlyRental) {
+                                return `₹${car.hourlyRental.limited.packages[0].hourlyRate * tripDurationHours}`;
+                            } else {
+                                return "0";
+                            }
+                        }
+
                         const filterdData = snapshot.docs
                             .map(doc => ({ id: doc.id, ...doc.data() }))
                             // .filter(car => car.cities?.some(c => c.toLowerCase() === city?.toLowerCase()))
                             .map(car => ({
                                 id: car.id,
-                                name: car.name,
                                 brand: "",
+                                name: car.name,
                                 options: [car.transmissionType, car.fuelType, `${car.noOfSeats} Seats`],
                                 address: car.pickupLocation,
+                                hourly_amount: getHourlyRate(car),
                                 images: car.images,
-                                fare: `₹${car.hourlyRate * tripDurationHours}`,
-                                actual_fare: car.hourlyRate * tripDurationHours,
-                                hourly_amount: car.id, hourlyRate,
-                                securityDeposit: car.securityDeposit,
+                                fare: formatFare(getHourlyRate(car) * tripDurationHours),
                                 ratingData: { rating: 4.5 },
                                 trips: 0,
                                 location_est: "",
@@ -164,8 +182,8 @@ const Listing = ({ title }) => {
 
                 const mychoizePromise = parseInt(tripDurationHours) < 24 ? null : fetchMyChoizeCars(CityName, formattedPickDate, formattedDropDate, tripDurationHours);
 
-                // const firebasePromise = fetchFirebaseCars();
-                const firebasePromise = null; // Temporarily Disabled
+                const firebasePromise = fetchFirebaseCars();
+                // const firebasePromise = null; // Temporarily Disabled
 
                 // Execute both API calls in parallel
                 const [zoomData, mychoizeData, firebaseData] = await Promise.allSettled([
