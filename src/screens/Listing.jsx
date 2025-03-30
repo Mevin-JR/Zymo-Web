@@ -353,7 +353,7 @@ const Listing = ({ title }) => {
             <header className="w-full max-w-8xl flex flex-col md:flex-row justify-between items-center mb-4 text-center md:text-left">
                 <div className="flex items-center gap-2 text-white text-lg">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate("/")}
                         className="border-none bg-none cursor-pointer"
                     >
                         <ArrowLeft size={25} />

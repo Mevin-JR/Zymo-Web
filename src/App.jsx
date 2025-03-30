@@ -59,6 +59,10 @@ const App = () => {
             path="/self-drive-car-rentals"
             element={<Navigate to="/" replace />}
           />
+          <Route 
+            path="/self-drive-car-rentals/:city" 
+            element={<HomeScreen title="City - Zymo Car Rentals" />} 
+           />
           <Route
             path="/self-drive-car-rentals/:city/cars"
             element={<Listing title="Available Cars - Zymo" />}
