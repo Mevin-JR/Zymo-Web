@@ -1,4 +1,4 @@
-import { FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaSignOutAlt, FaSignInAlt } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { FaCar } from "react-icons/fa6";
 import { ArrowLeft } from "lucide-react";
@@ -8,36 +8,42 @@ import { toast } from "react-toastify";
 import ReactGA from "react-ga4";
 import NavBar from "./NavBar";
 import Footer from "./Footer";
+import LoginPage from "./LoginPage";
 
 function UserNavigation(label) {
   ReactGA.event({
-    category: 'User Interaction',
-    action: 'User Dashboard',
-    label: label, 
+    category: "User Interaction",
+    action: "User Dashboard",
+    label: label,
   });
 }
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Profile = ({ title }) => {
   const navigate = useNavigate();
+  const [authUser, setAuthUser] = useState(null);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const handleLogout = () => {
     const user = appAuth.currentUser;
     if (user) {
-      appAuth.signOut().then(() => {
-        toast.success("Logged Out...", {
-          position: "top-center",
-          autoClose: 3000,
-        });
-        navigate("/");
-      }).catch((error) => {
-        console.error(error);
-        toast.error(error.message || "Something went wrong...", {
-          position: "top-center",
-          autoClose: 5000
+      appAuth
+        .signOut()
+        .then(() => {
+          toast.success("Logged Out...", {
+            position: "top-center",
+            autoClose: 3000,
+          });
+          navigate("/");
         })
-      })
-      
+        .catch((error) => {
+          console.error(error);
+          toast.error(error.message || "Something went wrong...", {
+            position: "top-center",
+            autoClose: 5000,
+          });
+        });
+
       UserNavigation("Account Logout");
     } else {
       toast.error("Not signed in..", {
@@ -45,21 +51,43 @@ const Profile = ({ title }) => {
         autoClose: 3000,
       });
     }
-  }
+  };
+
+  const handleLogin = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  useEffect(() => {
+    if (authUser) {
+      navigate("/details");
+      UserNavigation("User Details");
+    }
+  });
   useEffect(() => {
     document.title = title;
-}, [title]);
+  }, [title]);
 
   return (
     <>
-       <Helmet>
-                <title>{title}</title>
-                <meta name="description" content="Manage your profile, personal details, and settings at Zymo." />
-                <link rel="canonical" href="https://zymo.app/profile" />
-<meta property="og:title" content={title} />
-                <meta property="og:description" content="Manage your profile, personal details, and settings at Zymo." />
-            </Helmet>
-    <NavBar/>
+      <Helmet>
+        <title>{title}</title>
+        <meta
+          name="description"
+          content="Manage your profile, personal details, and settings at Zymo."
+        />
+        <link rel="canonical" href="https://zymo.app/profile" />
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:description"
+          content="Manage your profile, personal details, and settings at Zymo."
+        />
+      </Helmet>
+      <NavBar />
+      <LoginPage
+        onAuth={setAuthUser}
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
       <button
         onClick={() => navigate("/")}
         className="text-white m-5 cursor-pointer"
@@ -72,7 +100,7 @@ const Profile = ({ title }) => {
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
           {/* Your Details Section */}
-          <Link to="/details" onClick={()=>UserNavigation("User Details")}>
+          <Link to="/details" onClick={() => UserNavigation("User Details")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
               <div className="flex items-center space-x-3">
                 <FaUser className="text-gray-700 text-lg" />
@@ -82,7 +110,7 @@ const Profile = ({ title }) => {
           </Link>
 
           {/* Your Bookings Section */}
-          <Link to="/my-bookings" onClick={()=>UserNavigation("My Bookings")}>
+          <Link to="/my-bookings" onClick={() => UserNavigation("My Bookings")}>
             <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <FaCar className="text-gray-700 text-lg" />
@@ -95,13 +123,26 @@ const Profile = ({ title }) => {
           <hr className="border-gray-600 my-3" />
 
           {/* Logout Section */}
-          <div className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer" onClick={handleLogout}>
-            <FaSignOutAlt className="text-lg mr-3" />
-            <span className="font-medium">Log Out</span>
-          </div>
+          {appAuth.currentUser ? (
+            <div
+              className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer"
+              onClick={handleLogout}
+            >
+              <FaSignOutAlt className="text-lg mr-3" />
+              <span className="font-medium">Log Out</span>
+            </div>
+          ) : (
+            <div
+              className="bg-green-100 p-3 rounded-lg flex items-center text-green-600 cursor-pointer"
+              onClick={handleLogin}
+            >
+              <FaSignInAlt className="text-lg mr-3" />
+              <span className="font-medium">Log In</span>
+            </div>
+          )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };
