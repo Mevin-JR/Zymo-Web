@@ -218,7 +218,7 @@ useEffect(() => {
   
       return new Promise((resolve, reject) => {
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
+          key: import.meta.env.VITE_RAZORPAY_TEST_KEY,//Update the secret here also
           amount: orderData.amount,
           currency: "INR",
           name: "Zymo",
