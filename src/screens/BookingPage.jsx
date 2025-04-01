@@ -17,7 +17,7 @@ import {
   formatDateForMyChoize,
 } from "../utils/mychoize";
 import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { webDB, webStorage } from "../utils/firebase";
+import { appDB, webDB, webStorage } from "../utils/firebase";
 import PickupPopup from "../components/PickupPopup";
 import DropupPopup from "../components/DropupPopup";
 import BookingPageFormPopup from "../components/BookingPageFormPopup";
@@ -85,7 +85,7 @@ function BookingPage({ title }) {
 
   useEffect(() => {
     const fetchVendorDetails = async () => {
-      const docRef = doc(webDB, "carvendors", vendor);
+      const docRef = doc(appDB, "carvendors", vendor);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -200,26 +200,28 @@ function BookingPage({ title }) {
   };
 
   useEffect(() => {
-    const mychoizeFormattedPickDate = formatDateForMyChoize(startDate);
-    const mychoizeFormattedDropDate = formatDateForMyChoize(endDate);
+    if (vendor === "Mychoize") {
+      const mychoizeFormattedPickDate = formatDateForMyChoize(startDate);
+      const mychoizeFormattedDropDate = formatDateForMyChoize(endDate);
 
-    const fetchLocationList = () =>
-      fetchMyChoizeLocationList(
-        city,
-        mychoizeFormattedDropDate,
-        mychoizeFormattedPickDate
-      ).then((data) => {
-        const pickupLocations = filterLocationLists(
-          data.BranchesPickupLocationList
-        );
-        const dropupLocations = filterLocationLists(
-          data.BranchesDropupLocationList
-        );
+      const fetchLocationList = () =>
+        fetchMyChoizeLocationList(
+          city,
+          mychoizeFormattedDropDate,
+          mychoizeFormattedPickDate
+        ).then((data) => {
+          const pickupLocations = filterLocationLists(
+            data.BranchesPickupLocationList
+          );
+          const dropupLocations = filterLocationLists(
+            data.BranchesDropupLocationList
+          );
 
-        setMychoizePickupLocations(pickupLocations);
-        setMychoizeDropupLocations(dropupLocations);
-      });
-    fetchLocationList();
+          setMychoizePickupLocations(pickupLocations);
+          setMychoizeDropupLocations(dropupLocations);
+        });
+      fetchLocationList();
+    }
   }, [selectedPickupLocation, selectedDropLocation]);
 
   const uploadDocs = async (images) => {
