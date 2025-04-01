@@ -9,4 +9,12 @@ export default defineConfig({
         host:true,
         historyApiFallback: true,
       },
+    build: {
+      rollupOptions: {
+        external: ['firebase-admin', 'firebase-functions', 'fs']
+      }
+    },
+    optimizeDeps: {
+      exclude: ['firebase-admin', 'firebase-functions', 'fs']
+    }
 });
