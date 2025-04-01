@@ -18,6 +18,7 @@ function UserNavigation(label) {
   });
 }
 import { useEffect, useState } from "react";
+import { app } from "firebase-functions";
 
 const Profile = ({ title }) => {
   const navigate = useNavigate();
@@ -99,38 +100,46 @@ const Profile = ({ title }) => {
         <div className="max-w-md mx-auto bg-[#424242] shadow-lg rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
-          {/* Your Details Section */}
-          <Link to="/details" onClick={() => UserNavigation("User Details")}>
-            <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
-              <div className="flex items-center space-x-3">
-                <FaUser className="text-gray-700 text-lg" />
-                <span className="text-gray-800 font-medium">Your Details</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Your Bookings Section */}
-          <Link to="/my-bookings" onClick={() => UserNavigation("My Bookings")}>
-            <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <FaCar className="text-gray-700 text-lg" />
-                <span className="text-gray-800 font-medium">Your Bookings</span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Horizontal Line */}
-          <hr className="border-gray-600 my-3" />
-
-          {/* Logout Section */}
           {appAuth.currentUser ? (
-            <div
-              className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer"
-              onClick={handleLogout}
-            >
-              <FaSignOutAlt className="text-lg mr-3" />
-              <span className="font-medium">Log Out</span>
-            </div>
+            <>
+              {/* Your Details Section */}
+              <Link
+                to="/details"
+                onClick={() => UserNavigation("User Details")}
+              >
+                <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
+                  <div className="flex items-center space-x-3">
+                    <FaUser className="text-gray-700 text-lg" />
+                    <span className="text-gray-800 font-medium">
+                      Your Details
+                    </span>
+                  </div>
+                </div>
+              </Link>
+              {/* Your Bookings Section */}
+              <Link
+                to="/my-bookings"
+                onClick={() => UserNavigation("My Bookings")}
+              >
+                <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <FaCar className="text-gray-700 text-lg" />
+                    <span className="text-gray-800 font-medium">
+                      Your Bookings
+                    </span>
+                  </div>
+                </div>
+              </Link>
+              {/* Horizontal Line */}
+              <hr className="border-gray-600 my-3" />
+              <div
+                className="bg-red-100 p-3 rounded-lg flex items-center text-red-600 cursor-pointer"
+                onClick={handleLogout}
+              >
+                <FaSignOutAlt className="text-lg mr-3" />
+                <span className="font-medium">Log Out</span>
+              </div>
+            </>
           ) : (
             <div
               className="bg-green-100 p-3 rounded-lg flex items-center text-green-600 cursor-pointer"
