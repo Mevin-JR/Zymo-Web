@@ -120,19 +120,19 @@ const Listing = ({ title }) => {
 
             const filterdData = testSnapshot.docs
               .map((doc) => ({ id: doc.id, ...doc.data() }))
-              // .filter((car) =>
-              //   car.cities?.some((c) => c.toLowerCase() === city?.toLowerCase())
-              // )
-              .filter(
-                (car) =>
-                  !car.unavailableDates?.some((date) => {
-                    const unavailableDateTimestamp = Date.parse(date);
-                    return (
-                      unavailableDateTimestamp >= startDateEpoc &&
-                      unavailableDateTimestamp <= endDateEpoc
-                    );
-                  })
-              ) // Filter based on unavailable dates
+              .filter((car) =>
+                car.cities?.some((c) => c.toLowerCase() === city?.toLowerCase())
+              )
+              // .filter(
+              //   (car) =>
+              //     car.unavailableDates?.some((date) => {
+              //       const unavailableDateTimestamp = Date.parse("2025-04-01");
+              //       return (
+              //         unavailableDateTimestamp >= startDateEpoc &&
+              //         unavailableDateTimestamp <= endDateEpoc
+              //       );
+              //     })
+              // ) // Filter based on unavailable dates
               // .filter(
               //   (car) =>
               //     !car.unavailableHours?.some(({ startHour, endHour }) => {
@@ -183,12 +183,17 @@ const Listing = ({ title }) => {
                   car.hourlyRental.limit === "Limited"
                     ? car.hourlyRental.limited.extraHourRate
                     : car.hourlyRental.unlimited.extraHourRate,
+                slabRates: car.slabRates.enabled ? car.slabRates.slabs : [],
                 securityDeposit: car.securityDeposit,
-                deliveryCharges: car.deliveryCharges,
+                deliveryCharges: car.deliveryCharges.enabled
+                  ? car.deliveryCharges
+                  : false,
+                yearOfRegistration: car.yearOfRegistration,
                 ratingData: { text: "No ratings available" },
                 trips: "N/A",
-                source: "firebase",
+                source: "Local Owner",
                 sourceImg: null,
+                // rateBasis: car.hourlyRental.limit === "Limited" ? ,
               }));
 
             console.log("Firebase Filtered Data:", filterdData);
@@ -386,10 +391,7 @@ const Listing = ({ title }) => {
 
   const navigate = useNavigate();
   const goToDetails = (car) => {
-    console.log("Car:", car.source);
-
     handleSelectedCar(`${car.brand} ${car.name} - ${car.source}`);
-    // console.log("car name",car.name);
     navigate(`/self-drive-car-rentals/${city}/cars/booking-details`, {
       state: {
         startDate,
