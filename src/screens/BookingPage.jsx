@@ -587,7 +587,7 @@ function BookingPage({ title }) {
         currency: "INR",
         name: "Zymo",
         description: "Zymo Car Rental",
-        image: "/images/AppLogo/zymo2.jpg",
+        image: "/images/AppLogo/Zymo_Logo_payment.png",
         order_id: orderData.id,
         handler: async function (response) {
           const data = { ...response };
@@ -610,9 +610,9 @@ function BookingPage({ title }) {
           }
         },
         theme: {
-          color: "#000",
-          backdrop_color: "#000",
-        },
+          color: "#edff8d",
+          backdrop_color: "#212121",
+      },
         prefill: {
           name: userData.name,
           email: userData.email,

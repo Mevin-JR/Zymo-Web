@@ -223,7 +223,7 @@ useEffect(() => {
           currency: "INR",
           name: "Zymo",
           description: "Zymo is India's largest aggregator for self-drive car rentals.",
-          image: "/images/AppLogo/zymo2.jpg",
+          image: "/images/AppLogo/Zymo_Logo_payment.png",
           order_id: orderData.id,
           handler: async function (response) {
             try {
