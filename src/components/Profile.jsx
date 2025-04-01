@@ -23,9 +23,9 @@ const Profile = ({ title }) => {
   const navigate = useNavigate();
   const [authUser, setAuthUser] = useState(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const user = appAuth.currentUser;
 
   const handleLogout = () => {
-    const user = appAuth.currentUser;
     if (user) {
       appAuth
         .signOut()
@@ -59,7 +59,7 @@ const Profile = ({ title }) => {
 
   useEffect(() => {
     if (authUser) {
-      navigate("/details");
+      navigate("/your-details");
       UserNavigation("User Details");
     }
   });
@@ -99,11 +99,11 @@ const Profile = ({ title }) => {
         <div className="max-w-md mx-auto bg-[#424242] shadow-lg rounded-lg p-4">
           <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
 
-          {appAuth.currentUser ? (
+          {authUser || user ? (
             <>
               {/* Your Details Section */}
               <Link
-                to="/details"
+                to="/your-details"
                 onClick={() => UserNavigation("User Details")}
               >
                 <div className="bg-gray-50 p-3 rounded-lg mb-3 flex items-center justify-between cursor-pointer">
