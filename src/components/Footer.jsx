@@ -54,6 +54,7 @@ const Footer = () => {
                 <Link to="/privacy-policy" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Privacy Policy")}>Privacy Policy</Link>
                 <Link to="/terms-of-service" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Terms of Service")}>Terms of Service</Link>
                 <Link to="/cancellation-policy" className="hover:text-[#faffa4]"onClick={()=> handleFooterClicks("Cancellation Policy")}>Cancellation Policy</Link>
+                <a href="https://partner.zymo.app/" className="hover:text-[#faffa4]" target="_blank" rel="noopener noreferrer"  onClick={()=> handleFooterClicks("Partner with us")}>Partner with us</a>
             </div>
 
             {/* Install App Section */}
