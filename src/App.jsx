@@ -42,7 +42,7 @@ import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
 import CookiesConsent from "./components/CookiesConsent.jsx";
 import AgentList from "./components/AgentList.jsx";
-
+import ChatBotModal from './components/Chatbot/ChatBotModal.jsx';
 const App = () => {
   return (
     <HelmetProvider>
@@ -198,6 +198,7 @@ const App = () => {
             path="/agent-list"
             element={<AgentList title="Agent List - Zymo" />}
           />
+           <Route path="/Zymo-AI" element={<ChatBotModal />}/> 
           <Route
             path="*"
             element={<ErrorPage title="404 - Page Not Found" />}

@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
 import ChatBot from "../components/Chatbot/ChatBot";
 import { useParams } from "react-router-dom";
+import ChatBotButton from "../components/Chatbot/ChatBotButton";
 const HomeScreen = ({ title }) => {
 
   const {city} =useParams();
@@ -65,7 +66,10 @@ const HomeScreen = ({ title }) => {
           <FaWhatsapp className="text-3xl" />
         </a>
 
-        <ChatBot></ChatBot>
+        
+        <div>
+                    <ChatBotButton />
+                </div> 
       </div>
       <Footer />
     </>
