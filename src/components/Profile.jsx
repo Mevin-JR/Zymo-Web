@@ -18,7 +18,6 @@ function UserNavigation(label) {
   });
 }
 import { useEffect, useState } from "react";
-import { app } from "firebase-functions";
 
 const Profile = ({ title }) => {
   const navigate = useNavigate();
