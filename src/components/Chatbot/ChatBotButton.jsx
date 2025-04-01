@@ -21,7 +21,7 @@ const ChatBotButton = () => {
 
     const handleClick = (e) => {
         e.preventDefault();
-        navigate('/Zymo-AI');
+        navigate('/ZymoAI');
     };
 
     return (

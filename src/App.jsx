@@ -198,7 +198,7 @@ const App = () => {
             path="/agent-list"
             element={<AgentList title="Agent List - Zymo" />}
           />
-           <Route path="/Zymo-AI" element={<ChatBotModal />}/> 
+           <Route path="/ZymoAI" element={<ChatBotModal />}/> 
           <Route
             path="*"
             element={<ErrorPage title="404 - Page Not Found" />}
