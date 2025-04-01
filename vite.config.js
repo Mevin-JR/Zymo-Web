@@ -7,6 +7,6 @@ export default defineConfig({
     server: {
         allowedHosts: ['.loca.lt'], // Allow all LocalTunnel domains
         host:true,
+        historyApiFallback: true,
       },
-   
 });

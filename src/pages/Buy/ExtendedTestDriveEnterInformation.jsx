@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { countryCodes } from '../../api/CountryCode';
 import { Helmet } from "react-helmet-async";
 import { useEffect } from 'react';
-
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 export default function Extended_TestDriveFormPage( {title }) {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ export default function Extended_TestDriveFormPage( {title }) {
     dob: '',
   });
   const [errors, setErrors] = useState({});
+  const trackEvent = useTrackEvent();
   const { car, startDate, endDate } = location.state || {};
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   useEffect(() => {
@@ -89,6 +90,7 @@ export default function Extended_TestDriveFormPage( {title }) {
           } 
         } 
       });
+      trackEvent("Extended Test Drive Booking", "Extended Test Drive","User Details Entered");
     }
   };
 

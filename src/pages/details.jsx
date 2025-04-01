@@ -15,7 +15,7 @@ import NavBar from "../components/NavBar";
 function UserNavigation(label) {
   ReactGA.event({
     category: 'User Interaction',
-    action: 'Button Clicked',
+    action: 'User Dashboard',
     label: label, 
   });
 }
@@ -130,7 +130,7 @@ export default function YourDetails({title}) {
 
   const handleDeleteAccount = () => {
     console.log("Account Deleted");
-    UserNavigation("Account Deleted");
+    UserNavigation("User Deleted Account");
   };
 
   // Function to upload a file to Firebase Storage and return its download URL
@@ -174,7 +174,7 @@ export default function YourDetails({title}) {
       console.log("Document written with ID: ", docRef.id);
       setIsSaved(true); // Set saved state instead of alert
 
-      UserNavigation("Profile Saved");
+      UserNavigation("User Profile Saved");
     } catch (error) {
       console.error("Error saving profile: ", error);
       alert("Failed to save profile. Please try again.");

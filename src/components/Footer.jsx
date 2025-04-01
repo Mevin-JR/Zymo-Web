@@ -13,7 +13,7 @@ const Footer = () => {
     const trackEvent = useTrackEvent();
 
     const handleFooterClicks =(label)=>{
-        trackEvent("Foooter new Section","Footer Link Clicked!",label);
+        trackEvent("Foooter new Section","Footer Link Clicked",label);
 
     }
 

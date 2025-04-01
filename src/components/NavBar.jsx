@@ -19,7 +19,7 @@ const NavBar = () => {
 
     // Google Analytics Event Tracking Function
     const handleNavClick =(label)=>{
-        trackEvent("Navigation Bar","Navigation Link Clicked !",label);
+        trackEvent("Navigation Bar","Navbar Link Clicked",label);
 
     }
 

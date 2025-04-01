@@ -5,11 +5,14 @@ import { useNavigate,useLocation } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
 import { ArrowLeft } from 'lucide-react';
 import { useEffect } from "react";
+import useTrackEvent from "../../hooks/useTrackEvent";
+
 
 const ExtendedTestDriveDatePicker = ({ title }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [selectedDate, setSelectedDate] = useState(new Date());
+    const trackEvent = useTrackEvent();
     const { car } = location.state || {};
     const dates = Array.from({ length: 90 }, (_, i) => addDays(new Date(), i));
 
@@ -22,6 +25,17 @@ const ExtendedTestDriveDatePicker = ({ title }) => {
       document.title = title;
     }, [title]);
   
+    const onSubmit = () => {
+      navigate('/buy/upload-info',
+        { 
+          state: { 
+            car:car , startDate:startDateFormatted , endDate:endDateFormatted
+          } 
+        }
+      )
+      trackEvent("Extended Test Drive Booking", "Extended Test Drive","Start Date Selected");
+    }
+
   return (
     <>
     <Helmet>
@@ -91,7 +105,7 @@ const ExtendedTestDriveDatePicker = ({ title }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full p-3 md:p-4 rounded-lg font-semibold text-base md:text-lg transition-transform hover:scale-[1.02] active:scale-[0.98] bg-appColor text-black border"
-            onClick={() => navigate('/buy/upload-info',{ state: { car, startDate:startDateFormatted , endDate:endDateFormatted } })}
+            onClick={onSubmit}
             >
             Next
             </motion.button>

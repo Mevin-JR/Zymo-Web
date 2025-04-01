@@ -1,11 +1,16 @@
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect,useCallback ,useRef} from 'react';
+import useTrackEvent from "../../hooks/useTrackEvent";
+
 
 const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
   const navigate = useNavigate();
+  const trackEvent = useTrackEvent();
+
   const isProcessing = useRef(false);
   const processingComplete = useRef(false);
+  const eventTracked = useRef(false);
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
 
@@ -34,11 +39,17 @@ const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
         return;
       }
 
+      if (isOpen && !eventTracked.current) {
+        trackEvent("Extended Test Drive Booking", "Extended Test Drive", "Payment Successful/Booking Confirmed");
+        eventTracked.current = true; 
+      }
+
       try {
         isProcessing.current = true;
         await sendWhatsAppMessage(bookingData);
         processingComplete.current = true;
-        console.log('Extended test drive booking processed successfully');
+        
+        // console.log('Extended test drive booking processed successfully');
       } catch (error) {
         console.error('Error processing extended test drive booking:', error);
       } finally {
@@ -47,7 +58,7 @@ const ExtendedTestDriveConfirmPage = ({ isOpen, close, bookingData }) => {
     };
 
     processBooking();
-  }, [isOpen, bookingData, sendWhatsAppMessage]);
+  }, [isOpen, bookingData, sendWhatsAppMessage, trackEvent]);
 
   // Handle button click
   const handleConfirm = () => {

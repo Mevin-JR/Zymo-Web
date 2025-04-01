@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronDown } from 'lucide-react';
 import {countryCodes} from "../../api/CountryCode"
 import { Helmet } from 'react-helmet-async';
 import { useEffect } from 'react';
+import useTrackEvent from '../../hooks/useTrackEvent';
 
 export default function TestDriveFormPage({ title }) {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function TestDriveFormPage({ title }) {
     dob: '',
   });
   const [errors, setErrors] = useState({});
+  const trackEvent = useTrackEvent();
   const { car } = location.state || {};
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
 
@@ -86,6 +88,7 @@ export default function TestDriveFormPage({ title }) {
           } 
         } 
       });
+      trackEvent("Test Drive Booking", "Test Drive", "User Details Entered");
     }
   };
 
