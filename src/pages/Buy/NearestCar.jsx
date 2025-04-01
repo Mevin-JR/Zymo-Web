@@ -9,13 +9,14 @@ import { ArrowLeft } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { webDB } from "../../utils/firebase";
 import { Helmet } from "react-helmet-async";
-
-
+import LoadingCard from '../../components/buycomponent/LoadingCard'
+  
 const NearestCar = ({ title }) => {
   const navigate = useNavigate();
   const [filteredCars, setFilteredCars] = useState("Electric");
   const [allCars, setAllCars] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.title = title;
@@ -24,14 +25,17 @@ const NearestCar = ({ title }) => {
   useEffect(() => {
     const fetchCarsData = async () => {
       try {
+        setLoading(true);
         const carsCollectionRef = collection(webDB, "BuySectionCars");
         const querySnapshot = await getDocs(carsCollectionRef);
 
         const cars = querySnapshot.docs.map((doc) => doc.data());
         setAllCars(cars);
-        setSearchResults(cars);  // Store all cars in searchResults
+        setSearchResults(cars);
       } catch (err) {
         console.error("Error fetching cars data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -46,13 +50,20 @@ const NearestCar = ({ title }) => {
 
   return (
     <>
-     <Helmet>
-                <title>{title}</title>
-                <meta name="description" content="Find the best cars for sale near you with Zymo. Browse top deals and book your dream car today!" />
-                <meta property="og:title" content={title} />
-        <meta property="og:description" content="Browse Zymo's self-drive car options and choose the one that fits your needs." />
-                <link rel="canonical" href="https://zymo.app/buy" />
-            </Helmet>
+      <Helmet>
+        <title>{title}</title>
+        <meta
+          name="description"
+          content="Find the best cars for sale near you with Zymo. Browse top deals and book your dream car today!"
+        />
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:description"
+          content="Browse Zymo's self-drive car options and choose the one that fits your needs."
+        />
+        <link rel="canonical" href="https://zymo.app/buy" />
+      </Helmet>
+
       <NavBar />
       <div className="head-container flex flex-col sm:flex-row justify-between items-center bg-darkGrey text-white p-4">
         <button
@@ -70,11 +81,21 @@ const NearestCar = ({ title }) => {
       </div>
       <Filter setFilterCar={setFilteredCars} />
 
-      {searchResults.length > 0 ? (
+      {loading ? (
+        <div className="bg-darkGrey grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 py-6 my-3 rounded-lg mx-auto max-w-[1240px]">
+          {Array(6)
+            .fill()
+            .map((_, index) => (
+              <LoadingCard key={index} />
+            ))}
+        </div>
+      ) : searchResults.length > 0 ? (
         <Cards cars={searchResults} />
       ) : (
         <div className="flex justify-center items-center h-[60vh] p-4 bg-darkGrey">
-          <p className="text-white text-xl font-semibold">No cars at the moment. Please try another filter</p>
+          <p className="text-white text-xl font-semibold">
+            No cars at the moment. Please try another filter
+          </p>
         </div>
       )}
 
