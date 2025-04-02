@@ -39,8 +39,8 @@ const HomeScreen = ({ title }) => {
           property="og:description"
           content="Explore top self-drive car rentals with amazing deals and offers!"
         />
-        <link rel="canonical" href="https://zymo.app/self-drive-car-rentals" />
-      </Helmet>
+        <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}`} />
+        </Helmet>
       <NavBar />
       <div className="container flex flex-col w-full mx-auto">
         <div className="container">
