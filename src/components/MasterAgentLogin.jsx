@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { appDB } from '../utils/firebase';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import bcrypt from 'bcryptjs';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from "react-helmet-async";
@@ -20,54 +20,46 @@ const MasterAgentLogin = ({title}) => {
     appColor: "#edff8d", // Light yellow
     darkGrey: "#212121", // Dark background
     darkGrey2: "#424242", // Modal and table background
+    successGreen: "#4CAF50" // Added success color
   };
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [newAgent, setNewAgent] = useState({ userId: '', password: '' });
-  const [agents, setAgents] = useState([]);
+  const [createdAgents, setCreatedAgents] = useState([]); // Track newly created agents
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
      useEffect(() => {
         document.title = title;
       }, [title]);
 
-  const handleMasterLogin = async (e) => {
+  const handleMasterLogin = (e) => {
     e.preventDefault();
     const isValid = password === 'zymopanel';
     if (isValid) {
       setIsAuthenticated(true);
-      await loadAgents();
     }
-  };
-
-  const loadAgents = async () => {
-    const querySnapshot = await getDocs(collection(appDB, 'AgentLogin'));
-    const agentsData = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      userId: doc.data().userId,
-      password: '********' // Masked password
-    }));
-    setAgents(agentsData);
   };
 
   const handleCreateAgent = async (e) => {
     e.preventDefault();
     try {
       const hashedPassword = await bcrypt.hash(newAgent.password, 10);
-      await addDoc(collection(appDB, 'AgentLogin'), {
+      const docRef = await addDoc(collection(appDB, 'AgentLogin'), {
         userId: newAgent.userId,
         password: hashedPassword,
         createdAt: new Date()
       });
-      // Set success message
+      // Add to local state with plain password for current session
+      setCreatedAgents(prev => [
+        ...prev,
+        { id: docRef.id, userId: newAgent.userId, password: newAgent.password }
+      ]);
       setSuccessMessage(`Agent ${newAgent.userId} created successfully!`);
       setNewAgent({ userId: '', password: '' });
-      await loadAgents();
 
-       // Clear success message after 3 seconds
-       setTimeout(() => {
+      setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
     } catch (error) {
@@ -106,7 +98,7 @@ const MasterAgentLogin = ({title}) => {
           boxShadow: `0 0 20px ${colorScheme.appColor}33`
         }}
       >
-         {successMessage && (
+        {successMessage && (
           <div 
             className="flex items-center justify-center p-3 rounded-lg mb-4 animate-pulse"
             style={{ 
@@ -275,6 +267,17 @@ const MasterAgentLogin = ({title}) => {
                 Create Agent
               </button>
             </form>
+            {/* Agent List Button */}
+            <button
+              onClick={() => navigate('/agent-list', { state: { createdAgents } })}
+              className="mt-4 w-full p-3 rounded-lg text-lg font-bold uppercase tracking-wider transform transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              style={{ 
+                backgroundColor: colorScheme.appColor, 
+                color: colorScheme.darkGrey 
+              }}
+            >
+              Agent List
+            </button>
           </div>
         )}
       </div>

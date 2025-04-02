@@ -18,6 +18,7 @@ jobs:
           echo "VITE_PLACES_API_KEY=${{ secrets.VITE_PLACES_API_KEY }}" >> .env.production
           echo "VITE_FUNCTIONS_API_URL=${{ secrets.VITE_FUNCTIONS_API_URL }}" >> .env.production
           echo "VITE_RAZORPAY_TEST_KEY=${{ secrets.VITE_RAZORPAY_TEST_KEY }}" >> .env.production
+          echo "VITE_RAZORPAY_PROD_KEY=${{ secrets.VITE_RAZORPAY_PROD_KEY }}" >> .env.production
           echo "VITE_APP_FIREBASE_API_KEY=${{ secrets.VITE_APP_FIREBASE_API_KEY }}" >> .env.production
           echo "VITE_APP_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_APP_FIREBASE_AUTH_DOMAIN }}" >> .env.production
           echo "VITE_APP_FIREBASE_PROJECT_ID=${{ secrets.VITE_APP_FIREBASE_PROJECT_ID }}" >> .env.production

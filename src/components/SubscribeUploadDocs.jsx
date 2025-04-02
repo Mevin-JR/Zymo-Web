@@ -1,4 +1,4 @@
-import { useState  } from "react";
+import { useState } from "react";
 import { ArrowLeft, X } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Webcam from "react-webcam";
@@ -11,8 +11,6 @@ import { useEffect } from "react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { webDB, webStorage } from "../utils/firebase";
-
-
 
 // Function to dynamically load Razorpay script
 function loadScript(src) {
@@ -39,13 +37,11 @@ const dataURLtoFile = (dataURL, filename) => {
   return new File([u8arr], filename, { type: mime });
 };
 
-
-
 const SubscriptionUploadDocuments = ({ title }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { car, startDate, endDate, userData, activeTab ,city,totalAmount} = location.state;
-
+  const { car, startDate, endDate, userData, activeTab, city, totalAmount } =
+    location.state;
 
   const [aadharFrontImage, setAadharFrontImage] = useState(null);
   const [aadharBackImage, setAadharBackImage] = useState(null);
@@ -55,8 +51,7 @@ const SubscriptionUploadDocuments = ({ title }) => {
   const [currentDocType, setCurrentDocType] = useState("aadhar");
   const [currentPage, setCurrentPage] = useState("front");
   // const [allImages , setAllImages]=useState([])
-  const [isConfirmed, setIsConfirmed] = useState(false); 
-
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const functionsUrl = import.meta.env.VITE_FUNCTIONS_API_URL;
   const allImagesUploaded =
@@ -65,26 +60,26 @@ const SubscriptionUploadDocuments = ({ title }) => {
     aadharFrontImage &&
     aadharBackImage;
 
-    const resetAllState = () => {
-      setAadharFrontImage(null);
-      setAadharBackImage(null);
-      setDrivingFrontImage(null);
-      setDrivingBackImage(null);
-      setCameraOpen(false);
-      setCurrentDocType("aadhar");
-      setCurrentPage("front");  
-    };
-    useEffect(() => {
-      document.title = title;
-    }, [title]);
-    
+  const resetAllState = () => {
+    setAadharFrontImage(null);
+    setAadharBackImage(null);
+    setDrivingFrontImage(null);
+    setDrivingBackImage(null);
+    setCameraOpen(false);
+    setCurrentDocType("aadhar");
+    setCurrentPage("front");
+  };
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
   // To handle image upload
   const handleImageUpload = (type, page, docType) => {
     setCurrentDocType(docType);
     setCurrentPage(page);
 
     if (type === "camera") {
-      setCameraOpen(true); 
+      setCameraOpen(true);
     } else {
       // Handle Gallery
       const input = document.createElement("input");
@@ -194,8 +189,10 @@ const SubscriptionUploadDocuments = ({ title }) => {
   //Handle Payment
   const handlePayment = async () => {
     await delay(1000);
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
-  
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
+
     if (!res) {
       console.error("Razorpay SDK failed to load!");
       toast.error("Could not load Razorpay, Please try again later...", {
@@ -204,29 +201,33 @@ const SubscriptionUploadDocuments = ({ title }) => {
       });
       return false;
     }
-  
+
     try {
       const amount = parseInt(totalAmount);
       const orderData = await createOrder(amount, "INR");
-  
+
       return new Promise((resolve, reject) => {
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_TEST_KEY,
+          key: import.meta.env.VITE_RAZORPAY_PROD_KEY,
           amount: orderData.amount,
           currency: "INR",
           name: "Zymo",
-          description: "Zymo is India's largest aggregator for self-drive car rentals.",
+          description:
+            "Zymo is India's largest aggregator for self-drive car rentals.",
           image: "/images/AppLogo/zymo2.jpg",
           order_id: orderData.id,
           handler: async function (response) {
             try {
               const data = { ...response };
-  
+
               // console.log("Order ID:", response.razorpay_order_id);
               // console.log("Payment ID:", response.razorpay_payment_id);
 
-              const res = await axios.post(`${functionsUrl}/payment/verifyPayment`, data);
-  
+              const res = await axios.post(
+                `${functionsUrl}/payment/verifyPayment`,
+                data
+              );
+
               if (res.data.success) {
                 resolve({
                   success: true,
@@ -239,7 +240,7 @@ const SubscriptionUploadDocuments = ({ title }) => {
                   autoClose: 5000,
                 });
                 resetAllState();
-                resolve(false); 
+                resolve(false);
               }
             } catch (error) {
               console.error("Error verifying payment:", error);
@@ -256,18 +257,18 @@ const SubscriptionUploadDocuments = ({ title }) => {
             contact: userData.phone,
           },
         };
-  
+
         var rzp1 = new window.Razorpay(options);
         rzp1.on("payment.failed", function (response) {
           console.log("Payment failed:", response.error);
           reject(false);
         });
-  
+
         rzp1.on("payment.error", function (response) {
           console.log("Payment error:", response.error);
           reject(false);
         });
-  
+
         rzp1.open();
       });
     } catch (error) {
@@ -275,12 +276,10 @@ const SubscriptionUploadDocuments = ({ title }) => {
       return false;
     }
   };
-  
-
 
   //Firebase Upload Logic
-  const uploadDataToFirebase = async (images,orderId, paymentId) => {
-    try {      
+  const uploadDataToFirebase = async (images, orderId, paymentId) => {
+    try {
       // Create a timestamp for the folder name once
       const timestamp = Date.now();
       const folderPath = `documents/${userData.email}_${timestamp}`;
@@ -294,8 +293,9 @@ const SubscriptionUploadDocuments = ({ title }) => {
       );
 
       //Extract URLs of uploaded images
-      const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] = imageUrls;
-      
+      const [aadharFrontUrl, aadharBackUrl, licenseFrontUrl, licenseBackUrl] =
+        imageUrls;
+
       const data = {
         carId: car.id,
         carName: car.name,
@@ -326,7 +326,7 @@ const SubscriptionUploadDocuments = ({ title }) => {
       await addDoc(collection(webDB, "webBuyPaymentSuccessDetail"), data);
       // console.log("Data uploaded to Firebase:", data);
 
-      setIsConfirmed(true);          
+      setIsConfirmed(true);
       resetAllState();
     } catch (error) {
       console.error("Error uploading documents to Firebase:", error);
@@ -336,7 +336,7 @@ const SubscriptionUploadDocuments = ({ title }) => {
     document.title = title;
   }, [title]);
 
-  //On Submit 
+  //On Submit
   const handleSubmit = async () => {
     try {
       // Check if all required documents are uploaded
@@ -370,127 +370,132 @@ const SubscriptionUploadDocuments = ({ title }) => {
       }
       // Proceed with payment first & After payment is successful, upload the data to Firebase
       const paymentSuccess = await handlePayment();
-    
+
       if (!paymentSuccess.success) {
         console.error("Payment failed, not proceeding with Firebase upload.");
-        return; 
+        return;
       }
 
-      await uploadDataToFirebase(convertedImages,paymentSuccess.orderId, paymentSuccess.paymentId);
-      
+      await uploadDataToFirebase(
+        convertedImages,
+        paymentSuccess.orderId,
+        paymentSuccess.paymentId
+      );
     } catch (error) {
       console.error("Error uploading images:", error);
-      resetAllState();   
+      resetAllState();
     }
   };
 
-
-
   return (
     <>
-    <Helmet>
-    <title>{title}</title>
-                <meta name="description" content="Upload your documents to complete your Zymo subscription. Secure and easy verification process." />
-                <meta property="og:title" content={title} />
-        <meta property="og:description" content="Complete your Zymo subscription by uploading the necessary documents safely." />
-                <link rel="canonical" href="https://zymo.app/subscribe/upload-doc" />
-            </Helmet>
-    <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
-      <div className="container mx-auto max-w-4xl py-8">
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
-        >
-          <ArrowLeft size={30} />
-        </button>
+      <Helmet>
+        <title>{title}</title>
+        <meta
+          name="description"
+          content="Upload your documents to complete your Zymo subscription. Secure and easy verification process."
+        />
+        <meta property="og:title" content={title} />
+        <meta
+          property="og:description"
+          content="Complete your Zymo subscription by uploading the necessary documents safely."
+        />
+        <link rel="canonical" href="https://zymo.app/subscribe/upload-doc" />
+      </Helmet>
+      <div className="min-h-screen bg-[#212121]  text-white px-4 md:px-8">
+        <div className="container mx-auto max-w-4xl py-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="absolute left-1 md:left-5 top-10 p-2 text-white/80 hover:text-white hover:bg-[#2A2A2A] bg-transparent transition-all "
+          >
+            <ArrowLeft size={30} />
+          </button>
 
-        <div className="text-center mb-6 md:mb-10">
-          <h1 className="text-xl md:text-4xl font-bold">
-            You&apos;re just one step away from{" "}
-            <span className="text-[#edff8d]">Booking</span>
-          </h1>
-        </div>
-
-        <div className="bg-[#2A2A2A] p-6 md:p-8 rounded-xl shadow-2xl border border-white/10">
-          <div className="space-y-8">
-            <UploadSection
-              title="Upload Driving License Front Page"
-              image={drivingFrontImage}
-              onUpload={(type) => handleImageUpload(type, "front", "driving")}
-            />
-
-            <UploadSection
-              title="Upload Driving License Back Page"
-              image={drivingBackImage}
-              onUpload={(type) => handleImageUpload(type, "back", "driving")}
-            />
-
-            <UploadSection
-              title="Upload Aadhar Card Front Page"
-              image={aadharFrontImage}
-              onUpload={(type) => handleImageUpload(type, "front", "aadhar")}
-            />
-
-            <UploadSection
-              title="Upload Aadhar Card Back Page"
-              image={aadharBackImage}
-              onUpload={(type) => handleImageUpload(type, "back", "aadhar")}
-            />
+          <div className="text-center mb-6 md:mb-10">
+            <h1 className="text-xl md:text-4xl font-bold">
+              You&apos;re just one step away from{" "}
+              <span className="text-[#edff8d]">Booking</span>
+            </h1>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className={`w-full p-4 rounded-lg font-semibold text-lg transition-transform bg-[#edff8d] text-black 
+          <div className="bg-[#2A2A2A] p-6 md:p-8 rounded-xl shadow-2xl border border-white/10">
+            <div className="space-y-8">
+              <UploadSection
+                title="Upload Driving License Front Page"
+                image={drivingFrontImage}
+                onUpload={(type) => handleImageUpload(type, "front", "driving")}
+              />
+
+              <UploadSection
+                title="Upload Driving License Back Page"
+                image={drivingBackImage}
+                onUpload={(type) => handleImageUpload(type, "back", "driving")}
+              />
+
+              <UploadSection
+                title="Upload Aadhar Card Front Page"
+                image={aadharFrontImage}
+                onUpload={(type) => handleImageUpload(type, "front", "aadhar")}
+              />
+
+              <UploadSection
+                title="Upload Aadhar Card Back Page"
+                image={aadharBackImage}
+                onUpload={(type) => handleImageUpload(type, "back", "aadhar")}
+              />
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              className={`w-full p-4 rounded-lg font-semibold text-lg transition-transform bg-[#edff8d] text-black 
               ${
                 allImagesUploaded
                   ? "hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
                   : "cursor-not-allowed"
               }
               mt-8`}
-            disabled={!allImagesUploaded}
-          >
-            Proceed to Payment
-          </button>
-        </div>
-      </div>
-
-      {/* Modal for Camera */}
-      {cameraOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-          <div className="bg-[#121212] p-6 rounded-lg w-[90%] md:w-[600px] text-white text-center relative">
-            <button
-              onClick={() => setCameraOpen(false)}
-              className="absolute top-2 right-2 text-white"
+              disabled={!allImagesUploaded}
             >
-              <X size={24} />
+              Proceed to Payment
             </button>
-
-            <h3 className="text-xl mb-4">Take a Photo</h3>
-            <div className="text-center">
-              <WebcamCapture />
-            </div>
           </div>
         </div>
-      )}
 
-      {/* {isLoading && (
+        {/* Modal for Camera */}
+        {cameraOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+            <div className="bg-[#121212] p-6 rounded-lg w-[90%] md:w-[600px] text-white text-center relative">
+              <button
+                onClick={() => setCameraOpen(false)}
+                className="absolute top-2 right-2 text-white"
+              >
+                <X size={24} />
+              </button>
+
+              <h3 className="text-xl mb-4">Take a Photo</h3>
+              <div className="text-center">
+                <WebcamCapture />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* {isLoading && (
         <PaymentConfirmationPage
           isOpen={isLoading}
           close={() => setIsLoading(false)}
         />
       )} */}
-      
 
-      {isConfirmed && (
-        <ConfirmPage
-          isOpen={isConfirmed}
-          close={() => setIsConfirmed(false)}
-          car={car}
-          userData={userData}
-        />
-      )}
-
-    </div>
+        {isConfirmed && (
+          <ConfirmPage
+            isOpen={isConfirmed}
+            close={() => setIsConfirmed(false)}
+            car={car}
+            userData={userData}
+          />
+        )}
+      </div>
     </>
   );
 };
