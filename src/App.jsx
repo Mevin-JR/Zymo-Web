@@ -42,13 +42,13 @@ import PageTracker from "./components/PageTracker.jsx";
 import { Navigate } from "react-router-dom";
 import CookiesConsent from "./components/CookiesConsent.jsx";
 import AgentList from "./components/AgentList.jsx";
-import ChatBotModal from './components/Chatbot/ChatBotModal.jsx';
+import ChatBotModal from "./components/Chatbot/ChatBotModal.jsx";
 const App = () => {
   return (
     <HelmetProvider>
       <BrowserRouter>
         <PageTracker />
-        <CookiesConsent /> {/* Cookie consent component */}
+        <CookiesConsent /> {/* Cookie consent component f*/}
         <ScrollToTop /> {/* Ensures scrolling to top on route change */}
         <Routes>
           <Route
@@ -59,10 +59,10 @@ const App = () => {
             path="/self-drive-car-rentals"
             element={<Navigate to="/" replace />}
           />
-          <Route 
-            path="/self-drive-car-rentals/:city" 
-            element={<HomeScreen title="City - Zymo Car Rentals" />} 
-           />
+          <Route
+            path="/self-drive-car-rentals/:city"
+            element={<HomeScreen title="City - Zymo Car Rentals" />}
+          />
           <Route
             path="/self-drive-car-rentals/:city/cars"
             element={<Listing title="Available Cars - Zymo" />}
@@ -198,7 +198,7 @@ const App = () => {
             path="/agent-list"
             element={<AgentList title="Agent List - Zymo" />}
           />
-           <Route path="/ZymoAI" element={<ChatBotModal />}/> 
+          <Route path="/ZymoAI" element={<ChatBotModal />} />
           <Route
             path="*"
             element={<ErrorPage title="404 - Page Not Found" />}
