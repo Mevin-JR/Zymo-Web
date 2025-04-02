@@ -10,10 +10,10 @@ const ErrorPage = ({ title }) => {
     <>
     <Helmet>
     <title>{title}</title>
-    <meta name="description" content="Oops! The page you are looking for does not exist." />
+    <meta name="description" content="Oops! The page you're looking for doesn't exist. Visit Zymo's homepage to explore our car rental services and amazing offers." />
     <link rel="canonical" href="https://zymo.app/404" />
     <meta property="og:title" content={title} />
-                <meta property="og:description" content="Oops! The page you're trying to access isn't available." />
+                <meta property="og:description" content="Oops! The page you're looking for doesn't exist. Visit Zymo's homepage to explore our car rental services and amazing offers." />
 </Helmet>
     <div style={{ 
       display: 'flex', 

@@ -16,10 +16,10 @@ const TermsofService = ({ title }) => {
         <>
            <Helmet>
                 <title>{title}</title>
-                <meta name="description" content="Understand the terms and conditions of using Zymo services." />
+                <meta name="description" content="Read Zymo's terms and conditions to understand our rental policies, user responsibilities, and service guidelines." />
                 <link rel="canonical" href="https://zymo.app/terms-of-service" />
                 <meta property="og:title" content={title} />
-                <meta property="og:description" content="Read Zymo's terms of service to stay informed about our policies." />
+                <meta property="og:description" content="Read Zymo's terms and conditions to understand our rental policies, user responsibilities, and service guidelines." />
             </Helmet>
             <NavBar />
             <button
