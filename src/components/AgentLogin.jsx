@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IoClose } from "react-icons/io5";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { appDB } from "../utils/firebase";
 import { query, collection, where, getDocs } from "firebase/firestore";
@@ -68,6 +68,8 @@ export default function AgentLogin({ onClose }) {
   };
 
   return (
+    <>
+    
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#212121] bg-opacity-50 backdrop-blur-sm z-50"
       onClick={onClose}
@@ -78,7 +80,7 @@ export default function AgentLogin({ onClose }) {
       >
         <button
           className="absolute top-3 right-3 text-white hover:text-gray-300 transition-all duration-300 transform hover:rotate-180"
-          onClick={onClose}
+          onClick={() => navigate("/")}
         >
           <IoClose size={24} />
         </button>
@@ -139,5 +141,6 @@ export default function AgentLogin({ onClose }) {
         </form>
       </div>
     </div>
+    </>
   );
 }
