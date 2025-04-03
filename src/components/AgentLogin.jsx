@@ -85,9 +85,9 @@ export default function AgentLogin({ onClose }) {
           <IoClose size={24} />
         </button>
 
-        <h2 className="text-3xl font-bold mb-6 text-center tracking-wide uppercase text-[#edff8d] animate-pulse">
+        <h1 className="text-3xl font-bold mb-6 text-center tracking-wide uppercase text-[#edff8d] animate-pulse">
           Agent Login
-        </h2>
+        </h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="relative">
