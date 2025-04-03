@@ -36,7 +36,7 @@ const ErrorPage = ({ title }) => {
             alt="error"
             className="w-[300px] md:w-[400px] lg:w-[500px] max-w-full"
           />
-          <p className="text-2xl md:text-3xl font-bold mt-4">404 - Page Not Found</p>
+          <h1 className="text-2xl md:text-3xl font-bold mt-4">404 - Page Not Found</h1>
         </div>
       </div>
 

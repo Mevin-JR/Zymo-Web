@@ -35,8 +35,8 @@ const ContactUs = ({ title }) => {
       </button>
       <div className="flex justify-center items-center min-h-screen bg-[darkGrey2] text-white p-6">
         <div className="max-w-4xl  bg-[#303030] rounded-lg shadow-lg p-8 px-9 ">
-          <div className="font-bold text-lg mb-2 text-[#faffa4] text-center">
-            Contact Us
+          <div className="font-bold text-xl mb-2 text-[#faffa4] text-center">
+           <h1> Contact Us</h1> 
           </div>
           <br />
           <div className="max-w-lg text-center">
