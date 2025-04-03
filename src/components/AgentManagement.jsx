@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState} from 'react';
+import { Helmet } from "react-helmet-async";
 import { appDB } from '../utils/firebase';
 import { collection, getDocs, query, updateDoc, doc } from 'firebase/firestore';
 import { FiArrowLeft, FiCopy, FiCheck, FiUsers, FiFileText } from 'react-icons/fi';
 
-const AgentBookingList = () => {
+const AgentBookingList = ({title}) => {
   const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,6 +40,9 @@ const AgentBookingList = () => {
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1000);
   };
+    useEffect(() => {
+        document.title = title;
+      }, [title]);
 
   // Fetch and sort bookings from Firestore
   useEffect(() => {
@@ -210,6 +214,21 @@ const AgentBookingList = () => {
   };
 
   return (
+    <>
+    <Helmet>
+    <title>Agent Management - Zymo</title>
+    <meta
+        name="description"
+        content="Manage Zymo agent bookings, track customer rentals, and oversee agent operations efficiently."
+    />
+    <meta property="og:title" content="Agent Management - Zymo" />
+    <meta
+        property="og:description"
+        content="Access the Zymo agent dashboard to manage bookings, track rentals, and optimize operations."
+    />
+    <link rel="canonical" href="https://zymo.app/agent-info" />
+</Helmet>
+
     <div className="flex min-h-screen p-8" style={{ backgroundColor: colorScheme.darkGrey }}>
       <nav className="w-30 space-y-4 mr-8">
         <Link
@@ -687,6 +706,7 @@ const AgentBookingList = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

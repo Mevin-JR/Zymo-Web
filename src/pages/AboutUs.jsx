@@ -15,9 +15,9 @@ const AboutUs = ({ title }) => {
         <>
          <Helmet>
                 <title>{title}</title>
-                <meta name="description" content="Learn more about Zymo, our mission, and how we make car renting and buying seamless for you." />
+                <meta name="description" content="Learn about Zymo’s mission to simplify car rentals with reliable, affordable, and convenient self-drive options." />
                 <meta property="og:title" content={title} />
-        <meta property="og:description" content="Discover how Zymo is transforming the self-drive car rental experience." />
+        <meta property="og:description" content="Learn about Zymo’s mission to simplify car rentals with reliable, affordable, and convenient self-drive options." />
                 <link rel="canonical" href="https://zymo.app/about-us" />
             </Helmet>
             <NavBar />

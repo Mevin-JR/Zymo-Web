@@ -586,7 +586,7 @@ function BookingPage({ title }) {
         amount: orderData.amount,
         currency: "INR",
         name: "Zymo",
-        description: "Zymo Car Rental",
+        description: "Zymo is India's largest aggregator for self-drive car rentals.",
         image: "/images/AppLogo/Zymo_Logo_payment.png",
         order_id: orderData.id,
         handler: async function (response) {

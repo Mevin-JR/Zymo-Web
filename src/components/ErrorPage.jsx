@@ -39,8 +39,6 @@ const ErrorPage = ({ title }) => {
           <h1 className="text-2xl md:text-3xl font-bold mt-4">404 - Page Not Found</h1>
         </div>
       </div>
-
-
     </>
   );
 };
