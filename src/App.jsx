@@ -59,10 +59,10 @@ const App = () => {
             path="/self-drive-car-rentals"
             element={<Navigate to="/" replace />}
           />
-          <Route
-            path="/self-drive-car-rentals/:city"
-            element={<HomeScreen title="City - Zymo Car Rentals" />}
-          />
+          <Route 
+            path="/self-drive-car-rentals/:city" 
+            element={<Navigate to="/" replace />}
+           />
           <Route
             path="/self-drive-car-rentals/:city/cars"
             element={<Listing title="Available Cars - Zymo" />}
@@ -147,7 +147,7 @@ const App = () => {
           />
           <Route
             path="/blogs"
-            element={<BlogsMainPage title="Blogs - Zymo" />}
+            element={<BlogsMainPage title="Car Rental Tips & Travel Guides | Zymo Blogs" />}
           />
           <Route
             path="/blogs/:id/:title"
@@ -177,7 +177,7 @@ const App = () => {
             path="/my-bookings"
             element={<MyBookings title="My Bookings - Zymo" />}
           />
-          <Route path="/profile" element={<Profile title="Profile - Zymo" />} />
+          <Route path="/profile" element={<Profile title="Manage Your Bookings" />} />
           <Route
             path="/your-details"
             element={<YourDetails title="Your Details - Zymo" />}

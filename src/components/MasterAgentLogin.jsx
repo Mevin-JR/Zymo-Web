@@ -3,6 +3,8 @@ import { appDB } from '../utils/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import bcrypt from 'bcryptjs';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from "react-helmet-async";
+
 import { 
   KeyRound, 
   UserPlus, 
@@ -13,7 +15,7 @@ import {
   CheckCircle 
 } from 'lucide-react';
 
-const MasterAgentLogin = () => {
+const MasterAgentLogin = ({title}) => {
   const colorScheme = {
     appColor: "#edff8d", // Light yellow
     darkGrey: "#212121", // Dark background
@@ -28,6 +30,9 @@ const MasterAgentLogin = () => {
   const [createdAgents, setCreatedAgents] = useState([]); // Track newly created agents
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+     useEffect(() => {
+        document.title = title;
+      }, [title]);
 
   const handleMasterLogin = (e) => {
     e.preventDefault();
@@ -63,6 +68,21 @@ const MasterAgentLogin = () => {
   };
 
   return (
+    <>
+    <Helmet>
+    <title>Master Agent Login - Zymo</title>
+    <meta
+        name="description"
+        content="Log in as a Master Agent to oversee and manage Zymo's agent network, bookings, and operations."
+    />
+    <meta property="og:title" content="Master Agent Login - Zymo" />
+    <meta
+        property="og:description"
+        content="Secure access for Zymo Master Agents to manage agents, bookings, and platform settings."
+    />
+    <link rel="canonical" href="https://zymo.app/master-agent" />
+</Helmet>
+
     <div 
       className="flex items-center justify-center min-h-screen p-4"
       style={{ 
@@ -262,6 +282,7 @@ const MasterAgentLogin = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

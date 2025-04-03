@@ -49,9 +49,9 @@ const BlogsMainPage = ({ title }) => {
         <>
            <Helmet>
            <title>{title}</title>
-                <meta name="description" content="Read the latest blogs on car rentals, driving tips, and vehicle trends at Zymo." />
+                <meta name="description" content="Stay updated with Zymo’s latest blogs on car rentals, driving tips, industry trends, and expert travel insights." />
                 <meta property="og:title" content={title} />
-        <meta property="og:description" content="Stay updated with Zymo's latest blogs on travel, car rentals, and industry trends." />
+        <meta property="og:description" content="Stay updated with Zymo’s latest blogs on car rentals, driving tips, industry trends, and expert travel insights." />
                 <link rel="canonical" href="https://zymo.app/blogs" />
             </Helmet>
             <NavBar />

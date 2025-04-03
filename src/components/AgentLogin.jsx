@@ -1,17 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { appDB } from "../utils/firebase";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import bcrypt from "bcryptjs";
+import { Helmet } from "react-helmet-async";
 
-export default function AgentLogin({ onClose }) {
+export default function AgentLogin({ onClose ,title}) {
   const colorScheme = {
     appColor: "#edff8d", // Light yellow
     darkGrey: "#212121", // Dark background
     darkGrey2: "#424242", // Modal and table background
   };
+   useEffect(() => {
+      document.title = title;
+    }, [title]);
 
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -68,6 +72,21 @@ export default function AgentLogin({ onClose }) {
   };
 
   return (
+    <>
+    <Helmet>
+    <title>{title}</title>
+    <meta
+        name="description"
+        content="Securely log in to your Zymo agent account to manage bookings, view customer details, and access agent-specific tools."
+    />
+    <meta property="og:title" content={title} />
+    <meta
+        property="og:description"
+        content="Sign in to your Zymo agent dashboard to handle bookings, track rentals, and manage your account seamlessly."
+    />
+    <link rel="canonical" href="https://zymo.app/agent-login" />
+</Helmet>
+
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#212121] bg-opacity-50 backdrop-blur-sm z-50"
       onClick={onClose}
@@ -139,5 +158,7 @@ export default function AgentLogin({ onClose }) {
         </form>
       </div>
     </div>
+    </>
   );
+
 }

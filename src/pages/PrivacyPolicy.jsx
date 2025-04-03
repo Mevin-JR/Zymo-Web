@@ -15,9 +15,9 @@ const PrivacyPolicy = ({ title }) => {
         <>
             <Helmet>
                 <title>{title}</title>
-                <meta name="description" content="Read our privacy policy to understand how we handle your data at Zymo." />
+                <meta name="description" content=" Learn how Zymo collects, stores, and protects your personal data while ensuring a secure rental experience." />
                 <meta property="og:title" content={title} />
-                <meta property="og:description" content="Learn about Zymo's data protection and privacy measures." />
+                <meta property="og:description" content=" Learn how Zymo collects, stores, and protects your personal data while ensuring a secure rental experience." />
                 <link rel="canonical" href="https://zymo.app/privacy-policy" />
             </Helmet>
             <NavBar />

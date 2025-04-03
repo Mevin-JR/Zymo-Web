@@ -17,12 +17,12 @@ const ContactUs = ({ title }) => {
         <title>{title}</title>
         <meta
           name="description"
-          content="Get in touch with Zymo for inquiries, support, or business partnerships. We're here to help!"
+          content="Have questions? Contact Zymo for  inquiries, support, or business partnerships. We’re here to help!"
         />
         <meta property="og:title" content={title} />
         <meta
           property="og:description"
-          content="Contact Zymo for assistance with your bookings, customer support, or business collaborations."
+          content="Have questions? Contact Zymo for  inquiries, support, or business partnerships. We’re here to help!"
         />
         <link rel="canonical" href="https://zymo.app/contact-us" />
       </Helmet>

@@ -15,10 +15,10 @@ const CancellationPolicy = ({ title }) => {
         <>
          <Helmet>
                 <title>{title}</title>
-                <meta name="description" content="Check our cancellation and refund policies at Zymo." />
+                <meta name="description" content="Check Zymo’s cancellation and refund policies to understand how to modify or cancel bookings with ease." />
                 <link rel="canonical" href="https://zymo.app/cancellation-policy" />
                 <meta property="og:title" content={title} />
-                <meta property="og:description" content="Read about Zymo's cancellation and refund policy for a hassle-free experience." />
+                <meta property="og:description" content="Check Zymo’s cancellation and refund policies to understand how to modify or cancel bookings with ease." />
             </Helmet>
             <NavBar />
             <button

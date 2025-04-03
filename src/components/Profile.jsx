@@ -73,13 +73,13 @@ const Profile = ({ title }) => {
         <title>{title}</title>
         <meta
           name="description"
-          content="Manage your profile, personal details, and settings at Zymo."
+          content="Access your Zymo account, update personal details, manage bookings, and enjoy a seamless car rental experience."
         />
         <link rel="canonical" href="https://zymo.app/profile" />
         <meta property="og:title" content={title} />
         <meta
           property="og:description"
-          content="Manage your profile, personal details, and settings at Zymo."
+          content="Access your Zymo account, update personal details, manage bookings, and enjoy a seamless car rental experience."
         />
       </Helmet>
       <NavBar />
