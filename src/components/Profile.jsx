@@ -97,7 +97,7 @@ const Profile = ({ title }) => {
 
       <div className="min-h-screen bg-[#212121] p-4">
         <div className="max-w-md mx-auto bg-[#424242] shadow-lg rounded-lg p-4">
-          <h2 className="text-xl font-semibold mb-4 text-white">Profile</h2>
+          <h1 className="text-xl font-semibold mb-4 text-white">Profile</h1>
 
           {authUser || user ? (
             <>

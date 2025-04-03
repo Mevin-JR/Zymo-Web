@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import { Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { appDB } from "../utils/firebase";
 import { query, collection, where, getDocs } from "firebase/firestore";
@@ -72,21 +72,7 @@ export default function AgentLogin({ onClose ,title}) {
   };
 
   return (
-    <>
-    <Helmet>
-    <title>{title}</title>
-    <meta
-        name="description"
-        content="Securely log in to your Zymo agent account to manage bookings, view customer details, and access agent-specific tools."
-    />
-    <meta property="og:title" content={title} />
-    <meta
-        property="og:description"
-        content="Sign in to your Zymo agent dashboard to handle bookings, track rentals, and manage your account seamlessly."
-    />
-    <link rel="canonical" href="https://zymo.app/agent-login" />
-</Helmet>
-
+    <>    
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#212121] bg-opacity-50 backdrop-blur-sm z-50"
       onClick={onClose}
@@ -97,14 +83,14 @@ export default function AgentLogin({ onClose ,title}) {
       >
         <button
           className="absolute top-3 right-3 text-white hover:text-gray-300 transition-all duration-300 transform hover:rotate-180"
-          onClick={onClose}
+          onClick={() => navigate("/")}
         >
           <IoClose size={24} />
         </button>
 
-        <h2 className="text-3xl font-bold mb-6 text-center tracking-wide uppercase text-[#edff8d] animate-pulse">
+        <h1 className="text-3xl font-bold mb-6 text-center tracking-wide uppercase text-[#edff8d] animate-pulse">
           Agent Login
-        </h2>
+        </h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="relative">

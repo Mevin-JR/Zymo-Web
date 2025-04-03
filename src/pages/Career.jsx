@@ -6,6 +6,7 @@ import NavBar from "../components/NavBar";
 import Footer from "../components/Footer";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const CareerForm = ({ title }) => {
     const [selectedType, setSelectedType] = useState("Internship");
@@ -170,6 +171,7 @@ const CareerForm = ({ title }) => {
                 onClick={() => navigate("/")}
                 className="text-white m-5 cursor-pointer"
             >
+                <ArrowLeft className="w-6 h-6" />
             </button>
             <div className="flex flex-col items-center justify-center min-h-screen bg-[darkGrey2] text-white relative">
                 {hasSubmitted ? (
