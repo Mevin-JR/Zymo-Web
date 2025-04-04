@@ -16,32 +16,48 @@ import useTrackEvent from "../hooks/useTrackEvent";
 import ChatBot from "../components/Chatbot/ChatBot";
 import { useParams } from "react-router-dom";
 import ChatBotButton from "../components/Chatbot/ChatBotButton";
-const HomeScreen = ({ title }) => {
+const HomeScreen = ({ title ,canonical}) => {
 
   const {city} =useParams();
+  console.log(city);
+
+  const capitalizedCity =
+    city?.charAt(0).toUpperCase() + city?.slice(1).toLowerCase();
+
+  const pageTitle = city
+    ? `${capitalizedCity} Car Rentals | Zymo`
+    : title || "Zymo Car Rentals";
+
+  const pageDescription = city
+    ? `Rent affordable self-drive cars in ${capitalizedCity}. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals.`
+    : "Rent self-drive cars easily with Zymo. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals.";
+
+    const canonicalLink = canonical
+    ? `https://zymo.app${canonical}`
+    : city
+    ? `https://zymo.app/self-drive-car-rentals/${city.toLowerCase()}`
+    : "https://zymo.app/";
+
+  useEffect(() => {
+    document.title = pageTitle;
+  }, [pageTitle]);
+  
   const trackEvent = useTrackEvent();
   const handleWhatsappClicks = (label) => {
     trackEvent("Whatsapp Icon", "Icon Clicks", label);
   };
 
-  useEffect(() => {
-    document.title = title;
-  }, [title]);
+ 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-        <meta
-          name="description"
-          content=" Rent self-drive cars easily with Zymo. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals."
-        />
-        <meta property="og:title" content={title} />
-        <meta
-          property="og:description"
-          content=" Rent self-drive cars easily with Zymo. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals."
-        />
-        <link rel="canonical" href={`https://zymo.app/self-drive-car-rentals/${city}`} />
-        </Helmet>
+     <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <link rel="canonical" href={canonicalLink} />
+      </Helmet>
+
       <NavBar />
       <div className="container flex flex-col w-full mx-auto">
         <div className="container">
@@ -70,7 +86,8 @@ const HomeScreen = ({ title }) => {
         <div>
                     <ChatBotButton />
                 </div> 
-      </div>
+        </div>
+    
       <Footer />
     </>
   );
