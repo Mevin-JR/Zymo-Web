@@ -1,12 +1,18 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 
 const BlogCard = ({ blog }) => {
-  let urlTitle = blog.title.replace(/[^a-zA-Z0-9\s]/g, "").replace(/\s+/g, "-");
+  // Slug
+  let urlTitle = blog.title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .split(/\s+/)
+    .slice(0, 7)
+    .join("-");
 
   const goToBlog = () => {
     localStorage.setItem("selectedBlogTitle", blog.title);
-    window.open(`/blogs/${blog.id}/${urlTitle}`, "_blank");
+    window.open(`/blogs/${urlTitle}/${blog.id}`, "_blank");
   };
 
   return (

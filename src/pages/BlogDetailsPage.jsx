@@ -15,7 +15,7 @@ const BlogDetailPage = () => {
   });
 
   const navigate = useNavigate();
-  const { id, title } = useParams();
+  const { title, id } = useParams();
 
   useEffect(() => {
     console.log("Selected blog title:", title);
