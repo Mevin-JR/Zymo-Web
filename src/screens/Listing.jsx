@@ -423,7 +423,7 @@ const Listing = ({ title }) => {
 
         setCarList(allCarData);
         setClubbedCarList(groupCarList);
-        setCarCount(allCarData.length);
+        setCarCount(groupCarList.reduce((count, group) => count + group.cars.length, 0));
         setLoading(false);
 
         localStorage.setItem("carList", JSON.stringify(allCarData));
@@ -695,219 +695,208 @@ const Listing = ({ title }) => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 w-full max-w-5xl items-start">
-            {filteredList.map((car) => {
-              const uniqueKey = `${car.name}-${car.brand}`;
-              return (
-              <div
-                key={uniqueKey}
-                className="bg-[#404040] p-0 rounded-lg shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-[2%] mb-5"
-              >
-
-                {/* Small Screens Layout */}
-                <div className="block md:hidden p-3">
-                  <img
-                    loading="lazy"
-                    src={car.cars[0].images[0]}
-                    alt={car.name}
-                    className="w-full h-40 object-cover bg-[#353535] rounded-lg  p-1"
-                  />
-                  <div className="mt-3 flex justify-between items-start">
-                    <div>
-                      <h3 className="text-md font-semibold">
-                        {car.cars[0].source === "zoomcar"
-                          ? car.brand.split(" ")[0]
-                          : car.brand}{" "}
-                        {car.cars[0].source === "zoomcar"
-                          ? car.name.split(" ")[0]
-                          : car.name}
-                      </h3>
-                      <p className="text-md text-gray-400">{car.cars[0].options[2]}</p>
-                      <div className="img-container">
-                        <img
-                          loading="lazy"
-                          src={car.cars[0].sourceImg}
-                          alt={car.cars[0].source}
-                          className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
-                        />
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-md text-gray-400">Starts at</p>
-                      <p className="font-semibold text-md">{car.fare}</p>
-                      <p className="text-[10px] text-gray-400">
-                        {car.cars[0].source === "zoomcar"
-                          ? "(GST incl)"
-                          : "(GST not incl)"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center mt-3">
-                    <p className="text-md text-[#faffa4]">{car.cars[0].location_est}</p>
-                    <button
-                      style={{ backgroundColor: "#faffa4", padding: "3px 5px" }} 
-                      onClick={() => toggleDeals(`${car.name}-${car.brand}`)}
-                      className="bg-[#faffa4] flex items-center rounded-lg text-black text-xs lg:text-base font-semibold h-8 w-[calc(30%-0.25rem)] sm:w-[140px]" 
-                    >
-                      {expandedStates[`${car.name}-${car.brand}`] ? (
-                        <>
-                          <span className="ml-4">Hide</span>
-                          <ChevronUp className="text-black w-4 h-4"/>
-                        </>
-                      ) : (
-                        <>
-                          <span>View Deals</span>
-                          <ChevronDown className="text-black w-4 h-4"/>
-                        </>
-                      )}
-                    </button>
-                    {/* <p className="text-xs text-gray-400 mt-0 mb-0">{car.cars.length} deals</p> */}
-                  </div>
-                </div>
-
-                {/* Medium and Larger Screens Layout */}
-                <div className="hidden md:flex items-center  px-4 rounded-xl shadow-xl w-full h-44">
-                  <div className="flex items-stretch justify-between w-full  ">
-                    {/* Left Side Info */}
-                    <div className="flex flex-col text-white w-1/4 justify-between ">
-                      <div className="self-auto">
-                        <h3 className="text-lg font-semibold mb-1">
-                          {car.brand} {car.name}
-                        </h3>
-                      </div>
-                      <div className="img-container">
-                        <img
-                          loading="lazy"
-                          src={car.cars[0].sourceImg}
-                          alt={car.cars[0].source}
-                          className="h-5 rounded-sm mt-2 bg-white p-1 text-black"
-                        />
-                      </div>
-                      <div className="self-auto ">
-                        <p className="text-left text-xs text-gray-400 mb-1">
-                          {car.cars[0].options[2]}
-                        </p>
-                        <p className="text-xs text-[#faffa4]">
-                          {car.cars[0].location_est}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Middle Car Image */}
-                    <div className="w-2/4 flex justify-center items-center ">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4 w-full max-w-5xl items-start">
+              {filteredList.map((car) => {
+                const uniqueKey = `${car.name}-${car.brand}`;
+                return (
+                  <div
+                    key={uniqueKey}
+                    className="bg-[#404040] p-0 rounded-lg shadow-lg cursor-pointer transition-transform duration-300 hover:-translate-y-[2%] mb-5"
+                  >
+                    {/* Small Screens Layout */}
+                    <div className="block md:hidden p-3">
                       <img
                         loading="lazy"
                         src={car.cars[0].images[0]}
-                        alt={car.cars[0].name}
-                        className="w-48 h-32 object-contain bg-[#353535] rounded-md p-1"
+                        alt={car.name}
+                        className="w-full h-45 object-cover bg-[#353535] rounded-lg p-1"
                       />
-                    </div>
-
-                    {/* Right Side Info */}
-                    <div className="flex flex-col justify-between space-y-2 text-right w-1/4 border-l border-gray-400">
-                      <div className="pr-2">
-                        <p className="text-xs text-gray-400">Starts at</p>
-                        <p className="text-lg font-semibold text-white">
-                          {car.fare}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {car.cars[0].source === "zoomcar"
-                            ? "(GST incl)"
-                            : "(GST not incl)"}
-                        </p>
-                      </div>
-
-                      <button
-                        style={{ backgroundColor: "#faffa4" }}
-                        className="bg-[#faffa4] flex items-center pl-2 rounded-lg text-black text-xs font-semibold h-8 w-[calc(30%-0.25rem)] sm:w-[90px] ml-7"
-                        onClick={() => {
-                          toggleDeals(`${car.name}-${car.brand}`);
-                        }}
-                      >
-                        {expandedStates[`${car.name}-${car.brand}`] ? (
-                          <>
-                            <span className="ml-3">Hide</span>
-                            <ChevronUp className="text-black w-4 h-4" />
-                          </>
-                        ) : (
-                          <>
-                            <span >View Deals</span>
-                            <ChevronDown className="text-black w-4 h-4" />
-                          </>
-                        )}
-                      </button>
-                      <p className="text-xs text-[#eeff87] mt-0 mb-0">{car.cars.length} deals</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Deals Card (Dynamic height with Framer Motion) */}
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: expandedStates[uniqueKey] ? 'auto' : 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="bg-[#353535] rounded-b-lg shadow-md overflow-hidden"
-                >
-                  <div className="p-4">
-                    {car.cars.map((individualCar) => (
-                      <div
-                        key={individualCar.id}
-                        className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0"
-                      >
-                        <div className="text-left">
+                      <div className="mt-3 flex justify-between items-start">
+                        <div>
+                          <h3 className="text-md font-semibold">
+                            {car.cars[0].source === "zoomcar"
+                              ? car.brand.split(" ")[0]
+                              : car.brand}{" "}
+                            {car.cars[0].source === "zoomcar"
+                              ? car.name.split(" ")[0]
+                              : car.name}
+                          </h3>
+                          <p className="text-sm text-gray-400">{car.cars[0].options[2]}</p>
                           <div className="img-container">
                             <img
                               loading="lazy"
-                              src={individualCar.sourceImg}
-                              alt={individualCar.source}
+                              src={car.cars[0].sourceImg}
+                              alt={car.cars[0].source}
                               className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
                             />
                           </div>
-                          <p className="text-xs text-[#eeff87] flex items-center gap-1">
-                            Rating: {renderStarRating(individualCar?.ratingData?.rating)}
-                          </p>
-                          <p className="text-xs text-[#eeff87] flex items-center gap-1">
-                            <Armchair className="w-3 h-3" />
-                            {individualCar?.options?.find(opt => opt.includes("Seats")) || "N/A"}
-                          </p>
-                          <p className="text-xs text-[#eeff87] flex items-center  gap-1">
-                            {individualCar?.location_est ? (
-                              <>
-                                <LocateFixed className="w-3 h-3" />
-                                {individualCar.location_est}
-                              </>
-                            ) : (
-                              ''
-                            )}
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-gray-400">Starts at</p>
+                          <p className="font-semibold text-md">{car.fare}</p>
+                          <p className="text-[10px] text-gray-400">
+                            {car.cars[0].source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
                           </p>
                         </div>
-                        <div className="text-center flex flex-col items-center gap-3">
-                          <p className="text-md sm:text-md font-semibold">{individualCar.fare}</p>
-                          <div className="flex items-center">
+                      </div>
+                      <div className="flex justify-between items-center mt-3">
+                        <p className="text-sm text-[#faffa4]">{car.cars[0].location_est}</p>
+                        <button
+                          style={{ backgroundColor: "#faffa4", padding: "3px 5px" }}
+                          onClick={() => toggleDeals(`${car.name}-${car.brand}`)}
+                          className="bg-[#faffa4] flex items-center rounded-lg text-black text-xs font-semibold h-8 w-[30%] sm:w-[120px]"
+                        >
+                          {expandedStates[`${car.name}-${car.brand}`] ? (
+                            <>
+                              <span className="ml-2">Hide</span>
+                              <ChevronUp className="text-black w-4 h-4" />
+                            </>
+                          ) : (
+                            <>
+                              <span>View Deals</span>
+                              <ChevronDown className="text-black w-4 h-4" />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Medium and Larger Screens Layout */}
+                    <div className="hidden md:flex items-center px-4 py-2 rounded-xl shadow-xl w-full h-52">
+                      <div className="flex items-stretch justify-between w-full">
+                        {/* Left Side Info */}
+                        <div className="flex flex-col text-white w-1/4 justify-between">
+                          <div>
+                            <h3 className="text-xl font-semibold mb-1">
+                              {car.brand} {car.name}
+                            </h3>
+                          </div>
+                          <div>
+                            <img
+                              loading="lazy"
+                              src={car.cars[0].sourceImg}
+                              alt={car.cars[0].source}
+                              className="h-5 rounded-sm bg-white p-1 text-black"
+                            />
+                            <p className="text-xs text-gray-400 ">{car.cars[0].options[2]}</p>
+                            <p className="text-xs text-[#faffa4]">{car.cars[0].location_est}</p>
+                          </div>
+                        </div>
+
+                        {/* Middle Car Image */}
+                        <div className="w-2/4 flex justify-center items-center">
+                          <img
+                            loading="lazy"
+                            src={car.cars[0].images[0]}
+                            alt={car.cars[0].name}
+                            className="w-full max-w-60 h-36 object-contain bg-[#353535] rounded-md p-1"
+                          />
+                        </div>
+
+                        {/* Right Side Info */}
+                        <div className="flex flex-col justify-between text-right w-1/4 border-l border-gray-400 pl-4">
+                          <div>
+                            <p className="text-xs text-gray-400">Starts at</p>
+                            <p className="text-xl font-semibold text-white">{car.fare}</p>
+                            <p className="text-xs text-gray-400">
+                              {car.cars[0].source === "zoomcar" ? "(GST incl)" : "(GST not incl)"}
+                            </p>
+                          </div>
+                          <div className="flex flex-col items-end">
                             <button
                               style={{ backgroundColor: "#faffa4" }}
-                              className="bg-[#faffa4] flex items-center px-4 py-1 rounded-lg text-black text-xs font-semibold h-8 w-[calc(95%-0.25rem)] sm:w-[calc(90%-0.25rem)] ml-2"
-                              onClick={() => {
-                                if (car.cars[0].source === "zoomcar") {
-                                  goToDetails(individualCar);
-                                } else if (activeTab === "subscribe") {
-                                  goToDetails(individualCar); 
-                                } else {
-                                  goToPackages(individualCar); 
-                                }
-                              }}                            >
-                              Select <ArrowRight className="w-4 h-4 text-black" />
+                              className="bg-[#faffa4] flex items-center justify-center rounded-lg text-black text-xs font-semibold h-8 w-[90px] mt-4"
+                              onClick={() => toggleDeals(`${car.name}-${car.brand}`)}
+                            >
+                              {expandedStates[`${car.name}-${car.brand}`] ? (
+                                <>
+                                  <span>Hide</span>
+                                  <ChevronUp className="text-black w-4 h-4" />
+                                </>
+                              ) : (
+                                <>
+                                  <span>View Deals</span>
+                                  <ChevronDown className="text-black w-4 h-4" />
+                                </>
+                              )}
                             </button>
+                            <p className="text-xs text-[#eeff87] mt-2">{car.cars.length} deals</p>
                           </div>
                         </div>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Deals Card */}
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: expandedStates[uniqueKey] ? 'auto' : 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="bg-[#353535] rounded-b-lg shadow-md overflow-hidden"
+                    >
+                      <div className="p-4">
+                        {car.cars.map((individualCar) => (
+                          <div
+                            key={individualCar.id}
+                            className="flex justify-between items-center py-2 border-b border-gray-700 last:border-b-0"
+                          >
+                            <div className="text-left">
+                              <div className="img-container">
+                                <img
+                                  loading="lazy"
+                                  src={individualCar.sourceImg}
+                                  alt={individualCar.source}
+                                  className="h-6 rounded-sm mt-2 bg-white p-1 text-black"
+                                />
+                              </div>
+                              <p className="text-xs text-[#eeff87] flex items-center gap-1">
+                                Rating: {renderStarRating(individualCar?.ratingData?.rating)}
+                              </p>
+                              <p className="text-xs text-[#eeff87] flex items-center gap-1">
+                                <Armchair className="w-3 h-3" />
+                                {individualCar?.options?.find(opt => opt.includes("Seats")) || "N/A"}
+                              </p>
+                              <p className="text-xs text-[#eeff87] flex items-center gap-1">
+                                {individualCar?.location_est ? (
+                                  <>
+                                    <LocateFixed className="w-3 h-3" />
+                                    {individualCar.location_est}
+                                  </>
+                                ) : (
+                                  ''
+                                )}
+                              </p>
+                            </div>
+                            <div className="text-center flex flex-col items-center gap-3">
+                              <p className="text-xl sm:text-md font-semibold ml-3">{individualCar.fare}</p>
+                              <div className="flex items-center">
+                                <button
+                                  style={{ backgroundColor: "#faffa4" }}
+                                  className="bg-[#faffa4] flex items-center px-4 py-1 rounded-lg text-black text-xs font-semibold h-8 w-[calc(95%-0.25rem)] sm:w-[calc(90%-0.25rem)] ml-2"
+                                  onClick={() => {
+                                    if (car.cars[0].source === "zoomcar") {
+                                      goToDetails(individualCar);
+                                    } else if (activeTab === "subscribe") {
+                                      goToDetails(individualCar);
+                                    } else {
+                                      goToPackages(individualCar);
+                                    }
+                                  }}
+                                >
+                                  Select <ArrowRight className="w-4 h-4 text-black" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+
+
                   </div>
-                </motion.div>
-              </div>
-            )})}
-          </div>
-        )}
+                );
+              })}
+            </div>        
+          )}
       </div>
     </>
   );
