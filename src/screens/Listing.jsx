@@ -543,11 +543,11 @@ const Listing = ({ title }) => {
           </div>
         </div>
 
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <h1 className="text-[#eeff87] text-3xl font-bold">
             Choose from {carCount} cars
           </h1>
-        </div>
+        </div> */}
 
         {/* Car Grid */}
         {loading ? (

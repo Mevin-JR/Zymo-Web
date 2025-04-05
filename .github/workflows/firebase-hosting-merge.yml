@@ -34,6 +34,7 @@ jobs:
           echo "VITE_WEBSITE_FIREBASE_APP_ID=${{ secrets.VITE_WEBSITE_FIREBASE_APP_ID }}" >> .env.production
           echo "VITE_WEBSITE_FIREBASE_MEASUREMENT_ID=${{ secrets.VITE_WEBSITE_FIREBASE_MEASUREMENT_ID }}" >> .env.production
           echo "VITE_GOOGLE_ANALYTICS_MEASUREMENT_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_MEASUREMENT_ID }}" >> .env.production
+          echo "VITE_GEMINI_API_KEY=${{ secrets.VITE_GEMINI_API_KEY }}" >> .env.production
 
       - name: Installing dependencies & building
         run: npm ci --legacy-peer-deps && npm run build
