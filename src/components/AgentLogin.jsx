@@ -73,6 +73,20 @@ export default function AgentLogin({ onClose ,title}) {
 
   return (
     <>    
+      <Helmet>
+     <title>{title}</title>
+     <meta
+         name="description"
+         content="Securely log in to your Zymo agent account to manage bookings, view customer details, and access agent-specific tools."
+     />
+     <meta property="og:title" content={title} />
+     <meta
+         property="og:description"
+         content="Sign in to your Zymo agent dashboard to handle bookings, track rentals, and manage your account seamlessly."
+     />
+     <link rel="canonical" href="https://zymo.app/agent-login" />
+ </Helmet>
+ 
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#212121] bg-opacity-50 backdrop-blur-sm z-50"
       onClick={onClose}
