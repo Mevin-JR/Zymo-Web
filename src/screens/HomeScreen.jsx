@@ -14,23 +14,23 @@ import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
 import { useParams } from "react-router-dom";
 import ChatBotButton from "../components/Chatbot/ChatBotButton";
+const HomeScreen = ({ title ,canonical}) => {
 
-const HomeScreen = ({ title, canonical }) => {
-  const { city } = useParams();
+  const {city} =useParams();
   console.log(city);
 
   const capitalizedCity =
     city?.charAt(0).toUpperCase() + city?.slice(1).toLowerCase();
 
   const pageTitle = city
-    ? ` Explore Self-Drive Car Rentals in ${capitalizedCity} | Zymo`
+    ? `${capitalizedCity} Car Rentals | Zymo`
     : title || "Zymo Car Rentals";
-   
+
   const pageDescription = city
     ? `Rent affordable self-drive cars in ${capitalizedCity}. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals.`
     : "Rent self-drive cars easily with Zymo. Compare prices, book in minutes, and enjoy affordable, hassle-free car rentals.";
 
-  const canonicalLink = canonical
+    const canonicalLink = canonical
     ? `https://zymo.app${canonical}`
     : city
     ? `https://zymo.app/self-drive-car-rentals/${city.toLowerCase()}`
@@ -39,15 +39,16 @@ const HomeScreen = ({ title, canonical }) => {
   useEffect(() => {
     document.title = pageTitle;
   }, [pageTitle]);
-
+  
   const trackEvent = useTrackEvent();
   const handleWhatsappClicks = (label) => {
     trackEvent("Whatsapp Icon", "Icon Clicks", label);
   };
 
+ 
   return (
     <>
-      <Helmet>
+     <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
         <meta property="og:title" content={pageTitle} />
@@ -81,10 +82,10 @@ const HomeScreen = ({ title, canonical }) => {
         </a>
 
         <div>
-          <ChatBotButton />
+                    <ChatBotButton />
+                </div> 
         </div>
-      </div>
-
+    
       <Footer />
     </>
   );
