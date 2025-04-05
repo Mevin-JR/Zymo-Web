@@ -1,6 +1,5 @@
 import NavBar from "../components/NavBar";
 import Header from "../components/homecomponent/Header";
-import RSB from "../components/homecomponent/RSB";
 import HeroImage from "../components/homecomponent/HeroImage";
 import Benefits from "../components/homecomponent/Benefits";
 import Reviews from "../components/homecomponent/Reviews";
@@ -13,7 +12,6 @@ import { Helmet } from "react-helmet-async";
 import NewRSB from "../components/NewRSB";
 import { useEffect } from "react";
 import useTrackEvent from "../hooks/useTrackEvent";
-import ChatBot from "../components/Chatbot/ChatBot";
 import { useParams } from "react-router-dom";
 import ChatBotButton from "../components/Chatbot/ChatBotButton";
 const HomeScreen = ({ title ,canonical}) => {
@@ -62,7 +60,7 @@ const HomeScreen = ({ title ,canonical}) => {
       <div className="container flex flex-col w-full mx-auto">
         <div className="container">
           <Header />
-          <NewRSB urlcity={city}/>
+          <NewRSB urlcity={city} />
           <HeroImage />
           {/* <RSB /> */}
           <Benefits />
@@ -71,6 +69,7 @@ const HomeScreen = ({ title ,canonical}) => {
           <Reviews />
           <Cities />
         </div>
+
         {/* WhatsApp Floating Button */}
         <a
           href="https://wa.me/919987933348"
@@ -82,7 +81,6 @@ const HomeScreen = ({ title ,canonical}) => {
           <FaWhatsapp className="text-3xl" />
         </a>
 
-        
         <div>
                     <ChatBotButton />
                 </div> 
